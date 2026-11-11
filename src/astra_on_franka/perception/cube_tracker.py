@@ -1,4 +1,4 @@
-"""Tag-1 center relative to tag 0; adapted from reset_policy AprilTagTracker.
+"""Configured cube-tag center relative to the configured world/reference tag.
 
 Input is an existing RGB frame, never a new camera connection. Output XY uses
 the unchanged board bounds; no robot-base or physical cube-center calibration

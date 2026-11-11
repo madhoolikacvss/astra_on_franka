@@ -171,6 +171,16 @@ summary. A newly received old buffered frame cannot be proven fresh solely
 from its receipt time; exposure-age estimation requires clock calibration.
 Calibration and freshness metadata do not constitute motion safety checks.
 
+Both camera and cube recorders save `camera_diagnostics.json` on normal exit,
+interruption and caught failures. It retains the last 16 frame-pair decisions per
+camera with previous accepted/current counters, timestamp domains and timestamps.
+Zero-counter pairs are discarded without replacing the last accepted frame or
+refreshing its freshness timer. A later valid advancing pair may resume capture;
+persistent zeros still cause startup timeout or runtime staleness. Nonzero
+counter regressions, backward timestamps and domain transitions remain errors
+with separate messages. This handles a possible transient zero reported in the
+lab's depth stream without assuming that a real camera reset is harmless.
+
 The implementation follows the [RealSense alignment example](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/examples/align-depth2color.py).
 
 ### RealSense GLIBC_2.32 import failure on Ubuntu 20.04
@@ -217,10 +227,10 @@ python scripts/observe_cube.py
 python scripts/observe_cube.py --samples 0 --hz 10 --preview
 ```
 
-Use q/Escape or Ctrl-C to stop; omit preview when headless. Both tag 0 (fixed
-reference) and tag 1 (cube) must be visible in the same frame. `config/cube.yaml`
+Use q/Escape or Ctrl-C to stop; omit preview when headless. Both tag 1 (fixed
+reference) and tag 0 (cube) must be visible in the same frame. `config/cube.yaml`
 preserves tag36h11, 50 mm tag size and the confirmed board bounds. The tracked
-point is tag 1's center, not an independently calibrated cube center.
+point is tag 0's center, not an independently calibrated cube center.
 
 The observer uses the active color profile's intrinsics rather than applying
 the legacy 1280x720 calibration to 640x480 images. Zero-distortion images need
@@ -247,6 +257,6 @@ raw relative XYZ in meters, normalized XY, relative matrix, yaw, quality values,
 and processing/age measurements. `completed` means the loop completed; check
 `detected_samples` to know whether cube tracking succeeded.
 
-Verify normalized XY at known board locations and cover tag 1 to confirm the
+Verify normalized XY at known board locations and cover tag 0 to confirm the
 position becomes unavailable. The reference-tag frame is not yet transformed
 into the arm's base frame. Original reset-policy files are unchanged.

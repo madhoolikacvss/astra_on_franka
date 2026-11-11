@@ -100,10 +100,10 @@ def main(argv=None):
     except Exception as exc:
         status, error, code = "failed", f"{type(exc).__name__}: {exc}", 1
         print(error, file=sys.stderr)
+    finally:
         if rig is not None:
             write_json(run / "camera_diagnostics.json", rig.diagnostics())
-            print(f"Camera diagnostics: {run / 'camera_diagnostics.json'}", file=sys.stderr)
-    finally:
+            print(f"Camera diagnostics: {run / 'camera_diagnostics.json'}")
         if cv2 is not None:
             cv2.destroyAllWindows()
         write_json(run / "summary.json", {"status": status, "valid_samples": count,

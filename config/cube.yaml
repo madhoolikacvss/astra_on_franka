@@ -2,8 +2,8 @@
 schema_version: 1
 camera: top_down
 family: tag36h11
-reference_tag_id: 0
-cube_tag_id: 1
+reference_tag_id: 1
+cube_tag_id: 0
 tag_size_m: 0.05
 board_bounds_m:
   x_min: -0.50

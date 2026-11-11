@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from collections import deque
+import copy
 import math
 import threading
 import time
@@ -46,6 +48,29 @@ def inventory() -> list[dict]:
     import pyrealsense2 as rs
     # Enumeration only: no pipeline starts or hardware resets.
     return [device_info(device, rs) for device in rs.context().query_devices()]
+
+
+def classify_frame_pair(previous, current):
+    """Drop unusable zero counters/repeats; never silently rebase real resets."""
+    if any(current[k]["frame_number"] == 0 for k in ("color", "depth")):
+        return "zero_counter"
+    for name in ("color", "depth"):
+        b = current[name]
+        if b["frame_number"] < 0 or not math.isfinite(b["timestamp_ms"]):
+            raise ValueError(f"{name}: invalid frame metadata")
+        if previous is not None:
+            a = previous[name]
+            if a["timestamp_domain"] != b["timestamp_domain"]:
+                raise RuntimeError(f"{name}: timestamp domain changed {a['timestamp_domain']} -> {b['timestamp_domain']}")
+            if b["frame_number"] < a["frame_number"]:
+                raise RuntimeError(f"{name}: frame counter moved backwards {a['frame_number']} -> {b['frame_number']}")
+            if b["timestamp_ms"] < a["timestamp_ms"]:
+                raise RuntimeError(f"{name}: timestamp moved backwards {a['timestamp_ms']} -> {b['timestamp_ms']}")
+    if previous is not None and any(
+            current[k]["frame_number"] == previous[k]["frame_number"]
+            or current[k]["timestamp_ms"] == previous[k]["timestamp_ms"] for k in ("color", "depth")):
+        return "repeat"
+    return "accept"
 
 
 class RealSenseSource:
@@ -139,7 +164,8 @@ class CameraRig:
         self.latest, self.errors, self.delivered = {}, {}, {}
         self.cleanup_errors = {}
         self.health = {name: {"phase": "not_started", "accepted_pairs": 0,
-                              "repeated_pairs": 0} for name in cameras}
+                              "repeated_pairs": 0, "zero_counter_pairs": 0} for name in cameras}
+        self.transitions = {name: deque(maxlen=16) for name in cameras}
         self.threads = []
 
     def _worker(self, name, serial):
@@ -161,21 +187,26 @@ class CameraRig:
                 with self.condition:
                     self.health[name]["last_read_duration_ms"] = (time.monotonic_ns() - read_started) / 1e6
                     self.health[name]["last_returned_streams"] = current
-                if previous is not None:
-                    for stream in ("color", "depth"):
-                        a, b = previous[stream], current[stream]
-                        if (a["timestamp_domain"] != b["timestamp_domain"]
-                                or b["frame_number"] < a["frame_number"]
-                                or b["timestamp_ms"] < a["timestamp_ms"]):
-                            raise RuntimeError(f"{stream} clock/domain or frame counter changed backwards")
-                    if any(current[k]["frame_number"] == previous[k]["frame_number"]
-                           or current[k]["timestamp_ms"] == previous[k]["timestamp_ms"]
-                           for k in ("color", "depth")):
-                        # A repeated frame must not refresh the host freshness clock.
-                        with self.condition:
-                            self.health[name]["repeated_pairs"] += 1
-                        self.stop.wait(0.001)
-                        continue
+                event = {"host_monotonic_ns": time.monotonic_ns(),
+                         "previous_accepted_streams": copy.deepcopy(previous),
+                         "current_streams": copy.deepcopy(current)}
+                try:
+                    decision = classify_frame_pair(previous, current)
+                    event["decision"] = decision
+                except Exception as exc:
+                    event.update({"decision": "fail", "error": str(exc)})
+                    with self.condition:
+                        self.transitions[name].append(event)
+                    raise
+                with self.condition:
+                    self.transitions[name].append(event)
+                if decision != "accept":
+                    # Keep the previous accepted pair and its receipt time.
+                    with self.condition:
+                        key = "zero_counter_pairs" if decision == "zero_counter" else "repeated_pairs"
+                        self.health[name][key] += 1
+                    self.stop.wait(0.001)
+                    continue
                 previous = current
                 sequence += 1
                 frame.update({"sequence": sequence, "serial": serial})
@@ -186,6 +217,8 @@ class CameraRig:
         except Exception as exc:
             with self.condition:
                 self.errors[name] = f"{type(exc).__name__}: {exc}"
+                self.health[name]["phase"] = "failed"
+                self.health[name]["failure_monotonic_ns"] = time.monotonic_ns()
                 self.condition.notify_all()
         finally:
             if source is not None:
@@ -246,6 +279,7 @@ class CameraRig:
                     "stale_after_s": self.settings.stale_after_s,
                     "errors": dict(self.errors),
                     "cameras": {name: {**self.health[name], "serial": serial,
+                        "recent_transitions": copy.deepcopy(list(self.transitions[name])),
                         "host_age_ms": ((now - self.latest[name]["host_received_monotonic_ns"]) / 1e6
                                         if name in self.latest else None),
                         "last_delivered_sequence": self.delivered.get(name),

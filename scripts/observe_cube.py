@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone tag-1 position observer. No arm/gripper or goal integration."""
+"""Standalone configured cube-tag observer. No arm/gripper or goal integration."""
 import argparse
 import json
 import math
@@ -35,7 +35,7 @@ def main(argv=None):
     write_json(run / "metadata.json", {"schema_version": 1, "cube_config": config,
         "camera_config": camera_config, "source_view": view, "python": sys.version,
         "calibration_source": "active RealSense color stream intrinsics, logged per sample",
-        "tracked_point": "tag 1 center, not a calibrated physical cube center",
+        "tracked_point": f"tag {config['cube_tag_id']} center, not a calibrated physical cube center",
         "normalization": "Unclipped (coordinate-min)/(max-min); reference tag axes",
         "angle_unit": "radians"})
     print(f"Recording cube positions to {run}", flush=True)
@@ -71,9 +71,9 @@ def main(argv=None):
     except Exception as exc:
         status, error, code = "failed", f"{type(exc).__name__}: {exc}", 1
         print(error, file=sys.stderr)
+    finally:
         if rig is not None:
             write_json(run / "camera_diagnostics.json", rig.diagnostics())
-    finally:
         if args.preview:
             cv2.destroyAllWindows()
         write_json(run / "summary.json", {"status": status, "samples": count,
