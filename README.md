@@ -37,6 +37,9 @@ first sample. All fields are saved for every sample. Outputs go into unique
 - `observations.jsonl`: measured joints/velocities, `O_T_EE`, `F_T_EE`, robot
   timestamp, host receipt timestamps, error state and mode.
 - `summary.json`: completion/interruption/failure and number of valid samples.
+- `rejected_sample.json` (transform-validation failures only): original matrices,
+  determinant, orthogonality error and singular values from the rejected snapshot.
+  Invalid samples are never written as valid observations or silently normalized.
 
 `O_T_EE` maps configured EE coordinates into the robot base frame. `F_T_EE`
 maps them into the flange frame. Matrices are stored as four rows with position
@@ -65,3 +68,27 @@ python -m unittest discover -s tests -v
 API references: [Franky Affine](https://timschneider42.github.io/franky/api/generated/franky.Affine.html),
 [RobotState](https://timschneider42.github.io/franky/api/generated/franky.RobotState.html),
 [Duration](https://timschneider42.github.io/franky/api/generated/franky.Duration.html).
+
+## Robot server version mismatch
+
+The lab robot reported FCI server protocol 6; the generic PyPI Franky 2.0.0
+wheel reported library protocol 10. An import or pip dry run does not verify
+FCI compatibility. Use the maintainer's server-6 wheel index exclusively, to
+avoid selecting the generic wheel again. Replace only Franky in reset:
+
+```bash
+conda activate reset
+python -m pip install --force-reinstall --no-deps --only-binary=:all: \
+  --index-url https://timschneider42.github.io/franky/whl/by-robot-server-version/6/ \
+  'franky-control==2.0.0'
+python -m pip show franky-control
+python scripts/record_observations.py
+```
+
+The version pin permits a 2.0.0 local build suffix identifying libfranka.
+No firmware or system libfranka change is requested. This repair still needs
+verification on the lab computer. If pip cannot find a matching wheel for
+Python 3.14/glibc 2.31, keep its full output; do not fall back to the generic
+index or change Python automatically.
+
+Source: [Franky installation instructions](https://timschneider42.github.io/franky/getting-started/installation.html).

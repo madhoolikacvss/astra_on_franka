@@ -108,6 +108,37 @@ class ObserverTests(unittest.TestCase):
                 if not broken:
                     self.assertEqual(json.loads(rows[0])["robot_time_ms"], 100)
 
+    def test_rejected_rotation_saved_without_normalizing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            robot = FakeRobot()
+            robot.snapshot.O_T_EE.matrix[0, 1] = -0.999
+            original = robot.snapshot.O_T_EE.matrix.copy()
+            with patch.object(recorder, "ArmObserver", side_effect=lambda host:
+                              ArmObserver(host, robot_factory=lambda _: robot)):
+                with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                    code = recorder.main(["--output-root", directory])
+            run = next(Path(directory).iterdir())
+            details = json.loads((run / "rejected_sample.json").read_text())
+            self.assertEqual(code, 1)
+            self.assertFalse(details["valid"])
+            self.assertEqual(details["O_T_EE"]["matrix"], original.tolist())
+            self.assertGreater(details["O_T_EE"]["rotation_orthogonality_max_abs_error"], 1e-5)
+            self.assertEqual(details["F_T_EE"]["rotation_determinant"], 1.0)
+            self.assertEqual(robot.reads, 1)
+            self.assertEqual((run / "observations.jsonl").read_text(), "")
+
+    def test_nonfinite_transform_diagnostics_are_json_safe(self):
+        from astra_on_franka.hardware.arm_observer import ObservationValidationError
+        robot = FakeRobot()
+        robot.snapshot.O_T_EE.matrix[0, 0] = np.nan
+        with ArmObserver("unused", robot_factory=lambda _: robot) as observer:
+            with self.assertRaises(ObservationValidationError) as caught:
+                observer.read()
+        diagnostics = caught.exception.diagnostics
+        json.dumps(diagnostics, allow_nan=False)
+        self.assertFalse(diagnostics["O_T_EE"]["all_finite"])
+        self.assertIsNone(diagnostics["O_T_EE"]["matrix"][0][0])
+
 
 if __name__ == "__main__":
     unittest.main()

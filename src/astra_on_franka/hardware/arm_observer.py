@@ -7,6 +7,35 @@ from typing import Any
 import numpy as np
 
 
+class ObservationValidationError(ValueError):
+    """Rejected sample with JSON-safe evidence; never a valid observation."""
+
+    def __init__(self, message: str, diagnostics: dict):
+        super().__init__(message)
+        self.diagnostics = diagnostics
+
+
+def transform_diagnostics(value: Any) -> dict:
+    matrix = np.asarray(value.matrix, dtype=np.float64)
+    result = {
+        "shape": list(matrix.shape),
+        "all_finite": bool(np.isfinite(matrix).all()),
+        "matrix": np.where(np.isfinite(matrix), matrix, None).tolist(),
+        "nonfinite_encoding": "Nonfinite elements are null; matrix is not repaired",
+        "rotation_atol": 1e-5,
+        "bottom_row_atol": 1e-6,
+    }
+    if matrix.shape == (4, 4) and np.isfinite(matrix).all():
+        rotation = matrix[:3, :3]
+        result.update({
+            "rotation_determinant": float(np.linalg.det(rotation)),
+            "rotation_orthogonality_max_abs_error": float(np.max(np.abs(rotation.T @ rotation - np.eye(3)))),
+            "rotation_singular_values": np.linalg.svd(rotation, compute_uv=False).tolist(),
+            "bottom_row_max_abs_error": float(np.max(np.abs(matrix[3] - [0, 0, 0, 1]))),
+        })
+    return result
+
+
 def finite_array(value: Any, shape: tuple[int, ...], name: str) -> np.ndarray:
     array = np.asarray(value, dtype=np.float64)
     if array.shape != shape or not np.isfinite(array).all():
@@ -22,7 +51,10 @@ def transform(value: Any, name: str) -> np.ndarray:
     rotation = matrix[:3, :3]
     if (not np.allclose(rotation.T @ rotation, np.eye(3), atol=1e-5, rtol=0)
             or not np.isclose(np.linalg.det(rotation), 1, atol=1e-5, rtol=0)):
-        raise ValueError(f"{name}: rotation is not a proper orthonormal matrix")
+        error = float(np.max(np.abs(rotation.T @ rotation - np.eye(3))))
+        determinant = float(np.linalg.det(rotation))
+        raise ValueError(f"{name}: rotation is not a proper orthonormal matrix "
+                         f"(max |R.T R - I|={error:.9g}, det(R)={determinant:.9g}, atol=1e-5)")
     return matrix
 
 
@@ -49,8 +81,22 @@ class ArmObserver:
         wall = time.time_ns()
         joints = finite_array(state.q, (7,), "q")
         velocities = finite_array(state.dq, (7,), "dq")
-        base_ee = transform(state.O_T_EE, "O_T_EE")
-        flange_ee = transform(state.F_T_EE, "F_T_EE")
+        try:
+            base_ee = transform(state.O_T_EE, "O_T_EE")
+            flange_ee = transform(state.F_T_EE, "F_T_EE")
+        except ValueError as exc:
+            raise ObservationValidationError(str(exc), {
+                "valid": False,
+                "reason": str(exc),
+                "host_read_start_monotonic_ns": start,
+                "host_read_end_monotonic_ns": end,
+                "host_received_unix_ns": wall,
+                "robot_time_ms": int(state.time.to_msec()),
+                "joint_positions_rad": joints.tolist(),
+                "joint_velocities_rad_s": velocities.tolist(),
+                "O_T_EE": transform_diagnostics(state.O_T_EE),
+                "F_T_EE": transform_diagnostics(state.F_T_EE),
+            }) from exc
         robot_ms = int(state.time.to_msec())
         if robot_ms < 0:
             raise ValueError("Negative robot timestamp")

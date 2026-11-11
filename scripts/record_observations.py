@@ -16,7 +16,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from astra_on_franka.hardware.arm_observer import ArmObserver
+from astra_on_franka.hardware.arm_observer import ArmObserver, ObservationValidationError
 
 
 def create_run(root: Path) -> Path:
@@ -90,6 +90,9 @@ def main(argv=None) -> int:
         status, code = "interrupted", 130
     except Exception as exc:
         status, error, code = "failed", f"{type(exc).__name__}: {exc}", 1
+        if isinstance(exc, ObservationValidationError):
+            write_json(run / "rejected_sample.json", exc.diagnostics)
+            print(f"Rejected transform diagnostics: {run / 'rejected_sample.json'}", file=sys.stderr)
         print(error, file=sys.stderr)
     finally:
         write_json(run / "summary.json", {

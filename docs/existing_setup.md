@@ -72,6 +72,7 @@ The user supplied this inventory; it has not been tested from this Windows works
 | PyYAML | `6.0.3`, installation confirmed |
 | Host architecture / glibc | `x86_64` / `2.31`; pip selected a compatible manylinux_2_28 Franky wheel |
 | Franka Desk system | `5.3.1`, build `81f87d2933` |
+| Observed FCI server protocol | `6` (connection handshake) |
 | System librealsense2, GL, udev rules, utils | `2.56.5-0~realsense.17053` |
 | System librealsense2-dkms | `1.3.27-0ubuntu1` |
 | System ros-noetic-libfranka | `0.9.2-1focal.20250426.004608` |
@@ -79,8 +80,18 @@ The user supplied this inventory; it has not been tested from this Windows works
 Python 3.14.7 was reported for the base interpreter, not for `reset`.
 System library package versions do not establish which libraries a Python
 binding uses. NumPy, OpenCV and dynamixel_sdk imports succeed in reset.
-The user installed the three previously missing bindings in reset. The new
-Franky import succeeds; a hardware state read from reset is not yet reported.
+The user installed the three previously missing bindings in reset. The generic
+Franky 2.0.0 import succeeds, but the hardware connection failed: server protocol
+6 versus wheel library protocol 10. Run `arm_20261111T210832_622899Z_d5894441`
+recorded zero valid samples. Python/OS wheel compatibility is distinct from
+FCI protocol compatibility. Replace only Franky with a server-6 build; preserve
+the robot firmware and reset interpreter. See README troubleshooting.
+Subsequent run `arm_20261111T211949_705136Z_c6460805` reports
+`franky-control==2.0.0+libfranka.0.12.1` and reaches state validation, resolving
+the handshake failure. Its O_T_EE rotation failed the 1e-5 validation tolerance.
+That run did not retain the matrix, so the cause is unconfirmed. The observer
+now retains both transforms and numerical metrics in `rejected_sample.json`
+on transform rejection; tolerance and original values are unchanged.
 The system ROS libfranka package does not identify the library bundled in Franky.
 
 ### Cartesian observation API

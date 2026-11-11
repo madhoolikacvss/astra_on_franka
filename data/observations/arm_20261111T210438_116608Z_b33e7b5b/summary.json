@@ -1,6 +1,0 @@
-{
-  "status": "failed",
-  "valid_samples": 0,
-  "error": "NetworkException: libfranka: Connection to FCI refused. Please install FCI feature or enable FCI mode in Desk.",
-  "ended_unix_ns": 1794431078163646825
-}
