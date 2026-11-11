@@ -19,13 +19,17 @@ class StreamSettings:
     fps: int = 30
     stale_after_s: float = 0.5
     frame_timeout_ms: int = 1000
+    startup_valid_pairs: int = 5
+    max_rgb_depth_skew_ms: float = 70.0
 
     def __post_init__(self):
         if any(type(x) is not int or x <= 0 for x in
-               (self.width, self.height, self.fps, self.frame_timeout_ms)):
+               (self.width, self.height, self.fps, self.frame_timeout_ms, self.startup_valid_pairs)):
             raise ValueError("Stream dimensions, fps and timeout must be positive integers")
         if not math.isfinite(self.stale_after_s) or self.stale_after_s <= 0:
             raise ValueError("stale_after_s must be finite and positive")
+        if not math.isfinite(self.max_rgb_depth_skew_ms) or self.max_rgb_depth_skew_ms <= 0:
+            raise ValueError("max_rgb_depth_skew_ms must be finite and positive")
 
 
 def intrinsics(profile) -> dict:
@@ -164,7 +168,9 @@ class CameraRig:
         self.latest, self.errors, self.delivered = {}, {}, {}
         self.cleanup_errors = {}
         self.health = {name: {"phase": "not_started", "accepted_pairs": 0,
-                              "repeated_pairs": 0, "zero_counter_pairs": 0} for name in cameras}
+                              "repeated_pairs": 0, "zero_counter_pairs": 0,
+                              "startup_resets": 0, "startup_streak": 0,
+                              "skew_rejected_pairs": 0} for name in cameras}
         self.transitions = {name: deque(maxlen=16) for name in cameras}
         self.threads = []
 
@@ -177,6 +183,7 @@ class CameraRig:
             source.start()
             previous = None
             sequence = 0
+            startup_streak = 0
             while not self.stop.is_set():
                 read_started = time.monotonic_ns()
                 with self.condition:
@@ -193,21 +200,50 @@ class CameraRig:
                 try:
                     decision = classify_frame_pair(previous, current)
                     event["decision"] = decision
-                except Exception as exc:
-                    event.update({"decision": "fail", "error": str(exc)})
+                except RuntimeError as exc:
+                    # The observed SDK counters can reset during startup.
+                    # Never publish until a fresh consecutive run is established.
+                    event.update({"decision": "startup_rebase" if sequence == 0 else "fail", "error": str(exc)})
                     with self.condition:
                         self.transitions[name].append(event)
+                        if sequence == 0:
+                            self.health[name]["startup_resets"] += 1
+                            self.health[name]["startup_streak"] = 0
+                    if sequence == 0:
+                        previous, startup_streak = None, 0
+                        continue
                     raise
+                color, depth = current["color"], current["depth"]
+                # Device timestamp subtraction is only valid within a common domain.
+                same_domain = color["timestamp_domain"] == depth["timestamp_domain"]
+                skew = abs(color["timestamp_ms"] - depth["timestamp_ms"]) if same_domain else None
+                frame["rgb_depth_timestamp_skew_ms"] = skew
+                if decision == "accept" and (skew is None or skew > self.settings.max_rgb_depth_skew_ms):
+                    decision = "rgb_depth_skew"
+                event.update({"decision": decision, "rgb_depth_timestamp_skew_ms": skew})
                 with self.condition:
                     self.transitions[name].append(event)
                 if decision != "accept":
                     # Keep the previous accepted pair and its receipt time.
                     with self.condition:
-                        key = "zero_counter_pairs" if decision == "zero_counter" else "repeated_pairs"
+                        key = {"zero_counter": "zero_counter_pairs", "repeat": "repeated_pairs",
+                               "rgb_depth_skew": "skew_rejected_pairs"}[decision]
                         self.health[name][key] += 1
+                        if sequence == 0:
+                            self.health[name]["startup_streak"] = 0
+                    if sequence == 0:
+                        previous, startup_streak = None, 0
                     self.stop.wait(0.001)
                     continue
                 previous = current
+                if sequence == 0:
+                    startup_streak += 1
+                    with self.condition:
+                        self.health[name]["phase"] = "warming_up"
+                        self.health[name]["startup_streak"] = startup_streak
+                        event["decision"] = "warmup" if startup_streak < self.settings.startup_valid_pairs else "accept"
+                    if startup_streak < self.settings.startup_valid_pairs:
+                        continue
                 sequence += 1
                 frame.update({"sequence": sequence, "serial": serial})
                 with self.condition:

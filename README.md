@@ -181,6 +181,14 @@ counter regressions, backward timestamps and domain transitions remain errors
 with separate messages. This handles a possible transient zero reported in the
 lab's depth stream without assuming that a real camera reset is harmless.
 
+Startup now requires `startup_valid_pairs: 5` consecutive advancing pairs before
+the first publication. Startup counter/domain transitions discard the pair and
+restart warm-up; after publication they still fail. The original 10-second
+startup deadline remains. Pairs with different timestamp domains or more than
+`max_rgb_depth_skew_ms: 70.0` separation are discarded without refreshing
+freshness. This responds to the observed startup depth counter sequence
+3 -> 0 -> 1 and a 165 ms RGB/depth mismatch; it does not synchronize exposures.
+
 The implementation follows the [RealSense alignment example](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/examples/align-depth2color.py).
 
 ### RealSense GLIBC_2.32 import failure on Ubuntu 20.04

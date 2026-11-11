@@ -8,6 +8,8 @@ stream:
   fps: 30
   stale_after_s: 0.5
   frame_timeout_ms: 1000
+  startup_valid_pairs: 5
+  max_rgb_depth_skew_ms: 70.0
 cameras:
   top_down:
     serial: "145422070656"
