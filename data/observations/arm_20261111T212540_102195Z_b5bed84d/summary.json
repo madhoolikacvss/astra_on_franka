@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "valid_samples": 0,
+  "error": "ObservationValidationError: O_T_EE: rotation is not a proper orthonormal matrix (max |R.T R - I|=1.92530988e-05, det(R)=0.999980747, atol=1e-5)",
+  "ended_unix_ns": 1794432340211788041
+}

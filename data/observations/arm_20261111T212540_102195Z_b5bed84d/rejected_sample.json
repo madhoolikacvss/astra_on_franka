@@ -1,0 +1,114 @@
+{
+  "valid": false,
+  "reason": "O_T_EE: rotation is not a proper orthonormal matrix (max |R.T R - I|=1.92530988e-05, det(R)=0.999980747, atol=1e-5)",
+  "host_read_start_monotonic_ns": 6406157821081,
+  "host_read_end_monotonic_ns": 6406158799004,
+  "host_received_unix_ns": 1794432340158992098,
+  "robot_time_ms": 2291937,
+  "joint_positions_rad": [
+    -0.07840013750768685,
+    -0.15733344581560593,
+    -0.28390862745515383,
+    -1.9586663891785017,
+    -0.05364807727365279,
+    1.7831998207734325,
+    0.4289572497966868
+  ],
+  "joint_velocities_rad_s": [
+    0.000934981087773878,
+    0.0005582031587840209,
+    0.0003995762127649461,
+    -0.0005914216756903882,
+    -0.0012227868577925204,
+    -7.425754379170426e-05,
+    0.0002930362402718389
+  ],
+  "O_T_EE": {
+    "shape": [
+      4,
+      4
+    ],
+    "all_finite": true,
+    "matrix": [
+      [
+        0.9996165410216946,
+        0.009925160394029575,
+        -0.02547590045236081,
+        0.47210411701505656
+      ],
+      [
+        0.009939257126683088,
+        -0.9999408862225677,
+        0.00042677032515073265,
+        -0.1926840251251438
+      ],
+      [
+        -0.025470158711723086,
+        -0.0006798182013676816,
+        -0.9996753454813372,
+        0.43535156729271113
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "nonfinite_encoding": "Nonfinite elements are null; matrix is not repaired",
+    "rotation_atol": 1e-05,
+    "bottom_row_atol": 1e-06,
+    "rotation_determinant": 0.999980746901208,
+    "rotation_orthogonality_max_abs_error": 1.9253098792026968e-05,
+    "rotation_singular_values": [
+      0.9999999999999999,
+      0.9999903734042687,
+      0.9999903734042683
+    ],
+    "bottom_row_max_abs_error": 0.0
+  },
+  "F_T_EE": {
+    "shape": [
+      4,
+      4
+    ],
+    "all_finite": true,
+    "matrix": [
+      [
+        0.707099974155426,
+        0.707099974155426,
+        0.0,
+        0.0
+      ],
+      [
+        -0.707099974155426,
+        0.707099974155426,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.10339999943971634
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "nonfinite_encoding": "Nonfinite elements are null; matrix is not repaired",
+    "rotation_atol": 1e-05,
+    "bottom_row_atol": 1e-06,
+    "rotation_determinant": 0.9999807469012083,
+    "rotation_orthogonality_max_abs_error": 1.92530987916939e-05,
+    "rotation_singular_values": [
+      1.0,
+      0.9999903734042686,
+      0.9999903734042686
+    ],
+    "bottom_row_max_abs_error": 0.0
+  }
+}
