@@ -1,0 +1,7 @@
+{
+  "status": "failed",
+  "samples": 1,
+  "detected_samples": 1,
+  "missing_or_rejected_samples": 0,
+  "error": "RuntimeError: Camera failure: {'top_down': 'RuntimeError: depth clock/domain or frame counter changed backwards'}"
+}

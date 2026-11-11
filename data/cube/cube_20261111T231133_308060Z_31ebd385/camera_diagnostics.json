@@ -1,0 +1,31 @@
+{
+  "phase": "streaming",
+  "stale_after_s": 0.5,
+  "errors": {
+    "top_down": "RuntimeError: depth clock/domain or frame counter changed backwards"
+  },
+  "cameras": {
+    "top_down": {
+      "phase": "reading",
+      "accepted_pairs": 1,
+      "repeated_pairs": 0,
+      "read_started_monotonic_ns": 12761269848717,
+      "last_read_duration_ms": 14.729408,
+      "last_returned_streams": {
+        "color": {
+          "frame_number": 2,
+          "timestamp_ms": 1794438695246.3975,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "depth": {
+          "frame_number": 0,
+          "timestamp_ms": 1794438695246.3794,
+          "timestamp_domain": "timestamp_domain.global_time"
+        }
+      },
+      "serial": "145422070656",
+      "host_age_ms": 2314.195316,
+      "last_delivered_sequence": 1
+    }
+  }
+}
