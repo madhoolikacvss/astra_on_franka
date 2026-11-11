@@ -218,3 +218,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Locally generated RGB-D arrays and camera logs
+/data/cameras/

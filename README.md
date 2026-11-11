@@ -100,3 +100,72 @@ Python 3.14/glibc 2.31, keep its full output; do not fall back to the generic
 index or change Python automatically.
 
 Source: [Franky installation instructions](https://timschneider42.github.io/franky/getting-started/installation.html).
+
+## Three-camera RGB-D streaming
+
+The camera recorder is independent of Franky: it never connects to the arm or
+gripper. It selects the confirmed top-down, wrist and side serials from
+`config/cameras.yaml`, without hardware resets or `/dev/video*` assumptions.
+
+On the lab computer, first enumerate the cameras, then capture a single set:
+
+```bash
+conda activate reset
+python scripts/record_cameras.py --list
+python scripts/record_cameras.py
+```
+
+For a short recording with a local desktop preview:
+
+```bash
+python scripts/record_cameras.py --samples 150 --hz 15 --preview
+```
+
+Omit `--preview` when running headless/SSH. Use `--samples 0` for continuous
+recording until Ctrl-C (or q/Escape in the preview). Every recorded set includes
+all three cameras. Compression and USB bandwidth may reduce the actual rate;
+start with the short run before continuous recording. At 640x480, RGB plus two
+16-bit depth arrays total about 6.45 MB per three-camera set before compression.
+
+Requested capture is 640x480 at 30 fps for RGB8 and Z16 depth, matching the
+resolution/rate used by the existing GELLO RealSense path. Settings are explicit
+in YAML; unsupported profiles fail rather than silently switching resolution.
+Color and native depth have separate intrinsics. Actual profiles, camera name,
+firmware, USB descriptor, scale and factory depth-to-color extrinsics are logged.
+No camera-to-robot calibration is implied by these factory intrinsics/extrinsics.
+
+Each camera has its own acquisition worker and bounded latest-frame slot. The
+recorder runs at a requested 15 Hz independently of the 30 Hz capture. Capture
+pairs skipped between recorded sets are counted; this is intentional sampling,
+not a claim of lossless capture. Streams run concurrently, but this does not
+configure hardware exposure synchronization.
+
+Each unique `data/cameras/cameras_<UTC timestamp>_<id>/` contains:
+
+- `metadata.json`: settings, versions, units and clock conventions.
+- `observations.jsonl`: per-camera serial, both stream frame numbers/timestamps
+  and timestamp domains, host receipt timestamps/age, calibration, image file
+  path, depth-valid fraction and skipped capture-pair count. Receipt spread
+  reports the difference between earliest/latest host arrivals in each set;
+  it is not exposure skew. Do not directly subtract hardware-clock timestamps
+  from different cameras or from the robot's uptime.
+- `frames/<view>_<index>.npz`: RGB uint8 `(H,W,3)`, native `depth_raw` uint16
+  `(H,W)`, and `depth_aligned` uint16 on the color grid. Depth meters equal
+  raw units times `depth_scale_m_per_unit`; zero indicates missing depth.
+  Aligned intrinsics are recorded separately. RGB is not BGR.
+- `summary.json`: completion, interruption or failure, and committed set count.
+  A disk failure can leave image files without a corresponding JSONL row;
+  only rows committed to JSONL represent complete recorded sets.
+
+The preview shows RGB beside depth colored over a 0-2 m display range; this
+display clipping never modifies saved depth. No image rotation is applied.
+
+Freshness uses monotonic host receipt time (default 0.5 s maximum age).
+Repeated frame numbers/timestamps do not refresh it. Backward counters or
+changed timestamp domains fail explicitly; missing streams, disconnects,
+camera timeouts and stale frames stop the recorder and produce a failure
+summary. A newly received old buffered frame cannot be proven fresh solely
+from its receipt time; exposure-age estimation requires clock calibration.
+Calibration and freshness metadata do not constitute motion safety checks.
+
+The implementation follows the [RealSense alignment example](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/examples/align-depth2color.py).

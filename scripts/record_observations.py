@@ -19,10 +19,10 @@ sys.path.insert(0, str(ROOT / "src"))
 from astra_on_franka.hardware.arm_observer import ArmObserver, ObservationValidationError
 
 
-def create_run(root: Path) -> Path:
+def create_run(root: Path, prefix: str = "arm") -> Path:
     root.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S_%fZ")
-    run = root / f"arm_{stamp}_{uuid.uuid4().hex[:8]}"
+    run = root / f"{prefix}_{stamp}_{uuid.uuid4().hex[:8]}"
     run.mkdir(exist_ok=False)
     return run
 

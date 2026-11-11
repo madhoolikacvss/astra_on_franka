@@ -1,6 +1,12 @@
-# User-confirmed identities. Stream profiles and calibration remain unset.
+# User-confirmed identities. Requested profiles must be supported by each device.
 # This configuration does not open cameras or reset devices.
 schema_version: 1
+stream:
+  width: 640
+  height: 480
+  fps: 30
+  stale_after_s: 0.5
+  frame_timeout_ms: 1000
 cameras:
   top_down:
     serial: "144223023540"
