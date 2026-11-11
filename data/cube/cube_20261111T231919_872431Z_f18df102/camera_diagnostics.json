@@ -1,0 +1,126 @@
+{
+  "phase": "streaming",
+  "stale_after_s": 0.5,
+  "errors": {
+    "top_down": "RuntimeError: depth: frame counter moved backwards 3 -> 1"
+  },
+  "cameras": {
+    "top_down": {
+      "phase": "failed",
+      "accepted_pairs": 1,
+      "repeated_pairs": 0,
+      "zero_counter_pairs": 2,
+      "read_started_monotonic_ns": 13227870359642,
+      "last_read_duration_ms": 33.530505,
+      "last_returned_streams": {
+        "color": {
+          "frame_number": 4,
+          "timestamp_ms": 1794439161865.9778,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "depth": {
+          "frame_number": 1,
+          "timestamp_ms": 1794439161865.961,
+          "timestamp_domain": "timestamp_domain.global_time"
+        }
+      },
+      "failure_monotonic_ns": 13227903931316,
+      "serial": "145422070656",
+      "recent_transitions": [
+        {
+          "host_monotonic_ns": 13227854619993,
+          "previous_accepted_streams": null,
+          "current_streams": {
+            "color": {
+              "frame_number": 0,
+              "timestamp_ms": 1794439161732.5366,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 3,
+              "timestamp_ms": 1794439161634.0447,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "zero_counter"
+        },
+        {
+          "host_monotonic_ns": 13227863113498,
+          "previous_accepted_streams": null,
+          "current_streams": {
+            "color": {
+              "frame_number": 2,
+              "timestamp_ms": 1794439161799.2566,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 3,
+              "timestamp_ms": 1794439161634.0447,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept"
+        },
+        {
+          "host_monotonic_ns": 13227869259706,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 2,
+              "timestamp_ms": 1794439161799.2566,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 3,
+              "timestamp_ms": 1794439161634.0447,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 3,
+              "timestamp_ms": 1794439161832.6172,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 0,
+              "timestamp_ms": 1794439161832.6,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "zero_counter"
+        },
+        {
+          "host_monotonic_ns": 13227903893517,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 2,
+              "timestamp_ms": 1794439161799.2566,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 3,
+              "timestamp_ms": 1794439161634.0447,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 4,
+              "timestamp_ms": 1794439161865.9778,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 1,
+              "timestamp_ms": 1794439161865.961,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "fail",
+          "error": "depth: frame counter moved backwards 3 -> 1"
+        }
+      ],
+      "host_age_ms": 2286.164142,
+      "last_delivered_sequence": 1
+    }
+  }
+}
