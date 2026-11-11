@@ -1,0 +1,13 @@
+# User-confirmed identities. Stream profiles and calibration remain unset.
+# This configuration does not open cameras or reset devices.
+schema_version: 1
+cameras:
+  top_down:
+    serial: "144223023540"
+    depth_capable: true
+  wrist:
+    serial: "223423020653"
+    depth_capable: true
+  side:
+    serial: "243623021110"
+    depth_capable: true
