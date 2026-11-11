@@ -24,6 +24,7 @@ def main(argv=None):
     parser.add_argument("--samples", type=int, default=1, help="0: until Ctrl-C")
     parser.add_argument("--hz", type=float, default=15, help="Recording rate, independent of capture fps")
     parser.add_argument("--preview", action="store_true", help="Requires a local graphical desktop; q exits")
+    parser.add_argument("--camera", action="append", help="Select a configured view; repeat to select several (default: all)")
     parser.add_argument("--output-root", type=Path, default=ROOT / "data" / "cameras")
     args = parser.parse_args(argv)
     if args.list:
@@ -33,6 +34,10 @@ def main(argv=None):
         parser.error("samples must be nonnegative and hz finite and positive")
     config = yaml.safe_load(args.config.read_text())
     cameras = {name: item["serial"] for name, item in config["cameras"].items()}
+    if args.camera:
+        if any(name not in cameras for name in args.camera):
+            parser.error(f"Unknown camera; choose from {list(cameras)}")
+        cameras = {name: cameras[name] for name in args.camera}
     settings = StreamSettings(**config.get("stream", {}))
     # Validate names because they become filename prefixes.
     if any(not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789_" for c in name) for name in cameras):
@@ -44,6 +49,7 @@ def main(argv=None):
     (run / "frames").mkdir()
     write_json(run / "metadata.json", {
         "schema_version": 1, "config": config, "python": sys.version,
+        "selected_cameras": cameras,
         "pyrealsense2": importlib.metadata.version("pyrealsense2"),
         "requested_record_hz": args.hz, "requested_samples": args.samples,
         "clock_note": "Per-stream device timestamps retain their domains. Host receipt spread is not exposure synchronization.",
@@ -52,6 +58,7 @@ def main(argv=None):
     })
     print(f"Recording cameras to {run}", flush=True)
     count, code, error, status = 0, 0, None, "completed"
+    rig = None
     try:
         with (run / "observations.jsonl").open("x", encoding="utf-8", buffering=1) as log:
             with CameraRig(cameras, settings) as rig:
@@ -93,6 +100,9 @@ def main(argv=None):
     except Exception as exc:
         status, error, code = "failed", f"{type(exc).__name__}: {exc}", 1
         print(error, file=sys.stderr)
+        if rig is not None:
+            write_json(run / "camera_diagnostics.json", rig.diagnostics())
+            print(f"Camera diagnostics: {run / 'camera_diagnostics.json'}", file=sys.stderr)
     finally:
         if cv2 is not None:
             cv2.destroyAllWindows()

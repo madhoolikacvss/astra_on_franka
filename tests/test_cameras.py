@@ -8,6 +8,7 @@ import tempfile
 import json
 import contextlib
 import io
+import threading
 
 import numpy as np
 
@@ -65,9 +66,35 @@ class CameraTests(unittest.TestCase):
 
     def test_stale_frames_rejected(self):
         rig = CameraRig({"a": "1"}, StreamSettings(stale_after_s=0.01))
+        rig.delivered["a"] = 1  # Runtime, after the first successful set.
         rig.latest["a"] = {**frame(received=time.monotonic_ns() - 100_000_000), "sequence": 1}
         with self.assertRaisesRegex(RuntimeError, "Stale"):
             rig.read()
+
+    def test_startup_waits_for_fresh_replacement(self):
+        rig = CameraRig({"a": "1", "b": "2"}, StreamSettings(stale_after_s=0.1))
+        rig.latest["a"] = {**frame(received=time.monotonic_ns() - 1_000_000_000), "sequence": 1}
+        def publish():
+            with rig.condition:
+                rig.latest["a"] = {**frame(2), "sequence": 2}
+                rig.latest["b"] = {**frame(1), "sequence": 1}
+                rig.condition.notify_all()
+        timer = threading.Timer(0.02, publish)
+        timer.start()
+        try:
+            sample = rig.read(timeout_s=1)
+            self.assertEqual(sample["cameras"]["a"]["sequence"], 2)
+            self.assertLess(sample["cameras"]["a"]["host_age_ms"], 100)
+        finally:
+            timer.join()
+
+    def test_startup_never_delivers_stale_frame(self):
+        rig = CameraRig({"a": "1"}, StreamSettings(stale_after_s=0.01))
+        rig.latest["a"] = {**frame(received=time.monotonic_ns() - 1_000_000_000), "sequence": 1}
+        with self.assertRaises(TimeoutError):
+            rig.read(timeout_s=0.02)
+        self.assertEqual(rig.diagnostics()["phase"], "startup")
+        self.assertEqual(rig.delivered, {})
 
     def test_repeated_device_frames_do_not_refresh_host_clock(self):
         sources = []

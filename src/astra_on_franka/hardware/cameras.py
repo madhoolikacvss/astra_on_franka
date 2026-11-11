@@ -138,18 +138,29 @@ class CameraRig:
         self.stop = threading.Event()
         self.latest, self.errors, self.delivered = {}, {}, {}
         self.cleanup_errors = {}
+        self.health = {name: {"phase": "not_started", "accepted_pairs": 0,
+                              "repeated_pairs": 0} for name in cameras}
         self.threads = []
 
     def _worker(self, name, serial):
         source = None
         try:
             source = self.factory(serial, self.settings)
+            with self.condition:
+                self.health[name]["phase"] = "starting"
             source.start()
             previous = None
             sequence = 0
             while not self.stop.is_set():
+                read_started = time.monotonic_ns()
+                with self.condition:
+                    self.health[name]["phase"] = "reading"
+                    self.health[name]["read_started_monotonic_ns"] = read_started
                 frame = source.read()
                 current = frame["streams"]
+                with self.condition:
+                    self.health[name]["last_read_duration_ms"] = (time.monotonic_ns() - read_started) / 1e6
+                    self.health[name]["last_returned_streams"] = current
                 if previous is not None:
                     for stream in ("color", "depth"):
                         a, b = previous[stream], current[stream]
@@ -161,6 +172,8 @@ class CameraRig:
                            or current[k]["timestamp_ms"] == previous[k]["timestamp_ms"]
                            for k in ("color", "depth")):
                         # A repeated frame must not refresh the host freshness clock.
+                        with self.condition:
+                            self.health[name]["repeated_pairs"] += 1
                         self.stop.wait(0.001)
                         continue
                 previous = current
@@ -168,6 +181,7 @@ class CameraRig:
                 frame.update({"sequence": sequence, "serial": serial})
                 with self.condition:
                     self.latest[name] = frame
+                    self.health[name]["accepted_pairs"] = sequence
                     self.condition.notify_all()
         except Exception as exc:
             with self.condition:
@@ -205,9 +219,12 @@ class CameraRig:
                 now = time.monotonic_ns()
                 stale = [name for name, frame in self.latest.items()
                          if (now - frame["host_received_monotonic_ns"]) / 1e9 > self.settings.stale_after_s]
-                if stale:
+                # During initial startup, wait for a fresh replacement rather
+                # than rejecting the first old frame while other devices start.
+                # No stale frame is ever delivered, including during startup.
+                if stale and self.delivered:
                     raise RuntimeError(f"Stale camera frames: {stale}")
-                if all(name in self.latest and self.latest[name]["sequence"] > self.delivered.get(name, 0)
+                if not stale and all(name in self.latest and self.latest[name]["sequence"] > self.delivered.get(name, 0)
                        for name in self.cameras):
                     result = {name: dict(self.latest[name]) for name in self.cameras}
                     for name, frame in result.items():
@@ -221,6 +238,18 @@ class CameraRig:
                 if remaining <= 0:
                     raise TimeoutError("Timed out waiting for fresh RGB-D from every camera")
                 self.condition.wait(min(remaining, 0.05))
+
+    def diagnostics(self):
+        with self.condition:
+            now = time.monotonic_ns()
+            return {"phase": "startup" if not self.delivered else "streaming",
+                    "stale_after_s": self.settings.stale_after_s,
+                    "errors": dict(self.errors),
+                    "cameras": {name: {**self.health[name], "serial": serial,
+                        "host_age_ms": ((now - self.latest[name]["host_received_monotonic_ns"]) / 1e6
+                                        if name in self.latest else None),
+                        "last_delivered_sequence": self.delivered.get(name),
+                    } for name, serial in self.cameras.items()}}
 
     def close(self):
         self.stop.set()
