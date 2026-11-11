@@ -1,0 +1,6 @@
+{
+  "status": "failed",
+  "valid_samples": 0,
+  "error": "ValueError: O_T_EE: rotation is not a proper orthonormal matrix",
+  "ended_unix_ns": 1794431989816107350
+}
