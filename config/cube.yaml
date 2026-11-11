@@ -1,0 +1,15 @@
+# Reused from the working reset-policy tracker and user-confirmed board bounds.
+schema_version: 1
+camera: top_down
+family: tag36h11
+reference_tag_id: 0
+cube_tag_id: 1
+tag_size_m: 0.05
+board_bounds_m:
+  x_min: -0.50
+  x_max: -0.07
+  y_min: -0.71
+  y_max: -0.12
+# Reject corrected tag IDs; log margin/pose error without claiming calibrated confidence.
+max_hamming: 0
+min_decision_margin: 0.0

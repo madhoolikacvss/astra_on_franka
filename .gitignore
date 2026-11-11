@@ -222,3 +222,4 @@ __marimo__/
 # Locally generated RGB-D arrays and camera logs
 /data/cameras/
 /.build/
+/data/cube/

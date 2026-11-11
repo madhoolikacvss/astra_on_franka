@@ -200,3 +200,53 @@ If building fails, preserve its `build.log`; do not uninstall the old wheel firs
 
 References: [official source build instructions](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/readme.md),
 [upstream wheel definition](https://github.com/realsenseai/librealsense/blob/v2.59.1/wrappers/python/pyproject.toml).
+
+## Standalone AprilTag cube observer
+
+Adapted from the working reset-policy `track_apriltag.py` and `cube_tracker.py`.
+It opens only the top-down camera, using the existing camera worker. Stop other
+camera recorders/viewers before running. No arm, gripper, goal or combined
+observation integration is performed yet.
+
+```bash
+conda activate reset
+python -c "from pupil_apriltags import Detector; print('AprilTag import OK')"
+# If missing, install the detector in reset:
+# python -m pip install pupil-apriltags
+python scripts/observe_cube.py
+python scripts/observe_cube.py --samples 0 --hz 10 --preview
+```
+
+Use q/Escape or Ctrl-C to stop; omit preview when headless. Both tag 0 (fixed
+reference) and tag 1 (cube) must be visible in the same frame. `config/cube.yaml`
+preserves tag36h11, 50 mm tag size and the confirmed board bounds. The tracked
+point is tag 1's center, not an independently calibrated cube center.
+
+The observer uses the active color profile's intrinsics rather than applying
+the legacy 1280x720 calibration to 640x480 images. Zero-distortion images need
+no correction; Brown-Conrady uses OpenCV rectification; nonzero modified Brown
+uses the SDK projection model to construct a cached rectification map. Other
+nonzero models fail explicitly. First-map creation can cause an initial stale
+result; subsequent frames reuse the map. This is a change in calibration source
+from the old tracker, so compare against known physical board positions.
+
+`T_reference_cube_tag = inverse(T_camera_reference) @ T_camera_cube_tag`.
+XY normalization is unclipped: `(x+0.50)/0.43`, `(y+0.71)/0.59`. Values beyond
+[0,1] remain visible and set `inside_board=false`. Yaw is radians about reference
+Z; it is null if the Euler yaw is singular. Missing/rejected/duplicate required
+tags or stale source frames yield `detected=false` and null pose coordinates.
+No previous pose is held as a fresh measurement. Hamming corrections are
+rejected by default; margin and pose-error values are logged but are not
+calibrated uncertainty estimates. Occlusion or planar pose ambiguity still
+requires physical verification before any robot control.
+
+Unique `data/cube/cube_*` runs hold configuration metadata, per-frame JSONL,
+first-frame and first-detection annotated PNGs, and a summary with detection
+counts. Each record retains the source camera frame/timestamp/domain, intrinsics,
+raw relative XYZ in meters, normalized XY, relative matrix, yaw, quality values,
+and processing/age measurements. `completed` means the loop completed; check
+`detected_samples` to know whether cube tracking succeeded.
+
+Verify normalized XY at known board locations and cover tag 1 to confirm the
+position becomes unavailable. The reference-tag frame is not yet transformed
+into the arm's base frame. Original reset-policy files are unchanged.
