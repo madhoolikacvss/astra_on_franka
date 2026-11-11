@@ -223,4 +223,5 @@ __marimo__/
 /data/cameras/
 /.build/
 /data/cube/
+/data/combined/
 /tests

@@ -21,8 +21,11 @@ class StreamSettings:
     frame_timeout_ms: int = 1000
     startup_valid_pairs: int = 5
     max_rgb_depth_skew_ms: float = 70.0
+    shutdown_timeout_s: float = 10.0
 
     def __post_init__(self):
+        if not math.isfinite(self.shutdown_timeout_s) or self.shutdown_timeout_s <= 0:
+            raise ValueError("shutdown_timeout_s must be finite and positive")
         if any(type(x) is not int or x <= 0 for x in
                (self.width, self.height, self.fps, self.frame_timeout_ms, self.startup_valid_pairs)):
             raise ValueError("Stream dimensions, fps and timeout must be positive integers")
@@ -259,9 +262,16 @@ class CameraRig:
         finally:
             if source is not None:
                 try:
+                    with self.condition:
+                        self.health[name]["phase"] = "stopping"
+                        self.health[name]["stop_started_monotonic_ns"] = time.monotonic_ns()
                     source.close()
+                    with self.condition:
+                        self.health[name]["phase"] = "closed"
+                        self.health[name]["stop_duration_ms"] = (time.monotonic_ns() - self.health[name]["stop_started_monotonic_ns"]) / 1e6
                 except Exception as exc:
                     with self.condition:
+                        self.health[name]["phase"] = "cleanup_failed"
                         self.errors[name] = f"Cleanup failed: {exc}"
                         self.cleanup_errors[name] = str(exc)
                         self.condition.notify_all()
@@ -325,12 +335,18 @@ class CameraRig:
         self.stop.set()
         with self.condition:
             self.condition.notify_all()
+        deadline = time.monotonic() + self.settings.shutdown_timeout_s
         for thread in self.threads:
-            thread.join(timeout=self.settings.frame_timeout_ms / 1000 + 2)
+            thread.join(timeout=max(0, deadline - time.monotonic()))
         if any(thread.is_alive() for thread in self.threads):
             raise RuntimeError("Camera worker did not stop within its timeout")
         if self.cleanup_errors:
             raise RuntimeError(f"Camera cleanup failed: {self.cleanup_errors}")
 
-    def __exit__(self, *_):
-        self.close()
+    def __exit__(self, exc_type, exc, traceback):
+        try:
+            self.close()
+        except Exception as cleanup:
+            if exc is None:
+                raise
+            exc.add_note(f"Camera cleanup also failed: {cleanup}")

@@ -268,3 +268,39 @@ and processing/age measurements. `completed` means the loop completed; check
 Verify normalized XY at known board locations and cover tag 0 to confirm the
 position becomes unavailable. The reference-tag frame is not yet transformed
 into the arm's base frame. Original reset-policy files are unchanged.
+
+## Combined arm, cameras and cube observations
+
+From the activated lab `reset` environment, run:
+
+```bash
+python scripts/record_combined.py --samples 100 --hz 10 --preview
+```
+
+Close the standalone observers first. Omit `--preview` without a desktop;
+`--samples 0` runs until Ctrl-C or q. This connects to the arm at `172.16.0.2`
+(`--robot-host` overrides it), applies Franky's default initialization, and sends
+no motion commands. Gripper observation and task-goal integration are not included.
+
+Each unique `data/combined/combined_*/` contains metadata, a summary, final camera
+diagnostics, JSONL observations, and three compressed RGB-D files per sample.
+The cube detector consumes the exact top-down RGB frame saved in that sample;
+`source_view`, `source_sequence`, `source_color`, and `source_file` identify it.
+Intrinsics, depth scale, alignment metadata and original device clocks are retained.
+
+`valid` requires fresh camera/arm receipt times at assembly, an arm without errors,
+and a detected cube. Missing tags produce an invalid sample with absent coordinates;
+no previous cube position is substituted. Board inclusion is reported separately by
+`cube.inside_board`. This validity flag is not authorization to move the robot.
+Timing includes receipt spread, signed arm-to-camera receipt offsets, ages after
+processing, and persistence delay. Receipt times do not establish synchronized
+exposures; the requested rate is best effort and disk compression may slow it.
+
+Arm poses use robot-base meters and joint radians. Cube positions use reference
+tag 1 axes, track cube tag 0's center, and retain unclipped board normalization.
+There is no calibrated tag-to-robot-base transform or grasp TCP yet.
+
+Camera shutdown now allows a shared 10-second deadline (`shutdown_timeout_s` in
+camera stream settings). Per-camera `stopping`/`closed` phases and stop duration
+help distinguish capture delays from SDK shutdown delays. This is diagnostic
+hardening; a hardware shutdown fix still needs verification on the lab system.
