@@ -112,6 +112,11 @@ truthiness. The observer now aggregates the snapshot's named boolean error
 properties and logs `error_flags`; the original run remains unchanged.
 The system ROS libfranka package does not identify the library bundled in Franky.
 
+Camera import subsequently failed: the installed pyrealsense2 binary requires
+GLIBC_2.32, but the lab host has glibc 2.31. Camera enumeration has not yet run.
+The README documents building a local wheel in reset, without changing system
+glibc; a local source-build helper is provided but lab verification is pending.
+
 ### Cartesian observation API
 
 Installed Robot API inspection confirms `state`, `current_pose`,

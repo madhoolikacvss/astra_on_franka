@@ -169,3 +169,31 @@ from its receipt time; exposure-age estimation requires clock calibration.
 Calibration and freshness metadata do not constitute motion safety checks.
 
 The implementation follows the [RealSense alignment example](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/examples/align-depth2color.py).
+
+### RealSense GLIBC_2.32 import failure on Ubuntu 20.04
+
+The distributed `pyrealsense2==2.59.1.11053` CPython 3.14 wheel was accepted by
+pip but fails to import on this lab's glibc 2.31 host. A successful pip install
+does not verify native library compatibility. Do not replace system glibc.
+
+Build a local wheel against the host and active reset interpreter:
+
+```bash
+conda activate reset
+# Install missing build prerequisites only (not a system upgrade):
+sudo apt-get install build-essential cmake git pkg-config libusb-1.0-0-dev libssl-dev
+bash scripts/build_realsense_local.sh
+```
+
+The helper uses upstream v2.59.1, a static SDK and the userspace RSUSB backend.
+It does not install system SDK libraries, firmware, udev rules or kernel
+patches; existing device access rules remain in use. It keeps source, wheel
+and build logs in a unique ignored `.build/realsense-*` directory. It verifies
+the built extension can import, then prints the explicit wheel-install command.
+Run that command and retry `python scripts/record_cameras.py --list`.
+The local package version is 2.59.1. The helper requires a network connection
+for upstream build dependencies and has not been executed on the lab hardware.
+If building fails, preserve its `build.log`; do not uninstall the old wheel first.
+
+References: [official source build instructions](https://github.com/realsenseai/librealsense/blob/master/wrappers/python/readme.md),
+[upstream wheel definition](https://github.com/realsenseai/librealsense/blob/v2.59.1/wrappers/python/pyproject.toml).
