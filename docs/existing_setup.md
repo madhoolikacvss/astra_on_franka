@@ -92,6 +92,18 @@ the handshake failure. Its O_T_EE rotation failed the 1e-5 validation tolerance.
 That run did not retain the matrix, so the cause is unconfirmed. The observer
 now retains both transforms and numerical metrics in `rejected_sample.json`
 on transform rejection; tolerance and original values are unchanged.
+
+Follow-up `arm_20261111T212540_102195Z_b5bed84d` identifies the precision issue:
+F_T_EE has rounded coefficients `0.707099974155426`, with determinant
+`0.9999807469012083` and orthogonality error `1.92530987916939e-5`. O_T_EE
+has the same determinant/error to numerical precision. The observer tolerance
+was subsequently changed from `1e-5` to `1e-4`, preserving all original matrix
+values and logging metrics on accepted samples. A regression test uses both
+matrices from this run; malformed transforms remain rejected.
+
+The configured EE is approximately 103.4 mm along flange +Z with a -45 degree
+rotation about flange Z. This describes the current configuration, not a
+verification that it matches the custom gripper's physical grasp center.
 The system ROS libfranka package does not identify the library bundled in Franky.
 
 ### Cartesian observation API

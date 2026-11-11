@@ -47,6 +47,14 @@ in meters; there is no quaternion-order ambiguity. The EE frame is not yet
 verified as the custom gripper's grasp center. Do not compare this base-frame
 XYZ directly with table measurements until the table-to-base transform is known.
 
+Rotation validation uses absolute tolerance `1e-4` for both `R.T @ R - I`
+and `det(R) - 1`. The lab's configured flange-to-EE rotation contains rounded
+0.7071 coefficients, producing about `1.93e-5` error in both checks. Accepted
+samples retain the original matrices and report these metrics under
+`transform_validation`; no normalization or robot configuration change occurs.
+The homogeneous bottom-row tolerance remains `1e-6`. These are numerical
+validation tolerances, not physical workspace or contact-force limits.
+
 Malformed/non-finite samples, invalid rotations, repeated/backward robot times,
 and connection errors terminate recording with a failure summary. Robot error
 flags are logged but never automatically cleared. A first sample cannot prove

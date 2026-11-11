@@ -6,6 +6,11 @@ from typing import Any
 
 import numpy as np
 
+ROTATION_ATOL = 1e-4
+BOTTOM_ROW_ATOL = 1e-6
+# The lab's configured F_T_EE uses rounded 0.7071 coefficients, giving
+# ~1.93e-5 orthogonality/determinant error. Keep originals; do not normalize.
+
 
 class ObservationValidationError(ValueError):
     """Rejected sample with JSON-safe evidence; never a valid observation."""
@@ -22,8 +27,8 @@ def transform_diagnostics(value: Any) -> dict:
         "all_finite": bool(np.isfinite(matrix).all()),
         "matrix": np.where(np.isfinite(matrix), matrix, None).tolist(),
         "nonfinite_encoding": "Nonfinite elements are null; matrix is not repaired",
-        "rotation_atol": 1e-5,
-        "bottom_row_atol": 1e-6,
+        "rotation_atol": ROTATION_ATOL,
+        "bottom_row_atol": BOTTOM_ROW_ATOL,
     }
     if matrix.shape == (4, 4) and np.isfinite(matrix).all():
         rotation = matrix[:3, :3]
@@ -46,15 +51,15 @@ def finite_array(value: Any, shape: tuple[int, ...], name: str) -> np.ndarray:
 def transform(value: Any, name: str) -> np.ndarray:
     # Franky 2.0 Affine.matrix is a 4x4 property. Never guess flat-array order.
     matrix = finite_array(value.matrix, (4, 4), name)
-    if not np.allclose(matrix[3], [0, 0, 0, 1], atol=1e-6, rtol=0):
+    if not np.allclose(matrix[3], [0, 0, 0, 1], atol=BOTTOM_ROW_ATOL, rtol=0):
         raise ValueError(f"{name}: invalid homogeneous bottom row")
     rotation = matrix[:3, :3]
-    if (not np.allclose(rotation.T @ rotation, np.eye(3), atol=1e-5, rtol=0)
-            or not np.isclose(np.linalg.det(rotation), 1, atol=1e-5, rtol=0)):
+    if (not np.allclose(rotation.T @ rotation, np.eye(3), atol=ROTATION_ATOL, rtol=0)
+            or not np.isclose(np.linalg.det(rotation), 1, atol=ROTATION_ATOL, rtol=0)):
         error = float(np.max(np.abs(rotation.T @ rotation - np.eye(3))))
         determinant = float(np.linalg.det(rotation))
         raise ValueError(f"{name}: rotation is not a proper orthonormal matrix "
-                         f"(max |R.T R - I|={error:.9g}, det(R)={determinant:.9g}, atol=1e-5)")
+                         f"(max |R.T R - I|={error:.9g}, det(R)={determinant:.9g}, atol={ROTATION_ATOL:g})")
     return matrix
 
 
@@ -115,6 +120,16 @@ class ArmObserver:
             "joint_velocities_rad_s": velocities.tolist(),
             "O_T_EE": base_ee.tolist(),
             "F_T_EE": flange_ee.tolist(),
+            "transform_validation": {
+                "rotation_atol": ROTATION_ATOL,
+                "bottom_row_atol": BOTTOM_ROW_ATOL,
+                "matrices_normalized": False,
+                **{name: {
+                    "rotation_determinant": float(np.linalg.det(matrix[:3, :3])),
+                    "rotation_orthogonality_max_abs_error": float(np.max(
+                        np.abs(matrix[:3, :3].T @ matrix[:3, :3] - np.eye(3)))),
+                } for name, matrix in (("O_T_EE", base_ee), ("F_T_EE", flange_ee))},
+            },
             "ee_position_base_m": base_ee[:3, 3].tolist(),
             "ee_rotation_base": base_ee[:3, :3].tolist(),
             "has_errors": bool(state.current_errors),

@@ -41,6 +41,28 @@ class FakeRobot:
 
 
 class ObserverTests(unittest.TestCase):
+    def test_lab_rounded_tool_transform_is_accepted_unchanged(self):
+        # Regression: rejected sample arm_20261111T212540_102195Z_b5bed84d.
+        robot = FakeRobot()
+        robot.snapshot.F_T_EE.matrix = np.array([
+            [0.707099974155426, 0.707099974155426, 0, 0],
+            [-0.707099974155426, 0.707099974155426, 0, 0],
+            [0, 0, 1, 0.10339999943971634], [0, 0, 0, 1],
+        ])
+        robot.snapshot.O_T_EE.matrix = np.array([
+            [0.9996165410216946, 0.009925160394029575, -0.02547590045236081, 0.47210411701505656],
+            [0.009939257126683088, -0.9999408862225677, 0.00042677032515073265, -0.1926840251251438],
+            [-0.025470158711723086, -0.0006798182013676816, -0.9996753454813372, 0.43535156729271113],
+            [0, 0, 0, 1],
+        ])
+        with ArmObserver("unused", robot_factory=lambda _: robot) as observer:
+            sample = observer.read()
+        for name in ("O_T_EE", "F_T_EE"):
+            self.assertEqual(sample[name], getattr(robot.snapshot, name).matrix.tolist())
+            metrics = sample["transform_validation"][name]
+            self.assertAlmostEqual(metrics["rotation_determinant"], 0.999980746901208)
+        self.assertFalse(sample["transform_validation"]["matrices_normalized"])
+
     def test_single_snapshot_and_transform_direction(self):
         robot = FakeRobot()
         with ArmObserver("unused", robot_factory=lambda _: robot) as observer:
