@@ -35,9 +35,10 @@ def intrinsics(profile) -> dict:
 
 def device_info(device, rs) -> dict:
     result = {}
-    for key in ("serial_number", "name", "firmware_version", "usb_type_descriptor"):
-        field = getattr(rs.camera_info, key)
-        result[key] = device.get_info(field) if device.supports(field) else None
+    for key in ("serial_number", "asic_serial_number", "name", "firmware_version",
+                "usb_type_descriptor", "physical_port"):
+        field = getattr(rs.camera_info, key, None)
+        result[key] = device.get_info(field) if field is not None and device.supports(field) else None
     return result
 
 

@@ -1,5 +1,6 @@
 # User-confirmed identities. Requested profiles must be supported by each device.
 # This configuration does not open cameras or reset devices.
+# serial is the SDK device serial used by enable_device, not the ASIC serial.
 schema_version: 1
 stream:
   width: 640
@@ -9,11 +10,14 @@ stream:
   frame_timeout_ms: 1000
 cameras:
   top_down:
-    serial: "144223023540"
+    serial: "145422070656"
+    asic_serial: "144223023540"
     depth_capable: true
   wrist:
-    serial: "223423020653"
+    serial: "233622078546"
+    asic_serial: "223423020653"
     depth_capable: true
   side:
-    serial: "243623021110"
+    serial: "239722073976"
+    asic_serial: "243623021110"
     depth_capable: true

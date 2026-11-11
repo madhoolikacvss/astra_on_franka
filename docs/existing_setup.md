@@ -17,8 +17,8 @@ code contradictions rather than requiring hardware re-identification.
   Future contact thresholds and geometric workspace enforcement are separate
   mechanisms: contact thresholds alone do not enforce a permitted region.
 - Cameras are unchanged, but USB video-device paths may have changed.
-  Top-down serial: `144223023540`; wrist serial: `223423020653`;
-  side serial: `243623021110`. This supersedes the earlier side ID.
+  Top-down ASIC serial: `144223023540`; wrist ASIC serial: `223423020653`;
+  side ASIC serial: `243623021110`. Device-selection serials are mapped below.
 - Use the existing `reset` conda environment. No other process owns the
   cameras, robot or gripper, as confirmed by the user.
 - User reports arm identifier `73681343`, described as "Franka Emika arm,
@@ -68,7 +68,7 @@ The user supplied this inventory; it has not been tested from this Windows works
 | NumPy in reset | `2.5.2` |
 | OpenCV in reset | `5.0.0` |
 | franky-control | `2.0.0`, installed; import and Robot API inspection succeed |
-| pyrealsense2 | `2.59.1.11053`, installation confirmed |
+| pyrealsense2 | Local source-built `2.59.1`; import and device enumeration verified |
 | PyYAML | `6.0.3`, installation confirmed |
 | Host architecture / glibc | `x86_64` / `2.31`; pip selected a compatible manylinux_2_28 Franky wheel |
 | Franka Desk system | `5.3.1`, build `81f87d2933` |
@@ -214,6 +214,21 @@ register writes only establish that the communication operation succeeded.
   same signed conversion. Reuse its ping concept, not its normalized output.
 
 ## Cameras
+
+The user's SDK inventory confirms the following ASIC-to-device mapping. All
+three selected cameras are D435, firmware 5.17.3.10, on USB 3.2 connections.
+
+| View | SDK device serial (selection) | ASIC serial (identity) |
+| --- | --- | --- |
+| Top-down | `145422070656` | `144223023540` |
+| Wrist | `233622078546` | `223423020653` |
+| Side | `239722073976` | `243623021110` |
+
+The fourth D435, device `141722075473` / ASIC `144223022484`, firmware 5.15.1,
+USB 2.1, is not selected. `cameras.yaml` uses device serials in `serial` and
+retains `asic_serial` as descriptive identity metadata. Inventory and per-camera
+calibration logs include both identifiers. ASIC fields in the YAML are not
+used as device selectors. Actual simultaneous streaming remains to be tested.
 
 [Franka-toy camera code](../../franka-toy/pi05_franka/cameras.py) opens both
 external `/dev/video4` and wrist `/dev/video10` color devices through V4L2,

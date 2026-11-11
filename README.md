@@ -106,6 +106,9 @@ Source: [Franky installation instructions](https://timschneider42.github.io/fran
 The camera recorder is independent of Franky: it never connects to the arm or
 gripper. It selects the confirmed top-down, wrist and side serials from
 `config/cameras.yaml`, without hardware resets or `/dev/video*` assumptions.
+The `serial` field is the SDK device serial used for selection; `asic_serial`
+retains the separately reported ASIC identifier. The fourth detected camera
+is excluded. Inventory output and capture metadata report both identifiers.
 
 On the lab computer, first enumerate the cameras, then capture a single set:
 
