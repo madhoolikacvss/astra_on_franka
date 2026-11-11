@@ -48,6 +48,21 @@ def finite_array(value: Any, shape: tuple[int, ...], name: str) -> np.ndarray:
     return array.copy()
 
 
+def error_flags(errors: Any) -> dict[str, bool]:
+    """Read bound boolean error properties, not Python object truthiness."""
+    if isinstance(errors, (bool, np.bool_)):
+        return {"unspecified_error": bool(errors)}
+    flags = {}
+    for name in dir(errors):
+        if not name.startswith("_"):
+            value = getattr(errors, name)
+            if isinstance(value, (bool, np.bool_)):
+                flags[name] = bool(value)
+    if not flags:
+        raise ValueError("current_errors exposes no boolean flags; error status is unknown")
+    return flags
+
+
 def transform(value: Any, name: str) -> np.ndarray:
     # Franky 2.0 Affine.matrix is a 4x4 property. Never guess flat-array order.
     matrix = finite_array(value.matrix, (4, 4), name)
@@ -108,6 +123,7 @@ class ArmObserver:
         if self._previous_robot_ms is not None and robot_ms <= self._previous_robot_ms:
             raise ValueError("Robot timestamp repeated or moved backwards; sample rejected")
         self._previous_robot_ms = robot_ms
+        flags = error_flags(state.current_errors)
         return {
             "schema_version": 1,
             "valid": True,
@@ -132,7 +148,8 @@ class ArmObserver:
             },
             "ee_position_base_m": base_ee[:3, 3].tolist(),
             "ee_rotation_base": base_ee[:3, :3].tolist(),
-            "has_errors": bool(state.current_errors),
+            "has_errors": any(flags.values()),
+            "error_flags": flags,
             "current_errors": str(state.current_errors),
             "robot_mode": str(state.robot_mode),
         }

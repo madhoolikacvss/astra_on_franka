@@ -41,6 +41,19 @@ class FakeRobot:
 
 
 class ObserverTests(unittest.TestCase):
+    def test_error_object_truthiness_does_not_mean_robot_error(self):
+        robot = FakeRobot()
+        errors = SimpleNamespace(joint_reflex=False, cartesian_reflex=False)
+        self.assertTrue(bool(errors))
+        robot.snapshot.current_errors = errors
+        with ArmObserver("unused", robot_factory=lambda _: robot) as observer:
+            self.assertFalse(observer.read()["has_errors"])
+            robot.ms += 1
+            errors.joint_reflex = True
+            sample = observer.read()
+            self.assertTrue(sample["has_errors"])
+            self.assertTrue(sample["error_flags"]["joint_reflex"])
+
     def test_lab_rounded_tool_transform_is_accepted_unchanged(self):
         # Regression: rejected sample arm_20261111T212540_102195Z_b5bed84d.
         robot = FakeRobot()

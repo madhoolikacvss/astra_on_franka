@@ -104,6 +104,12 @@ matrices from this run; malformed transforms remain rejected.
 The configured EE is approximately 103.4 mm along flange +Z with a -45 degree
 rotation about flange Z. This describes the current configuration, not a
 verification that it matches the custom gripper's physical grasp center.
+
+Run `arm_20261111T212834_579812Z_9a0da498` completed with one valid pose sample,
+confirming connection and pose decoding, but not sustained streaming. It exposed
+`has_errors: true` with `current_errors: "[]"`: the observer had used object
+truthiness. The observer now aggregates the snapshot's named boolean error
+properties and logs `error_flags`; the original run remains unchanged.
 The system ROS libfranka package does not identify the library bundled in Franky.
 
 ### Cartesian observation API
