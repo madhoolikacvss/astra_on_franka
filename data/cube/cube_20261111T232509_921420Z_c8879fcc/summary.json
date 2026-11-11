@@ -1,0 +1,7 @@
+{
+  "status": "failed",
+  "samples": 178,
+  "detected_samples": 178,
+  "missing_or_rejected_samples": 0,
+  "error": "RuntimeError: Camera worker did not stop within its timeout"
+}
