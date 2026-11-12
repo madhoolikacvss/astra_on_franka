@@ -1,0 +1,9 @@
+{
+  "status": "completed",
+  "samples": 100,
+  "valid_samples": 100,
+  "detected_samples": 100,
+  "invalid_samples": 0,
+  "error": null,
+  "cleanup_errors": []
+}

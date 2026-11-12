@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "camera_config": {
+    "schema_version": 1,
+    "stream": {
+      "width": 640,
+      "height": 480,
+      "fps": 30,
+      "stale_after_s": 0.5,
+      "frame_timeout_ms": 1000,
+      "startup_valid_pairs": 5,
+      "max_rgb_depth_skew_ms": 70.0
+    },
+    "cameras": {
+      "top_down": {
+        "serial": "145422070656",
+        "asic_serial": "144223023540",
+        "depth_capable": true
+      },
+      "wrist": {
+        "serial": "233622078546",
+        "asic_serial": "223423020653",
+        "depth_capable": true
+      },
+      "side": {
+        "serial": "239722073976",
+        "asic_serial": "243623021110",
+        "depth_capable": true
+      }
+    }
+  },
+  "cube_config": {
+    "schema_version": 1,
+    "camera": "top_down",
+    "family": "tag36h11",
+    "reference_tag_id": 1,
+    "cube_tag_id": 0,
+    "tag_size_m": 0.05,
+    "board_bounds_m": {
+      "x_min": -0.5,
+      "x_max": -0.07,
+      "y_min": -0.71,
+      "y_max": -0.12
+    },
+    "max_hamming": 0,
+    "min_decision_margin": 0.0
+  },
+  "robot_host": "172.16.0.2",
+  "packages": {
+    "franky-control": "2.0.0+libfranka.0.12.1",
+    "pyrealsense2": "2.59.1",
+    "numpy": "2.5.2",
+    "PyYAML": "6.0.3",
+    "pupil-apriltags": "1.0.4.post11"
+  },
+  "python": "3.14.4 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 17:07:44) [GCC 14.3.0]",
+  "requested_hz": 10.0,
+  "requested_samples": 100,
+  "freshness_limit_s": 0.5,
+  "frames": {
+    "arm": "robot base to configured EE; grasp TCP not calibrated",
+    "cube": "cube tag center in reference tag axes; no robot-base registration yet"
+  },
+  "units": "Joint angles/yaw radians; translations meters; board XY normalized and unclipped",
+  "clock_note": "Host receipt ages/offsets are diagnostic, not exposure synchronization. Robot uptime and camera timestamps retain separate clocks.",
+  "arrays": "NPZ: rgb uint8 RGB, depth_raw and depth_aligned uint16; meters = depth * depth_scale_m_per_unit; zero invalid",
+  "valid_note": "Fresh observations, arm without errors and cube detected; not a motion safety authorization or board-bound check",
+  "initialization": "Franky Robot applies default collision thresholds; no motion commands"
+}
