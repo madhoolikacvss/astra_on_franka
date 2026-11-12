@@ -1,0 +1,7 @@
+{
+  "status": "completed",
+  "samples": 100,
+  "detected_samples": 98,
+  "missing_or_rejected_samples": 2,
+  "error": null
+}
