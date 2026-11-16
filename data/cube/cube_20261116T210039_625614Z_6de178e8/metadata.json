@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "cube_config": {
+    "schema_version": 1,
+    "camera": "top_down",
+    "family": "tag36h11",
+    "reference_tag_id": 1,
+    "cube_tag_id": 0,
+    "tag_size_m": 0.05,
+    "board_bounds_m": {
+      "x_min": -0.5,
+      "x_max": -0.07,
+      "y_min": -0.71,
+      "y_max": -0.12
+    },
+    "max_hamming": 0,
+    "min_decision_margin": 0.0,
+    "board_mapping": {
+      "method": "homography_reference_xy",
+      "calibration_id": "board_corners_20261116T205146_051836Z_ee0ab320",
+      "reference_tag_id": 1,
+      "cube_tag_id": 0,
+      "center_verified": false,
+      "corners_reference_m": {
+        "near_left": [
+          -0.7474776568882004,
+          0.4669655954058985,
+          -0.06275566325749748
+        ],
+        "near_right": [
+          -0.11415685549192373,
+          0.4662812296537671,
+          -0.06541265242983285
+        ],
+        "far_right": [
+          -0.10868867041129382,
+          0.0030291455524380784,
+          -0.06882677715773444
+        ],
+        "far_left": [
+          -0.752746556590772,
+          -0.004772713533278683,
+          -0.06856047747030936
+        ]
+      }
+    }
+  },
+  "camera_config": {
+    "schema_version": 1,
+    "stream": {
+      "width": 640,
+      "height": 480,
+      "fps": 30,
+      "stale_after_s": 0.5,
+      "frame_timeout_ms": 1000,
+      "startup_valid_pairs": 5,
+      "max_rgb_depth_skew_ms": 70.0
+    },
+    "cameras": {
+      "top_down": {
+        "serial": "145422070656",
+        "asic_serial": "144223023540",
+        "depth_capable": true
+      },
+      "wrist": {
+        "serial": "233622078546",
+        "asic_serial": "223423020653",
+        "depth_capable": true
+      },
+      "side": {
+        "serial": "239722073976",
+        "asic_serial": "243623021110",
+        "depth_capable": true
+      }
+    }
+  },
+  "source_view": "top_down",
+  "python": "3.14.4 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 17:07:44) [GCC 14.3.0]",
+  "calibration_source": "active RealSense color stream intrinsics, logged per sample",
+  "tracked_point": "tag 0 center, not a calibrated physical cube center",
+  "normalization": "Unclipped four-corner mapping if configured; otherwise legacy axis bounds",
+  "angle_unit": "radians"
+}

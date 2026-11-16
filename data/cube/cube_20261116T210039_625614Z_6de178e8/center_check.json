@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "calibration_id": "board_corners_20261116T205146_051836Z_ee0ab320",
+  "target_normalized": [
+    0.5,
+    0.5
+  ],
+  "tolerance_per_axis": 0.03,
+  "samples": 100,
+  "detected_samples": 100,
+  "fraction_detected_within_tolerance": 1.0,
+  "median_normalized": [
+    0.4890151238767435,
+    0.4945479075346303
+  ],
+  "std_normalized": [
+    0.00037657804076224446,
+    0.001459657571596846
+  ],
+  "max_absolute_error_per_axis": [
+    0.011719195837384622,
+    0.008408240255634303
+  ],
+  "note": "Diagnostic center check only; assumes independent physical placement. Does not validate robot registration or motion safety."
+}
