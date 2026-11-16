@@ -224,4 +224,5 @@ __marimo__/
 /.build/
 /data/cube/
 /data/combined/
+/data/calibration/
 /tests

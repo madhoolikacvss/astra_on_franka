@@ -339,3 +339,67 @@ should not yet be converted into executable Cartesian limits.
 The initial review added this report and its README link. Subsequent user
 confirmations updated the report and camera identity configuration. No hardware
 drivers have been executed by this review.
+
+## Pick-and-place setup constraints (2026-11-11)
+
+Motion remains disabled by user instruction. The new workspace and gripper YAML
+files are declarative setup records, not an implemented motion interlock. Existing
+standalone motion scripts are not made safe by these fields and must not be run
+as part of this setup.
+
+The ceiling is 0.760 m above the tabletop, which is also the base mounting
+surface. The base center is 0.100 m behind the near table edge (corrected from
+the earlier 0.200 m typo). Left/right edges
+are 0.440/0.470 m from the base center and also bound walls/obstacles. The gripper
+must not go behind the base; all arm links and attached equipment must respect
+obstacles, not merely joint centers or the commanded endpoint.
+
+The forward safety boundary is confirmed at 0.640 m from the base center;
+do not add table depth to this measurement. With the near edge at +0.100 m,
+the permitted tabletop span in the forward direction is 0.540 m. The originally
+reported physical table depth is retained separately and does not set the limit.
+The gripper's edge restrictions mean the left, right and far edges, with its
+rear boundary at the base. Other arm links have a 0.150 m rear allowance,
+confirmed by the user as behind the base center. The gripper's rear allowance
+remains zero. Lab forward/right axes have not yet been registered
+to the robot API axes. These envelopes do not replace table-surface, mounting
+region, full-body and self-collision geometry.
+
+The unchanged physical custom gripper and its existing encoder/current/width
+calibrations are accepted. Reusing those settings does not supply missing outer
+geometry: 119 mm is finger opening, not tool height, swept volume or grasp TCP.
+The simulation Robotiq model is not a substitute for the custom gripper. A
+conservative bounding model can be established later using calibrated depth
+views and verified coverage; unobserved surfaces cannot be assumed empty.
+
+Next setup work: establish reference-tag-to-base registration, grasp TCP and
+conservative tool/attachment bounds; resolve the obstacle scene; then validate
+full-arm paths offline. Keep table contact, held-cube geometry, and clearance
+margins explicit. No physical calibration motions are authorized at this stage.
+
+## Provisional tag assignment update
+
+By user request, Astra now uses board/reference tag 0 and cube tag 1, matching
+legacy reset-policy configuration. The previous combined recording used the
+opposite assignment and remains unchanged. Existing board bounds are retained.
+This is a provisional selection, not verification of physical tag identity:
+the reported annotated image appeared to show the opposite physical placement.
+Verify that tag 1 moves with the cube and tag 0 stays fixed before registering
+this frame for motion. Motion remains disabled. Next: verify the new observation,
+then establish and validate robot-base-to-reference-tag registration.
+
+## Moving-cube check supersedes provisional assignment (2026-11-12)
+
+User confirmed that physical tag 0 moves with the cube. Use reference/board tag 1
+and cube tag 0. Run cube_20261112T222953_303106Z_55c59bfa already used this assignment
+on the lab machine; the local configuration has now been brought into agreement.
+The run completed with 98/100 detections, two missing/rejected-required-tag
+samples (7 and 33), no camera errors, and a closed camera worker.
+
+Detected positions span X [-0.5768, -0.3956] m and Y [0.0380, 0.4090] m in tag 1
+axes. All detected samples fall outside legacy board normalization bounds.
+This motion trace does not define board extrema. Retain raw reference-frame
+positions; recalibrate bounds from known board locations before using normalized
+coordinates for goals. The local run contains no preview images, so physical ID
+verification relies on the user's moving-cube observation, not an image review.
+Motion remains disabled; old recordings are unchanged.

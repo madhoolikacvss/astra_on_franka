@@ -297,10 +297,40 @@ processing, and persistence delay. Receipt times do not establish synchronized
 exposures; the requested rate is best effort and disk compression may slow it.
 
 Arm poses use robot-base meters and joint radians. Cube positions use reference
-tag 1 axes, track cube tag 0's center, and retain unclipped board normalization.
+tag 1 axes and track cube tag 0's center, confirmed by the user's moving-cube
+check on 2026-11-12. Legacy normalization bounds remain unverified in this frame;
+normalized values must not be used for motion until board calibration is corrected.
 There is no calibrated tag-to-robot-base transform or grasp TCP yet.
 
 Camera shutdown now allows a shared 10-second deadline (`shutdown_timeout_s` in
 camera stream settings). Per-camera `stopping`/`closed` phases and stop duration
 help distinguish capture delays from SDK shutdown delays. This is diagnostic
 hardening; a hardware shutdown fix still needs verification on the lab system.
+
+## Four-corner normalization and fresh center check
+
+Active cube normalization now uses the measured corners from
+`board_corners_20261116T205146_051836Z_ee0ab320`, embedded in `config/cube.yaml`.
+A planar homography maps reference-tag XY to unclipped board coordinates:
+near-left (0,0), near-right (1,0), far-right (1,1), far-left (0,1).
+Directions use the robot-base viewpoint. This fits the four measured tag-center
+placement limits, not physical wall geometry. Legacy bounds are fallback only.
+Z and yaw remain in the reference-tag frame; neither is transformed by the
+2-D normalization. The mapping is for cube placement on the board, not lifted
+cube geometry. Both standalone and combined observers use the same mapping.
+
+Place the cube at the independently measured center of the captured placement
+region (keep the same orientation and resting height), then run:
+
+```bash
+python scripts/observe_cube.py --check-center --samples 100 --hz 10 --preview
+```
+
+Press Enter in the terminal when placement is ready. The preview then streams.
+Do not use normalized feedback to choose the physical center: that would only
+check the mapping against itself. `center_check.json` records detection rate,
+median, spread and error. Default diagnostic acceptance requires a completed
+run with at least 95% detection and 95% of detected samples within 0.03 of
+(0.5,0.5) on both axes. This is a placement consistency check, not a certified
+accuracy threshold. The active configuration remains `center_verified: false`
+until independent evidence is reviewed. No arm connection or motion is made.

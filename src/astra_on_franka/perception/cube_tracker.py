@@ -1,7 +1,7 @@
 """Configured cube-tag center relative to the configured world/reference tag.
 
 Input is an existing RGB frame, never a new camera connection. Output XY uses
-the unchanged board bounds; no robot-base or physical cube-center calibration
+configured four-corner mapping or legacy bounds; no robot-base or physical cube-center calibration
 is implied. Angles are radians, unlike the original tracker's degree output.
 """
 from __future__ import annotations
@@ -11,6 +11,7 @@ import time
 
 import cv2
 import numpy as np
+from .board import BoardMapping
 
 
 def normalize_xy(xy, bounds):
@@ -32,6 +33,14 @@ class CubeTracker:
         self.tag_size = float(config["tag_size_m"])
         self.bounds = config["board_bounds_m"]
         normalize_xy([0, 0], self.bounds)
+        mapping = config.get("board_mapping")
+        self.board = None
+        if mapping:
+            if mapping["reference_tag_id"] != self.reference_id or mapping["cube_tag_id"] != self.cube_id:
+                raise ValueError("Board calibration tag IDs do not match tracker")
+            if mapping["method"] != "homography_reference_xy":
+                raise ValueError("Unsupported board mapping")
+            self.board = BoardMapping(mapping["corners_reference_m"])
         if self.reference_id == self.cube_id or not math.isfinite(self.tag_size) or self.tag_size <= 0:
             raise ValueError("Distinct reference/cube IDs and positive tag size are required")
         if detector is None:
@@ -92,6 +101,11 @@ class CubeTracker:
                   "source_host_received_unix_ns": frame["host_received_unix_ns"],
                   "calibration": frame["calibration"]["color_intrinsics"],
                   "tags": []}
+        result["normalization"] = ({"method": "homography_reference_xy",
+            "calibration_id": self.config["board_mapping"]["calibration_id"],
+            "axes": "u left-to-right, v near-to-far; robot-base viewpoint",
+            "center_verified": self.config["board_mapping"].get("center_verified", False)}
+            if self.board else {"method": "legacy_axis_bounds"})
         image, camera_params = self._rectify(frame["rgb"], result["calibration"])
         preview = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         transforms = {}
@@ -135,7 +149,7 @@ class CubeTracker:
                 result["reason"] = "missing_or_rejected_required_tag"
             else:
                 T = np.linalg.inv(transforms[self.reference_id]) @ transforms[self.cube_id]
-                normalized = normalize_xy(T[:2, 3], self.bounds)
+                normalized = self.board.normalize(T[:2, 3]) if self.board else normalize_xy(T[:2, 3], self.bounds)
                 result.update({"detected": True, "T_reference_cube_tag": T.tolist(),
                     "position_reference_m": T[:3, 3].tolist(), "position_board_normalized": normalized,
                     "inside_board": all(0 <= v <= 1 for v in normalized),

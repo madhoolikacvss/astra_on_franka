@@ -1,10 +1,12 @@
-# Reused from the working reset-policy tracker and user-confirmed board bounds.
+# Legacy bounds retained for diagnosis; not verified in reference tag 1 axes.
 schema_version: 1
 camera: top_down
 family: tag36h11
+# User confirmed tag 0 moves with cube on 2026-11-12.
 reference_tag_id: 1
 cube_tag_id: 0
 tag_size_m: 0.05
+# Do not use normalized positions for motion until bounds are recalibrated.
 board_bounds_m:
   x_min: -0.50
   x_max: -0.07
@@ -13,3 +15,28 @@ board_bounds_m:
 # Reject corrected tag IDs; log margin/pose error without claiming calibrated confidence.
 max_hamming: 0
 min_decision_margin: 0.0
+
+# Active four-corner mapping; legacy bounds above are fallback only.
+board_mapping:
+  method: homography_reference_xy
+  calibration_id: board_corners_20261116T205146_051836Z_ee0ab320
+  reference_tag_id: 1
+  cube_tag_id: 0
+  center_verified: false
+  corners_reference_m:
+    near_left:
+    - -0.7474776568882004
+    - 0.4669655954058985
+    - -0.06275566325749748
+    near_right:
+    - -0.11415685549192373
+    - 0.4662812296537671
+    - -0.06541265242983285
+    far_right:
+    - -0.10868867041129382
+    - 0.0030291455524380784
+    - -0.06882677715773444
+    far_left:
+    - -0.752746556590772
+    - -0.004772713533278683
+    - -0.06856047747030936

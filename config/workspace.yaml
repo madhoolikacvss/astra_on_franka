@@ -1,0 +1,46 @@
+schema_version: 1
+status: measured_constraints_not_registered
+# Setup data only. No motion executor or collision checker consumes this yet.
+motion_enabled: false
+task: pick_and_place_cube
+measurement_frame:
+  name: lab_table
+  axes: {forward: toward_table, lateral_positive: right, up: above_tabletop}
+  robot_base_transform: null
+  tabletop_height_m: 0.0
+  base_mounting_surface_height_m: 0.0
+  note: Mounting surface height does not establish the robot API frame origin.
+measurements_m:
+  left_edge_from_base_center: 0.440
+  right_edge_from_base_center: 0.470
+  table_width: 0.910
+  table_depth_previously_reported: 0.640
+  base_center_behind_near_edge: 0.100
+  height_ceiling_above_tabletop: 0.760
+  far_boundary_from_base_confirmed: 0.640
+  # Forward safety boundary is measured from base, not added to table depth.
+  near_edge_to_forward_safety_boundary: 0.540
+# Coordinates below use lab forward/right/up, not robot API XYZ.
+proposed_envelopes_m:
+  lateral: {min: -0.440, max: 0.470}
+  ceiling_above_tabletop: 0.760
+  gripper_forward: {min: 0.0, max: 0.640}
+  arm_links_forward: {min: -0.150, max: 0.640}
+  rear_allowance_interpretation: 150 mm behind base center
+  rear_allowance_datum_confirmed: true
+  note: Rear datum confirmed by user; coordinate registration and collision validation remain pending.
+constraints:
+  gripper_must_not_go_behind_base: true
+  lateral_table_edges_are_obstacle_boundaries: true
+  far_edge_is_obstacle_boundary: true
+  check_entire_arm_links_and_tool: true
+  check_wrist_camera_adapter_and_carried_cube: true
+  check_entire_path_not_only_endpoints: true
+  rear_mounting_region_geometry: null
+  clearance_margin_m: null
+  note: Base is behind the tabletop; a tabletop-only volume cannot contain the whole arm.
+calibration:
+  robot_base_T_reference_tag: null
+  configured_ee_T_grasp_tcp: null
+  collision_scene: null
+  validated: false
