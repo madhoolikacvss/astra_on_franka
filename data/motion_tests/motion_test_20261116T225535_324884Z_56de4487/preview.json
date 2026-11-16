@@ -1,0 +1,308 @@
+{
+  "preset": "tz+",
+  "start": {
+    "schema_version": 1,
+    "valid": true,
+    "host_read_start_monotonic_ns": 443801393929216,
+    "host_read_end_monotonic_ns": 443801394837504,
+    "host_received_unix_ns": 1794869735395030748,
+    "read_duration_ms": 0.908288,
+    "robot_time_ms": 9456718,
+    "joint_positions_rad": [
+      -0.08027989382382601,
+      -0.1576215803357575,
+      -0.2795322510386557,
+      -1.9565058858366022,
+      -0.05229175076841614,
+      1.7838720438798807,
+      0.42840435050078457
+    ],
+    "joint_velocities_rad_s": [
+      0.000408216821181969,
+      7.93392779205769e-05,
+      -0.0004504633339554489,
+      -0.0003375038329738281,
+      6.63245629989433e-05,
+      0.000793227050496738,
+      -0.0026303338787570345
+    ],
+    "O_T_EE": [
+      [
+        0.999666873233201,
+        0.012516701398030516,
+        -0.022141162705318185,
+        0.4732021423035941
+      ],
+      [
+        0.012518180493628295,
+        -0.9999120145807083,
+        -7.180240736300025e-05,
+        -0.1914754836189929
+      ],
+      [
+        -0.02214011333512656,
+        -0.00020538858302473692,
+        -0.999754851830423,
+        0.43667903948839476
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "F_T_EE": [
+      [
+        0.707099974155426,
+        0.707099974155426,
+        0.0,
+        0.0
+      ],
+      [
+        -0.707099974155426,
+        0.707099974155426,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0,
+        0.10339999943971634
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "transform_validation": {
+      "rotation_atol": 0.0001,
+      "bottom_row_atol": 1e-06,
+      "matrices_normalized": false,
+      "O_T_EE": {
+        "rotation_determinant": 0.9999807469012082,
+        "rotation_orthogonality_max_abs_error": 1.9253098791915946e-05
+      },
+      "F_T_EE": {
+        "rotation_determinant": 0.9999807469012083,
+        "rotation_orthogonality_max_abs_error": 1.92530987916939e-05
+      }
+    },
+    "ee_position_base_m": [
+      0.4732021423035941,
+      -0.1914754836189929,
+      0.43667903948839476
+    ],
+    "ee_rotation_base": [
+      [
+        0.999666873233201,
+        0.012516701398030516,
+        -0.022141162705318185
+      ],
+      [
+        0.012518180493628295,
+        -0.9999120145807083,
+        -7.180240736300025e-05
+      ],
+      [
+        -0.02214011333512656,
+        -0.00020538858302473692,
+        -0.999754851830423
+      ]
+    ],
+    "has_errors": false,
+    "error_flags": {
+      "base_acceleration_initialization_timeout": false,
+      "base_acceleration_invalid_reading": false,
+      "cartesian_motion_generator_acceleration_discontinuity": false,
+      "cartesian_motion_generator_elbow_limit_violation": false,
+      "cartesian_motion_generator_elbow_sign_inconsistent": false,
+      "cartesian_motion_generator_joint_acceleration_discontinuity": false,
+      "cartesian_motion_generator_joint_position_limits_violation": false,
+      "cartesian_motion_generator_joint_velocity_discontinuity": false,
+      "cartesian_motion_generator_joint_velocity_limits_violation": false,
+      "cartesian_motion_generator_start_elbow_invalid": false,
+      "cartesian_motion_generator_velocity_discontinuity": false,
+      "cartesian_motion_generator_velocity_limits_violation": false,
+      "cartesian_position_limits_violation": false,
+      "cartesian_position_motion_generator_invalid_frame": false,
+      "cartesian_position_motion_generator_start_pose_invalid": false,
+      "cartesian_reflex": false,
+      "cartesian_spline_motion_generator_violation": false,
+      "cartesian_velocity_profile_safety_violation": false,
+      "cartesian_velocity_violation": false,
+      "communication_constraints_violation": false,
+      "controller_torque_discontinuity": false,
+      "force_control_safety_violation": false,
+      "force_controller_desired_force_tolerance_violation": false,
+      "instability_detected": false,
+      "joint_motion_generator_acceleration_discontinuity": false,
+      "joint_motion_generator_position_limits_violation": false,
+      "joint_motion_generator_velocity_discontinuity": false,
+      "joint_motion_generator_velocity_limits_violation": false,
+      "joint_move_in_wrong_direction": false,
+      "joint_p2p_insufficient_torque_for_planning": false,
+      "joint_position_limits_violation": false,
+      "joint_position_motion_generator_start_pose_invalid": false,
+      "joint_reflex": false,
+      "joint_velocity_violation": false,
+      "joint_via_motion_generator_planning_joint_limit_violation": false,
+      "max_goal_pose_deviation_violation": false,
+      "max_path_pose_deviation_violation": false,
+      "power_limit_violation": false,
+      "self_collision_avoidance_violation": false,
+      "start_elbow_sign_inconsistent": false,
+      "tau_j_range_violation": false
+    },
+    "current_errors": "[]",
+    "robot_mode": "RobotMode.Idle"
+  },
+  "target_O_T_EE": [
+    [
+      0.9996764967146974,
+      0.012516821892414792,
+      -0.02214116270531817,
+      0.4732021423035941
+    ],
+    [
+      0.012518301002251294,
+      -0.9999216404221029,
+      -7.180240736299906e-05,
+      -0.1914754836189929
+    ],
+    [
+      -0.02214032647109887,
+      -0.00020539056023665488,
+      -0.9997548518304226,
+      0.44167903948839476
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "workspace": {
+    "schema_version": 1,
+    "status": "approximate_registration_accepted_motion_disabled",
+    "motion_enabled": false,
+    "task": "pick_and_place_cube",
+    "task_object": {
+      "shape": "cube",
+      "side_length_m": 0.06
+    },
+    "goal_check": {
+      "board_center_clearance_m": 0.05,
+      "boundary_basis": "captured_cube_tag_center_placement_region",
+      "note": "Stage 1 checks a point. Cube dimensions are recorded for later volume checks; no extra half-width is subtracted from the captured center limits."
+    },
+    "measurement_frame": {
+      "name": "lab_table",
+      "axes": {
+        "forward": "toward_table",
+        "lateral_positive": "right",
+        "up": "above_tabletop"
+      },
+      "robot_base_transform": null,
+      "tabletop_height_m": 0.0,
+      "base_mounting_surface_height_m": 0.0,
+      "note": "Mounting surface height does not establish the robot API frame origin."
+    },
+    "measurements_m": {
+      "left_edge_from_base_center": 0.44,
+      "right_edge_from_base_center": 0.47,
+      "table_width": 0.91,
+      "table_depth_previously_reported": 0.64,
+      "base_center_behind_near_edge": 0.1,
+      "height_ceiling_above_tabletop": 0.76,
+      "far_boundary_from_base_confirmed": 0.64,
+      "near_edge_to_forward_safety_boundary": 0.54
+    },
+    "proposed_envelopes_m": {
+      "lateral": {
+        "min": -0.44,
+        "max": 0.47
+      },
+      "ceiling_above_tabletop": 0.76,
+      "gripper_forward": {
+        "min": 0.0,
+        "max": 0.64
+      },
+      "arm_links_forward": {
+        "min": -0.15,
+        "max": 0.64
+      },
+      "rear_allowance_interpretation": "150 mm behind base center",
+      "rear_allowance_datum_confirmed": true,
+      "note": "Rear datum confirmed by user; coordinate registration and collision validation remain pending."
+    },
+    "constraints": {
+      "gripper_must_not_go_behind_base": true,
+      "lateral_table_edges_are_obstacle_boundaries": true,
+      "far_edge_is_obstacle_boundary": true,
+      "check_entire_arm_links_and_tool": true,
+      "check_wrist_camera_adapter_and_carried_cube": true,
+      "check_entire_path_not_only_endpoints": true,
+      "rear_mounting_region_geometry": null,
+      "clearance_margin_m": null,
+      "note": "Base is behind the tabletop; a tabletop-only volume cannot contain the whole arm."
+    },
+    "calibration": {
+      "robot_base_T_reference_tag": [
+        [
+          0.04459481148284958,
+          -0.9990051565376478,
+          0.0,
+          0.7273427835007076
+        ],
+        [
+          -0.9990051565376477,
+          -0.0445948114828496,
+          0.0,
+          -0.3849842780640542
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0000000000000009,
+          -5.551115123125783e-17
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "configured_ee_T_grasp_tcp": null,
+      "collision_scene": null,
+      "validated": false
+    },
+    "registration_provenance": {
+      "source_run": "registration_rough_20261116T213828_325186Z_76345fd4",
+      "source_frame": "apriltag_1",
+      "target_frame": "robot_base",
+      "accepted_by_user": true,
+      "quality": "approximate_manual_registration",
+      "rms_fit_residual_mm": 13.295771046942075,
+      "max_fit_residual_mm": 18.927763440054413,
+      "independently_validated": false,
+      "residual_is_error_bound": false,
+      "assumptions": [
+        "Reference Z assigned -0.06 m to every point from approximate user report; not individually recorded.",
+        "Robot-base Z assigned +0.06 m: tag 6 cm above board surface, assuming board surface equals base mounting datum.",
+        "Base origin and axes follow user description; no independent datum verification.",
+        "No independent check points yet. Fit is diagnostic only, not motion calibration."
+      ]
+    }
+  },
+  "offline": false,
+  "guard_margin_m": 0.05,
+  "rejection_reasons": [],
+  "target_rotation_projection": "Closest proper rotation from measured rounded matrix via SVD; raw observation preserved",
+  "scope": "EE and flange POINT guards only. No full-arm/tool-volume collision enforcement. Base-axis rotation about configured EE origin; not fingertips. No gripper or camera commands."
+}
