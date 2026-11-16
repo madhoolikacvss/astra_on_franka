@@ -382,3 +382,120 @@ passed, 1 means goal rejected, and 2 means invalid input/configuration.
 `motion_authorized` is always false. No hardware is opened. The measured fit
 residual is not treated as a guaranteed error bound. The full-arm collision scene,
 reachability, grasp pose, swept tool volume and trajectories remain unchecked.
+
+## Stage 2: static tool-envelope checker
+
+`config/tool_geometry.yaml` describes conservative axis-aligned boxes in the
+CONFIGURED EE frame for the gripper, adapter, and wrist camera. Bounds must
+include cables and the gripper's full finger opening range. The 119 mm opening
+is not a complete outer bound. Missing bounds, coverage confirmation, or padding
+produce an incomplete result, never a pass. The user must choose additional
+measurement padding; the 50 mm board goal margin is separate.
+
+```bash
+python scripts/check_tool_pose.py --observations data/observations/ARM_RUN/observations.jsonl
+```
+
+A combined observations JSONL is also supported. `--sample` selects a zero-based
+row; `--holding-cube` additionally requires the configured-EE-to-cube-center
+attachment transform and uses the recorded 60 mm cube dimensions. No rigid
+attachment is assumed from camera-tag observation alone.
+
+The checker transforms all eight vertices of each padded box and reports minimum
+signed clearance to front/rear/left/right/ceiling and a conservative global
+horizontal tabletop plane. All tool components currently use the gripper's
+nonnegative forward boundary; the arm-link rear allowance belongs to the future
+full-arm checker. Table contact is not specially permitted. Tool-to-tool and
+arm self-collision, internal obstacles, motion paths and inverse kinematics are
+not checked. Even a static envelope pass never authorizes motion.
+
+Recorded matrices use the observer's 1e-4 rotation tolerance and 1e-6 homogeneous
+row tolerance, without silently normalizing them. Box padding must account for
+measurement/model uncertainty. Results and exact input snapshots are saved to
+unique `data/calibration/tool_check_*/` directories. Exit 1 means incomplete or
+rejected; exit 2 means malformed inputs. The script opens no hardware connections.
+
+## Preview-first supervised motion test
+
+`test_motion.py` implements ONE small preset per invocation. It defaults to
+preview and never homes, retries, recovers errors, or commands the gripper.
+
+```bash
+# Live arm state preview (connects but sends no move/stop/dynamics commands):
+python scripts/test_motion.py --preset tz+
+
+# Fully offline preview from a saved arm or combined JSONL:
+python scripts/test_motion.py --preset tz+ --observations data/observations/ARM_RUN/observations.jsonl
+```
+
+Presets `tx+`, `tx-`, `ty+`, `ty-`, `tz+`, `tz-` translate 5 mm in ROBOT BASE
+axes. `rx+`, `rx-`, `ry+`, `ry-`, `rz+`, `rz-` rotate 1 degree about a base-axis
+through the configured EE origin, NOT around the fingertips. One preset only;
+no chained movement or return-to-start is scheduled. Raw measured matrices are
+preserved; the target rotation is projected to the closest proper rotation
+because the configured lab EE transform has rounded coefficients.
+
+Execution additionally requires workspace `motion_enabled: true`, `--execute`,
+and `--confirm-clear-path`. The configuration remains false in this checkout.
+The clear-path flag means the operator has inspected clearance for the complete
+arm, gripper, camera and cables and has the physical stop available. Do not run
+another arm recorder: this script shares one Franky Robot with ArmObserver.
+A live preview changes Franky's default collision settings at construction, as
+existing lab observers do; it issues no motion, recovery, or gripper command.
+
+Requested effective translation limits are 5 mm/s, 10 mm/s² and 50 mm/s³.
+Requested rotation limits are 1 degree/s, 2 degrees/s² and 10 degrees/s³.
+The script sets explicit dynamics caps and a 0.05 global factor. Requested joint
+limits are 0.02 rad/s, 0.04 rad/s², 0.2 rad/s³; actual joint velocity is separately
+observed. Default Franka collision thresholds remain unchanged. No MAX_DYNAMICS
+or abrupt direct torque control is used. Native controller behavior on the lab
+installation still needs verification; no hardware execution was performed here.
+
+Before submission, both configured EE and flange POINTS are checked at 21
+interpolated poses against workspace limits with a 50 mm inward guard. This
+separate test guard is not a model of tool volume and does not enforce board
+placement normalization. EE uses no-behind-base; flange uses the arm rear limit.
+The floor is conservatively treated as the tabletop plane across the workspace.
+Only Idle, stationary, error-free starts are permitted. Execution re-reads state
+and rejects displacement since preview rather than executing an obsolete target.
+
+During motion, an independent observer thread polls state at a requested 100 Hz.
+The main thread checks a 100 ms observation watchdog while joining asynchronous
+motion in 5 ms intervals. It requests robot.stop() on reader failure, stale or
+repeated robot time, invalid values, robot errors, guard crossing, >2 mm departure
+from the translation segment, excessive rotation, >0.05 rad joint excursion,
+>0.08 rad/s observed joint speed, >15 mm/s observed EE speed, or >3 degrees/s
+observed EE rotation. A native Franky time reaction also stops the motion after
+30 seconds. Completion requires ten subsequent observations, final position
+within 1 mm, orientation within 0.3 degrees, and settled joints. Stop failures are
+reported explicitly. There are no automatic corrective moves.
+
+These are BEST-EFFORT software checks. Python polling/network stop latency and
+braking distance are nonzero; stop is not a guarantee against crossing a physical
+boundary. The margin is not a certified braking/uncertainty budget. This script
+does not enforce complete link/tool geometry, self-collision, or interior
+obstacles. It is a supervised test, not an autonomous safety controller.
+
+Arm observations (joint state, poses, timestamps, faults) are retained in memory
+during the bounded test and written to a unique `data/motion_tests/` run afterward,
+so disk writes cannot block supervision. A hard process crash can lose this buffer.
+RGB-D acquisition/tag detection is not performed in the control-monitor thread.
+The existing camera-only recorder may be used separately; do not start the combined
+recorder or another arm connection simultaneously. Final preview, dynamics and
+summary records are included. Native time reaction is not a hardware watchdog.
+
+Repository review: `franka-toy/pi05_franka/controller.py` uses a 0.10 dynamics
+factor and 0.10 rad/s joint command cap; `reset_franka_home.py` scales velocity,
+acceleration and jerk to 0.10. `gello-local/teleop_franka.py` uses 100 Hz, 0.35 rad/s
+cap, 0.20 velocity smoothing, 0.25 dynamics and startup alignment checks. Its
+hardcoded joint-position arrays were not copied as verified FR3 limits. Neither
+lab path establishes this workspace's full-body collision geometry.
+
+Franky API references used:
+- https://timschneider42.github.io/franky/guide/robot.html
+- https://timschneider42.github.io/franky/api/generated/franky.Robot.html
+- https://timschneider42.github.io/franky/api/generated/franky.CartesianMotion.html
+- https://timschneider42.github.io/franky/guide/reactions.html
+
+Hardware-free regression checks:
+`python -m unittest discover -s tests -p test_motion_preview.py -v`.

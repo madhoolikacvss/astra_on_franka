@@ -1,0 +1,43 @@
+schema_version: 1
+status: measurements_required
+frame: configured_ee
+coverage_confirmed: false
+# Axis-aligned boxes in configured EE coordinates, meters. Enclose the entire
+# component, including cables and the fingers over their full opening range.
+# These are not robot-base coordinates, tag coordinates, or fingertip coordinates.
+boxes:
+  gripper: {min_m: null, max_m: null}
+  adapter: {min_m: null, max_m: null}
+  wrist_camera: {min_m: null, max_m: null}
+# Extra padding for measurement uncertainty; not the board's 50 mm goal margin.
+padding_m: null
+# Required only when checking with a held cube: measured rigid attachment pose.
+# Do not assume cube center equals configured EE or grasp TCP.
+configured_ee_T_cube_center: null
+
+# User-reported measurements, not yet registered to configured EE axes.
+reported_measurements:
+  gripper_outer_width_m: 0.150
+  extension_below_gripper_mount_base_m: 0.180
+  mount_base_datum: robot_metal_mounting_flange
+  camera_offset_in_front_of_flange_m: 0.060
+  camera_mount: shared_with_gripper
+  gripper_front_to_back_depth_m: 0.030
+  width_includes_full_finger_opening: true
+  finger_motion: two_fingers_on_one_linear_axis
+  camera_outer_dimensions_m:
+    width: 0.080
+    height: 0.020
+    thickness: 0.020
+  camera_width_confirmation_pending: false
+  camera_offset_reference_points: nearest_flange_surface_to_nearest_camera_surface
+  camera_center_from_nearest_flange_surface_m: 0.070
+  camera_center_below_flange_m: 0.040
+  camera_reported_level_below_flange_m: 0.030
+  camera_level_datum: camera_top_surface
+  camera_width_parallel_to_gripper_width: true
+  camera_centered_sideways: true
+  camera_sideways_center_offset_m: 0.0
+  note_camera: Center offset assumes the 20 mm thickness follows the measured gap direction. Flange surface is not yet located relative to the flange frame origin; bracket and cable envelope remain unmeasured.
+  mount_base_to_configured_ee_transform: null
+  note: Below and in front are physical descriptions, not assigned EE axes. The 180 mm outer extension is not a measured grasp TCP offset. Camera offset is not camera size.
