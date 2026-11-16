@@ -1,8 +1,15 @@
 schema_version: 1
-status: measured_constraints_not_registered
+status: approximate_registration_accepted_motion_disabled
 # Setup data only. No motion executor or collision checker consumes this yet.
 motion_enabled: false
 task: pick_and_place_cube
+task_object:
+  shape: cube
+  side_length_m: 0.060
+goal_check:
+  board_center_clearance_m: 0.050
+  boundary_basis: captured_cube_tag_center_placement_region
+  note: Stage 1 checks a point. Cube dimensions are recorded for later volume checks; no extra half-width is subtracted from the captured center limits.
 measurement_frame:
   name: lab_table
   axes: {forward: toward_table, lateral_positive: right, up: above_tabletop}
@@ -40,7 +47,25 @@ constraints:
   clearance_margin_m: null
   note: Base is behind the tabletop; a tabletop-only volume cannot contain the whole arm.
 calibration:
-  robot_base_T_reference_tag: null
+  robot_base_T_reference_tag: [[0.04459481148284958, -0.9990051565376478, 0.0, 0.7273427835007076], [-0.9990051565376477, -0.0445948114828496, 0.0, -0.3849842780640542], [0.0, 0.0, -1.0000000000000009, -5.551115123125783e-17], [0.0, 0.0, 0.0, 1.0]]
   configured_ee_T_grasp_tcp: null
   collision_scene: null
   validated: false
+
+registration_provenance:
+  source_run: registration_rough_20261116T213828_325186Z_76345fd4
+  source_frame: apriltag_1
+  target_frame: robot_base
+  accepted_by_user: true
+  quality: approximate_manual_registration
+  rms_fit_residual_mm: 13.295771046942075
+  max_fit_residual_mm: 18.927763440054413
+  independently_validated: false
+  residual_is_error_bound: false
+  assumptions:
+  - Reference Z assigned -0.06 m to every point from approximate user report; not individually
+    recorded.
+  - 'Robot-base Z assigned +0.06 m: tag 6 cm above board surface, assuming board surface
+    equals base mounting datum.'
+  - Base origin and axes follow user description; no independent datum verification.
+  - No independent check points yet. Fit is diagnostic only, not motion calibration.

@@ -403,3 +403,38 @@ positions; recalibrate bounds from known board locations before using normalized
 coordinates for goals. The local run contains no preview images, so physical ID
 verification relies on the user's moving-cube observation, not an image review.
 Motion remains disabled; old recordings are unchanged.
+
+## Center normalization sanity check (2026-11-16)
+
+Run `cube_20261116T210039_625614Z_6de178e8` used the active four-corner calibration
+and completed with 100/100 detections, all inside the board and within the
+configured +/-0.03 normalized center tolerance. Median UV was
+(0.489015, 0.494548); standard deviations were (0.000377, 0.001460).
+Maximum source age was 104.3 ms, camera diagnostics reported no errors, and
+shutdown completed. The saved preview shows tag 0 near the board center and
+fixed reference tag 1.
+
+The user placed the cube approximately at center, so this establishes a passed
+normalization sanity check, not independently measured absolute accuracy.
+`center_sanity_check` records the evidence; `center_verified` remains false for
+precise verification. No mapping coefficients were adjusted to force this
+observation to (0.5,0.5). Robot-base registration and collision validation remain
+pending, and motion stays disabled.
+
+## Approximate registration accepted for setup (2026-11-16)
+
+The user accepted the manual registration discrepancy and requested proceeding.
+`workspace.yaml` now stores the fitted `robot_base_T_reference_tag`, with
+provenance: 13.3 mm RMS and 18.9 mm maximum fit residual, approximate heights,
+and no independent validation. Acceptance is for working coordinate conversion;
+it does not turn residuals into a guaranteed uncertainty bound or enable motion.
+Robot X is forward, Y left, Z up; manual X was right and Y forward.
+
+`python scripts/audit_workspace.py` transforms the calibrated corner tag centers
+into robot-base coordinates and checks lateral, forward and ceiling point limits.
+Initial audit places far-left at X=0.6985 m and far-right at X=0.7195 m, beyond
+the retained 0.640 m forward boundary by 58.5 and 79.5 mm. Normalized board
+membership therefore does not imply workspace acceptance. Goal filtering must
+retain the smaller allowed region and later account for tool/cube size and
+clearance. The audit does not check arm links, paths, self-collision, or table
+contact. Motion remains disabled and the overall safety calibration unvalidated.

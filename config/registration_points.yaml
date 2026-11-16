@@ -1,0 +1,77 @@
+# Approximate measurements: review assumptions before use.
+schema_version: 1
+source_frame: apriltag_1
+target_frame: robot_base
+units: meters
+measurement_method: Approximate user manual inches and rounded tag observations; not
+  surveyed
+points:
+- name: fit_1
+  use: fit
+  manual_xy_inches:
+  - -9.5
+  - 26.1
+  reference_xyz_m:
+  - -0.64
+  - 0.034
+  - -0.06
+  base_xyz_m:
+  - 0.66294
+  - 0.2413
+  - 0.06
+- name: fit_2
+  use: fit
+  manual_xy_inches:
+  - 0
+  - 7.4
+  reference_xyz_m:
+  - -0.42
+  - 0.52
+  - -0.06
+  base_xyz_m:
+  - 0.18796
+  - 0.0
+  - 0.06
+- name: fit_3
+  use: fit
+  manual_xy_inches:
+  - 0
+  - 18.5
+  reference_xyz_m:
+  - -0.38
+  - 0.25
+  - -0.06
+  base_xyz_m:
+  - 0.4699
+  - 0.0
+  - 0.06
+- name: fit_4
+  use: fit
+  manual_xy_inches:
+  - 9.8
+  - 19.1
+  reference_xyz_m:
+  - -0.14
+  - 0.23
+  - -0.06
+  base_xyz_m:
+  - 0.48514
+  - -0.24892
+  - 0.06
+- name: check_a
+  use: check
+  reference_xyz_m: null
+  base_xyz_m: null
+- name: check_b
+  use: check
+  reference_xyz_m: null
+  base_xyz_m: null
+manual_axes: X positive right, Y positive forward; robot X=manual Y, robot Y=-manual
+  X
+assumptions:
+- Reference Z assigned -0.06 m to every point from approximate user report; not individually
+  recorded.
+- 'Robot-base Z assigned +0.06 m: tag 6 cm above board surface, assuming board surface
+  equals base mounting datum.'
+- Base origin and axes follow user description; no independent datum verification.
+- No independent check points yet. Fit is diagnostic only, not motion calibration.

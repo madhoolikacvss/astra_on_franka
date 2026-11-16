@@ -23,6 +23,14 @@ board_mapping:
   reference_tag_id: 1
   cube_tag_id: 0
   center_verified: false
+  center_sanity_check:
+    passed: true
+    run_id: cube_20261116T210039_625614Z_6de178e8
+    placement: approximate_center_by_user
+    median_normalized: [0.4890151238767435, 0.4945479075346303]
+    detected_samples: 100
+    total_samples: 100
+    note: Approximate placement confirms normalization consistency, not measured absolute accuracy.
   corners_reference_m:
     near_left:
     - -0.7474776568882004

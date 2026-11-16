@@ -334,3 +334,51 @@ run with at least 95% detection and 95% of detected samples within 0.03 of
 (0.5,0.5) on both axes. This is a placement consistency check, not a certified
 accuracy threshold. The active configuration remains `center_verified: false`
 until independent evidence is reviewed. No arm connection or motion is made.
+
+## Offline reference-tag to robot-base registration
+
+`config/registration_points.yaml` holds corresponding physical points measured
+in reference tag 1 axes and actual robot-base XYZ, in meters. At least three
+noncollinear fit points and two independently measured check points are required.
+The fixed robot does not need to move, but a metrology datum tied to its actual
+base origin and axes is required. Table edges and lab forward/right/up are not
+that datum until their relationship is measured. Cube-tag centers are above the
+board plane: do not pair them with tabletop Z or physical board corners.
+
+The current corner captures supply reference-frame cube-tag coordinates, but no
+matching robot-base coordinates. Unknown fields remain null and are rejected.
+After filling measured pairs, run `python scripts/register_board.py --max-error-mm N`,
+replacing N with an explicitly chosen residual tolerance in millimeters. The
+script fits a rigid transform (no scaling), reports fit and independent-check
+errors, and saves a candidate in a unique `data/calibration/registration_*/`.
+A diagnostic pass does not enable motion or install the transform. A common
+axis/origin mistake in all input points can pass residual checks, so measurement
+provenance must be reviewed separately. No hardware connections are opened.
+
+## Stage-1 offline goal checker
+
+```bash
+python scripts/check_goal.py --goal 0.5 0.5
+```
+
+U increases left-to-right and V near-to-far, viewed from the robot base.
+The checker inverts the four-corner homography, estimates resting tag-center Z
+using a least-squares plane through the captured corner XYZ measurements, and
+applies the accepted approximate reference-to-base transform. Output is the
+cube TAG CENTER, not a grasp TCP, cube geometric center, or motion command.
+
+The user's 60 mm cube dimension is recorded in workspace configuration. The
+50 mm margin is applied inside the polygon of measured cube-tag-center corner
+placements, using signed perpendicular distances to its edge lines in reference
+XY meters (not a fixed normalized-coordinate inset). These are already placement
+limits: no additional 30 mm half-cube subtraction is applied to that polygon.
+Physical cube/tool volume checks remain stage 2. Reported workspace distances
+use the configured point limits, without assuming the board margin also applies
+to walls. Table-surface collision and a minimum tool height are not checked.
+
+Each invocation saves result and configuration snapshots in a unique
+`data/calibration/goal_check_*/` directory. Exit code 0 means stage-1 point checks
+passed, 1 means goal rejected, and 2 means invalid input/configuration.
+`motion_authorized` is always false. No hardware is opened. The measured fit
+residual is not treated as a guaranteed error bound. The full-arm collision scene,
+reachability, grasp pose, swept tool volume and trajectories remain unchecked.
