@@ -1,0 +1,195 @@
+{
+  "corner": "near_right",
+  "captured_unix_ns": 1794862340266316325,
+  "source_sequence": 963,
+  "observation": {
+    "schema_version": 1,
+    "detected": true,
+    "reason": null,
+    "reference_frame": "apriltag_1",
+    "tracked_point": "apriltag_0_center",
+    "position_reference_m": [
+      -0.11415685549192373,
+      0.4662812296537671,
+      -0.06541265242983285
+    ],
+    "position_board_normalized": [
+      0.8973096383908751,
+      1.9936969994131646
+    ],
+    "yaw_rad": -1.6184971085251847,
+    "inside_board": false,
+    "T_reference_cube_tag": [
+      [
+        -0.04761167853687895,
+        0.998595235209546,
+        -0.023252618856694877,
+        -0.11415685549192373
+      ],
+      [
+        -0.9973748861809821,
+        -0.04879919911333679,
+        -0.053497425932182485,
+        0.4662812296537671
+      ],
+      [
+        -0.05455698380934754,
+        0.020644475839572626,
+        0.9982972208390325,
+        -0.06541265242983285
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "camera_serial": "145422070656",
+    "source_color": {
+      "frame_number": 969,
+      "timestamp_ms": 1794862340207.6577,
+      "timestamp_domain": "timestamp_domain.global_time"
+    },
+    "source_host_received_monotonic_ns": 436406240377910,
+    "source_host_received_unix_ns": 1794862340240571024,
+    "calibration": {
+      "width": 640,
+      "height": 480,
+      "fx": 606.1214599609375,
+      "fy": 605.1428833007812,
+      "ppx": 318.3548583984375,
+      "ppy": 242.92498779296875,
+      "distortion_model": "distortion.inverse_brown_conrady",
+      "coeffs": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "tags": [
+      {
+        "id": 0,
+        "accepted": true,
+        "hamming": 0,
+        "decision_margin": 57.70340347290039,
+        "pose_error": 1.3440430213456308e-06
+      },
+      {
+        "id": 1,
+        "accepted": true,
+        "hamming": 0,
+        "decision_margin": 67.24068450927734,
+        "pose_error": 4.9277557744160896e-08
+      }
+    ],
+    "processing_ms": 17.757635,
+    "source_age_at_result_ms": 23.352637
+  },
+  "frame_file": "near_right.npz",
+  "preview_file": "near_right.png",
+  "camera_metadata": {
+    "host_received_monotonic_ns": 436406240377910,
+    "host_received_unix_ns": 1794862340240571024,
+    "streams": {
+      "color": {
+        "frame_number": 969,
+        "timestamp_ms": 1794862340207.6577,
+        "timestamp_domain": "timestamp_domain.global_time"
+      },
+      "depth": {
+        "frame_number": 967,
+        "timestamp_ms": 1794862340207.6406,
+        "timestamp_domain": "timestamp_domain.global_time"
+      }
+    },
+    "calibration": {
+      "serial_number": "145422070656",
+      "asic_serial_number": "144223023540",
+      "name": "RealSense D435",
+      "firmware_version": "5.17.3.10",
+      "usb_type_descriptor": "3.2",
+      "physical_port": "4-2.4.1-22",
+      "depth_scale_m_per_unit": 0.0010000000474974513,
+      "color_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 606.1214599609375,
+        "fy": 605.1428833007812,
+        "ppx": 318.3548583984375,
+        "ppy": 242.92498779296875,
+        "distortion_model": "distortion.inverse_brown_conrady",
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "depth_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 390.6062316894531,
+        "fy": 390.6062316894531,
+        "ppx": 323.8263244628906,
+        "ppy": 237.31814575195312,
+        "distortion_model": "distortion.brown_conrady",
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "depth_to_color_extrinsics": {
+        "rotation_column_major": [
+          0.9999818205833435,
+          0.005399388261139393,
+          -0.002678032498806715,
+          -0.005400543101131916,
+          0.9999853372573853,
+          -0.00042425814899615943,
+          0.0026757025625556707,
+          0.0004387132648844272,
+          0.9999963045120239
+        ],
+        "translation_m": [
+          0.014900271780788898,
+          0.00011492006888147444,
+          0.00026538033853285015
+        ]
+      },
+      "color_format": "format.rgb8",
+      "depth_format": "format.z16",
+      "color_fps": 30,
+      "depth_fps": 30,
+      "image_rotation_applied": false
+    },
+    "aligned_depth_intrinsics": {
+      "width": 640,
+      "height": 480,
+      "fx": 606.1214599609375,
+      "fy": 605.1428833007812,
+      "ppx": 318.3548583984375,
+      "ppy": 242.92498779296875,
+      "distortion_model": "distortion.inverse_brown_conrady",
+      "coeffs": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "depth_valid_fraction": 0.8772591145833334,
+    "rgb_depth_timestamp_skew_ms": 0.01708984375,
+    "sequence": 963,
+    "serial": "145422070656",
+    "host_age_ms": 5.569072,
+    "skipped_capture_pairs": 0
+  }
+}
