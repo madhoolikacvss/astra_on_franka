@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "stage1_passed": false,
+  "motion_authorized": false,
+  "goal_normalized": [
+    0.05,
+    0.05
+  ],
+  "tracked_point": "apriltag_0_center",
+  "proposed_tag_position_reference_m": [
+    -0.7155014546151062,
+    0.44374208016623523,
+    -0.06364220763840203
+  ],
+  "proposed_tag_position_robot_base_m": [
+    0.252134504757631,
+    0.3100167701946037,
+    0.06364220763840203
+  ],
+  "board_boundaries": {
+    "near": {
+      "signed_distance_m": 0.023188948252332166,
+      "required_margin_m": 0.05,
+      "remaining_clearance_m": -0.026811051747667836
+    },
+    "right": {
+      "signed_distance_m": 0.6015687416717791,
+      "required_margin_m": 0.05,
+      "remaining_clearance_m": 0.551568741671779
+    },
+    "far": {
+      "signed_distance_m": 0.4480307508122819,
+      "required_margin_m": 0.05,
+      "remaining_clearance_m": 0.3980307508122819
+    },
+    "left": {
+      "signed_distance_m": 0.03223357790638841,
+      "required_margin_m": 0.05,
+      "remaining_clearance_m": -0.017766422093611595
+    }
+  },
+  "workspace_boundary_distances_m": {
+    "rear": 0.252134504757631,
+    "front": 0.387865495242369,
+    "left": 0.12998322980539628,
+    "right": 0.7800167701946037,
+    "ceiling": 0.696357792361598
+  },
+  "rejection_reasons": [
+    "board_near: clearance 23.2 mm below required 50.0 mm",
+    "board_left: clearance 32.2 mm below required 50.0 mm"
+  ],
+  "board_calibration_id": "board_corners_20261116T205146_051836Z_ee0ab320",
+  "registration_quality": "approximate_manual_registration",
+  "cube_side_length_m": 0.06,
+  "height_method": "Least-squares resting tag-center plane from four captured XYZ corners",
+  "scope": "Board distances are perpendicular distances to edge lines in reference XY. 50 mm margin applies to captured tag-center placement region. Workspace checks use point only, without added margin. No cube-volume, tool, arm, table-surface, reachability or path checks."
+}
