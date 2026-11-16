@@ -499,3 +499,11 @@ Franky API references used:
 
 Hardware-free regression checks:
 `python -m unittest discover -s tests -p test_motion_preview.py -v`.
+
+## Astra agent bridge
+
+See [Astra bridge setup](docs/astra_bridge.md) for the operator-run file bridge,
+restricted command protocol and deployment permissions. The agent writes only
+`controller/command.json` and reads published data. Start in replay or live-preview;
+all execution gates remain disabled. This is setup for constrained requests,
+not a declaration that full-arm collision safety has been implemented.

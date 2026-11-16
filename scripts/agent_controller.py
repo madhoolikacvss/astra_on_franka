@@ -1,0 +1,256 @@
+#!/usr/bin/env python3
+"""Operator-run JSON inbox bridge. Replay and live preview never execute commands."""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import threading
+import time
+import uuid
+
+import numpy as np
+import yaml
+
+from record_observations import ROOT,create_run,write_json
+from test_motion import supervised_move,set_dynamics
+from astra_on_franka.agent_protocol import CommandFilter,decode_request
+from astra_on_franka.hardware.arm_observer import ArmObserver
+from astra_on_franka.hardware.motion_test import TIMEOUT_S,pose_guard
+from astra_on_franka.hardware.managed_gripper import ManagedGripper
+
+
+def atomic_json(path,value):
+    temporary=path.with_name(path.name+'.tmp')
+    with temporary.open('w',encoding='utf-8') as f: json.dump(value,f,allow_nan=False,indent=2)
+    temporary.replace(path)
+
+
+class Cameras:
+    def __init__(self,run):
+        self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
+        self.thread=threading.Thread(target=self.work,daemon=True)
+
+    def work(self):
+        from astra_on_franka.hardware.cameras import CameraRig,StreamSettings
+        from astra_on_franka.perception.cube_tracker import CubeTracker
+        import cv2
+        config=yaml.safe_load((ROOT/'config/cameras.yaml').read_text())
+        cube=yaml.safe_load((ROOT/'config/cube.yaml').read_text())
+        rig=None
+        try:
+            tracker=CubeTracker(cube);settings=StreamSettings(**config['stream'])
+            (self.run/'frames').mkdir()
+            with CameraRig({k:v['serial'] for k,v in config['cameras'].items()},settings) as rig:
+                index=0
+                while not self.done.is_set():
+                    capture=rig.read();frames=capture['cameras']
+                    result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
+                    saved={}
+                    for name,frame in frames.items():
+                        stem=self.run/'frames'/f'{index:06d}_{name}'
+                        with stem.with_suffix('.npz').open('xb') as f:
+                            np.savez_compressed(f,**{k:frame[k] for k in ('rgb','depth_raw','depth_aligned')})
+                        display=preview if name==cube['camera'] else frame['rgb'][:,:,::-1]
+                        if not cv2.imwrite(str(stem.with_suffix('.jpg')),display): raise RuntimeError('Cannot save camera preview')
+                        saved[name]={k:v for k,v in frame.items() if k not in ('rgb','depth_raw','depth_aligned')}
+                        saved[name]['rgbd_file']=str(stem.with_suffix('.npz').relative_to(ROOT))
+                        saved[name]['preview_file']=str(stem.with_suffix('.jpg').relative_to(ROOT))
+                    self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':min(f['host_received_monotonic_ns'] for f in frames.values())}
+                    index+=1;self.done.wait(.1)
+        except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
+        finally:
+            if rig is not None:write_json(self.run/'camera_diagnostics.json',rig.diagnostics())
+
+    def snapshot(self):
+        if self.error:raise RuntimeError(self.error)
+        if self.latest is None:raise RuntimeError('Cameras are warming up')
+        if time.monotonic_ns()-self.latest['oldest_receipt_ns']>500_000_000:raise RuntimeError('Camera observations stale')
+        return self.latest
+
+    def close(self):
+        self.done.set();self.thread.join(timeout=12)
+        if self.thread.is_alive():raise RuntimeError('Camera publisher did not stop')
+
+
+class LiveBackend:
+    def __init__(self,workspace,gripper_config,execute):
+        import franky
+        self.franky=franky;self.workspace=workspace;self.execute=execute
+        self.gripper=None;self.observer=None;self.latest=None;self.busy=False
+        self.robot=franky.Robot('172.16.0.2')
+        if self.robot.is_in_control:raise RuntimeError('Robot already controlled')
+        self.observer=ArmObserver('172.16.0.2',robot_factory=lambda _:self.robot)
+        try:self.gripper=ManagedGripper(gripper_config)
+        except BaseException:self.observer.close();raise
+
+    def observe(self):
+        if not self.busy:
+            self.latest={'arm':self.observer.read(),'gripper':self.gripper.read()}
+        if self.latest is None:raise RuntimeError('No arm observation')
+        if time.monotonic_ns()-self.latest['arm']['host_read_end_monotonic_ns']>150_000_000:
+            raise RuntimeError('Live arm observation stale')
+        return self.latest
+
+    def arm_update(self,sample):
+        self.latest={**self.latest,'arm':sample}
+
+    def perform(self,plan,start,cancel):
+        if not self.execute:return {'status':'previewed','plan':plan,'hardware_command_sent':False}
+        if plan['action']=='arm_step':
+            set_dynamics(self.robot,self.franky)
+            target=np.asarray(plan['target_O_T_EE'])
+            motion=self.franky.CartesianMotion(self.franky.Affine(target),self.franky.ReferenceType.Absolute)
+            motion.add_reaction(self.franky.Reaction(self.franky.Measure.ABS_TIME>TIMEOUT_S,self.franky.CartesianStopMotion()))
+            result,samples=supervised_move(self.robot,self.observer,start['arm'],target,self.workspace,motion,
+                cancel_event=cancel,on_observation=self.arm_update)
+            return {**result,'arm_observations':samples}
+        target=plan['closed_fraction'];begin=start['gripper']['closed_fraction'];samples=[]
+        try:
+            if cancel.is_set():raise RuntimeError('Stop requested before gripper enable')
+            self.gripper.enable_at_current_position()
+            started=time.monotonic();stable=0
+            while time.monotonic()-started<5.:
+                if cancel.is_set():raise RuntimeError('Stop requested')
+                arm=self.observer.read();grip=self.gripper.read();self.latest={'arm':arm,'gripper':grip}
+                if cancel.is_set():raise RuntimeError('Stop requested during observation')
+                _,reasons=pose_guard(arm['O_T_EE'],arm['F_T_EE'],self.workspace)
+                if arm['has_errors'] or reasons or np.max(np.abs(arm['joint_velocities_rad_s']))>.005:
+                    raise RuntimeError('Arm changed or violated bounds during gripper command')
+                if np.linalg.norm(np.asarray(arm['ee_position_base_m'])-start['arm']['ee_position_base_m'])>.001:
+                    raise RuntimeError('Arm moved during gripper command')
+                fraction=begin+np.clip(target-begin,-.1*(time.monotonic()-started),.1*(time.monotonic()-started))
+                self.gripper.command(float(fraction));samples.append({'arm':arm,'gripper':grip})
+                stable=stable+1 if abs(grip['closed_fraction']-target)<.025 and abs(fraction-target)<1e-6 else 0
+                if stable>=3:return {'status':'completed','gripper_observations':samples,'hardware_command_sent':True}
+                cancel.wait(.05)
+            raise RuntimeError('Gripper did not reach target; possible contact. No retry.')
+        except BaseException:
+            self.gripper.disable();raise
+
+    def close(self):
+        try:self.gripper.close()
+        finally:self.observer.close()
+
+
+def main(argv=None):
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--mode',choices=('replay','live-preview','live-execute'),default='replay')
+    parser.add_argument('--observations',type=Path,help='Replay only: existing arm/combined JSONL; never considered live')
+    parser.add_argument('--confirm-clear-path',action='store_true')
+    args=parser.parse_args(argv)
+    config=yaml.safe_load((ROOT/'config/agent_bridge.yaml').read_text())
+    workspace=yaml.safe_load((ROOT/'config/workspace.yaml').read_text())
+    grip_config=yaml.safe_load((ROOT/'config/gripper.yaml').read_text())
+    execute=args.mode=='live-execute'
+    if execute:
+        gates=(config['autonomous_execution_enabled'],config['os_isolation_verified'],config['arm_hardware_test_passed'],config['gripper_hardware_test_passed'],workspace['motion_enabled'],grip_config['motion_enabled'],args.confirm_clear_path)
+        if not all(x is True for x in gates):parser.error('Operator execution gates are closed; use preview mode')
+        import resource
+        if resource.getrlimit(resource.RLIMIT_RTPRIO)[0]<1:parser.error('Realtime priority unavailable')
+    if args.mode=='replay' and not args.observations:parser.error('Replay requires --observations')
+    if args.mode!='replay' and args.observations:parser.error('Live mode cannot use saved observations')
+    data=(ROOT/config['data_directory']).resolve();inbox=ROOT/config['request_file']
+    if inbox.is_symlink():parser.error('Symlink inbox refused')
+    if not data.is_relative_to(ROOT) or not inbox.resolve().is_relative_to(ROOT):parser.error('Paths must stay inside project')
+    data.mkdir(parents=True,exist_ok=True)
+    # This service must be started by the operator, under a different OS account.
+    lock=(data/'controller.lock').open('a+')
+    try:
+        if sys_platform_linux():
+            import fcntl
+            fcntl.flock(lock.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+        else:raise RuntimeError('Run the bridge on Linux; lock/permission deployment is Linux-specific')
+    except BaseException:lock.close();raise
+    run=create_run(data,prefix='session');filter_=CommandFilter(config,workspace)
+    backend=cameras=None;cancel=threading.Event();worker=None;outcome={};busy=False;digest=None;fault=None
+    last_request=None;inbox_index=0
+    try:
+        if args.mode=='replay':
+            with args.observations.open() as f:record=json.loads(next(f))
+            replay=record if 'arm' in record else {'arm':record,'gripper':None}
+        else:
+            backend=LiveBackend(workspace,grip_config,execute);cameras=Cameras(run);cameras.thread.start()
+        write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config})
+        print(f'{args.mode}: session {filter_.session_id}; inbox {inbox}',flush=True)
+        def work(plan,current):
+            try:outcome['result']=backend.perform(plan,current,cancel) if backend else {'status':'previewed','plan':plan,'hardware_command_sent':False}
+            except BaseException as exc:outcome['result']={'status':'failed','error':f'{type(exc).__name__}: {exc}'}
+        while True:
+            if worker and not worker.is_alive() and busy:
+                busy=False
+                if backend:
+                    backend.busy=False
+                    if cancel.is_set():backend.gripper.disable()
+                result=outcome['result']
+                if result['status']=='failed':
+                    fault=result.get('error') or result.get('stop_error') or 'Command failed';filter_.fault=fault
+                    if backend:backend.gripper.disable()
+                response={'request_id':last_request,'session_id':filter_.session_id,**result}
+                write_json(run/f'response_{filter_.count:04d}_{last_request}.json',response)
+                atomic_json(data/'response.json',response)
+                worker=None
+            observation=None
+            try:
+                observation=backend.observe() if backend else replay
+                if cameras:observation={**observation,**cameras.snapshot()}
+            except Exception as exc:
+                if busy:cancel.set();fault=str(exc);filter_.fault=fault
+                observation_error=str(exc)
+            else:observation_error=None
+            if observation is not None and observation_error is None:
+                token=filter_.publish(observation)
+                atomic_json(data/'latest.json',{'schema_version':1,'session_id':filter_.session_id,'observation_id':token,
+                    'published_unix_ns':time.time_ns(),'mode':args.mode,'live':args.mode!='replay','busy':busy,'fault':fault,
+                    'motion_authorized':False,'observation':observation,
+                    'note':'Agent cannot authorize motion; only operator-controlled service gates permit execution.'})
+            atomic_json(data/'status.json',{'session_id':filter_.session_id,'mode':args.mode,'busy':busy,'fault':fault,
+                'observation_error':observation_error,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})
+            if inbox.is_symlink():raise RuntimeError('Symlink inbox refused')
+            with inbox.open('rb') as f:raw=f.read(config['max_request_bytes']+1)
+            current_digest=hashlib.sha256(raw).digest()
+            if current_digest!=digest:
+                digest=current_digest;request=None
+                write_json(run/f'inbox_{inbox_index:06d}.json',{'received_unix_ns':time.time_ns(),'bytes_utf8':raw.decode('utf-8',errors='replace')})
+                inbox_index+=1
+                try:
+                    request=decode_request(raw,config['max_request_bytes'])
+                    if not request:continue
+                    if request.get('action')!='stop' and (observation is None or observation_error):raise ValueError('Fresh complete observation unavailable')
+                    plan=filter_.accept(request,observation,busy=busy)
+                    if plan['action']=='stop':
+                        cancel.set();fault=filter_.fault
+                        if backend and not busy:backend.gripper.disable()
+                        atomic_json(data/'response.json',{'request_id':request['request_id'],'status':'stop_requested','session_id':filter_.session_id})
+                    else:
+                        cancel.clear();outcome.clear();last_request=request['request_id'];busy=True
+                        if backend:backend.busy=True
+                        atomic_json(data/'response.json',{'request_id':last_request,'status':'accepted','session_id':filter_.session_id,'plan':plan})
+                        worker=threading.Thread(target=work,args=(plan,observation),daemon=True);worker.start()
+                except (ValueError,KeyError,TypeError) as exc:
+                    atomic_json(data/'response.json',{'status':'rejected','request_id':request.get('request_id') if isinstance(request,dict) else None,
+                        'reason':str(exc),'session_id':filter_.session_id})
+            time.sleep(.1)
+    except KeyboardInterrupt:pass
+    finally:
+        cancel.set()
+        if worker:worker.join(timeout=35)
+        errors=[]
+        if worker and worker.is_alive():errors.append('Command worker did not stop; use physical stop')
+        else:
+            if backend:
+                try:backend.close()
+                except Exception as exc:errors.append(str(exc))
+        if cameras:
+            try:cameras.close()
+            except Exception as exc:errors.append(str(exc))
+        atomic_json(data/'status.json',{'session_id':filter_.session_id,'status':'closed','cleanup_errors':errors,'heartbeat_unix_ns':time.time_ns()})
+        write_json(run/'summary.json',{'closed':True,'cleanup_errors':errors,'commands_used':filter_.count})
+        lock.close()
+
+
+def sys_platform_linux():
+    import sys
+    return sys.platform.startswith('linux')
+
+
+if __name__=='__main__':main()

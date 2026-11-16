@@ -74,10 +74,11 @@ def validate_sample(sample,start,target,workspace):
 
 class Monitor:
     """Poll current state, not delayed callback queues. No disk/camera work here."""
-    def __init__(self,observer,start,target,workspace):
+    def __init__(self,observer,start,target,workspace,on_observation=None):
         self.observer,self.start,self.target,self.workspace=observer,start,target,workspace
         self.samples=[]; self.error=None; self.last_ok=time.monotonic(); self.done=threading.Event()
         self.ready=threading.Event(); self.thread=threading.Thread(target=self.run,daemon=True)
+        self.on_observation=on_observation
 
     def run(self):
         try:
@@ -85,6 +86,7 @@ class Monitor:
                 t=time.monotonic(); sample=self.observer.read();self.samples.append(sample)
                 if len(self.samples)>10000: raise RuntimeError('Observation buffer limit')
                 validate_sample(sample,self.start,self.target,self.workspace)
+                if self.on_observation is not None: self.on_observation(sample)
                 if len(self.samples)>1:
                     previous=self.samples[-2]
                     robot_dt=(sample['robot_time_ms']-previous['robot_time_ms'])/1000

@@ -31,14 +31,15 @@ def set_dynamics(robot, franky):
             'relative_factor':factor}
 
 
-def supervised_move(robot,observer,start,target,workspace,motion):
-    monitor=Monitor(observer,start,target,workspace)
+def supervised_move(robot,observer,start,target,workspace,motion,*,cancel_event=None,on_observation=None):
+    monitor=Monitor(observer,start,target,workspace,on_observation=on_observation)
     error=None; stop_error=None; final=None; submitted=False
     monitor.thread.start()
     try:
         if not monitor.ready.wait(2.): raise RuntimeError('No initial monitored observation')
         monitor.check()
         latest=monitor.samples[-1]
+        if cancel_event is not None and cancel_event.is_set(): raise RuntimeError('Operator/agent stop requested')
         if (np.linalg.norm(np.asarray(latest['ee_position_base_m'])-np.asarray(start['ee_position_base_m']))>.0005
                 or angle_between(np.asarray(latest['O_T_EE'])[:3,:3],np.asarray(start['O_T_EE'])[:3,:3])>np.deg2rad(.1)):
             raise RuntimeError('Arm moved since preview; rerun from new state')
@@ -46,6 +47,7 @@ def supervised_move(robot,observer,start,target,workspace,motion):
         started=time.monotonic()
         robot.move(motion,asynchronous=True)
         while True:
+            if cancel_event is not None and cancel_event.is_set(): raise RuntimeError('Operator/agent stop requested')
             monitor.check()
             if time.monotonic()-started>TIMEOUT_S: raise RuntimeError('Motion timeout')
             if robot.join_motion(timeout=.005): break
@@ -53,6 +55,7 @@ def supervised_move(robot,observer,start,target,workspace,motion):
         # Require new observations AFTER motion completion, then verify settling.
         count=len(monitor.samples); until=time.monotonic()+1.
         while len(monitor.samples)<count+10:
+            if cancel_event is not None and cancel_event.is_set(): raise RuntimeError('Operator/agent stop requested')
             monitor.check()
             if time.monotonic()>until: raise RuntimeError('No settled final observations')
             time.sleep(.005)

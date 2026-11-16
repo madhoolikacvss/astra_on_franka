@@ -226,4 +226,5 @@ __marimo__/
 /data/combined/
 /data/calibration/
 /data/motion_tests/
+/data/agent_bridge/
 /tests

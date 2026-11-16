@@ -1,0 +1,16 @@
+schema_version: 1
+# Operator-controlled gates, never writable by Astra.
+autonomous_execution_enabled: false
+os_isolation_verified: false
+arm_hardware_test_passed: false
+gripper_hardware_test_passed: false
+request_file: controller/command.json
+data_directory: data/agent_bridge
+max_request_bytes: 4096
+observation_ttl_s: 10.0
+minimum_command_interval_s: 1.0
+max_commands_per_session: 20
+max_gripper_fraction_step: 0.10
+max_translation_from_session_start_m: 0.030
+max_rotation_from_session_start_deg: 5.0
+max_joint_excursion_from_session_start_rad: 0.10
