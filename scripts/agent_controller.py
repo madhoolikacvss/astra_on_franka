@@ -54,7 +54,20 @@ class Cameras:
         self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
         self.stale_after_s=.5
         self.retained_frames=deque()
+        self.stage={'name':'not_started','started_monotonic_ns':time.monotonic_ns()}
+        self.stage_timings={}
         self.thread=threading.Thread(target=self.work,daemon=True)
+
+    def mark_stage(self,name):
+        now=time.monotonic_ns()
+        self.stage_timings[self.stage['name']]=(now-self.stage['started_monotonic_ns'])/1e6
+        self.stage={'name':name,'started_monotonic_ns':now,'started_unix_ns':time.time_ns()}
+
+    def publisher_diagnostics(self):
+        stage=self.stage
+        return {'stage':stage['name'],'stage_age_ms':(time.monotonic_ns()-stage['started_monotonic_ns'])/1e6,
+                'thread_alive':self.thread.is_alive(),'error':self.error,
+                'completed_stage_ms':dict(self.stage_timings)}
 
     def retain_frame_set(self,paths):
         """Only prune files created by this publisher in this session's frames dir."""
@@ -71,6 +84,7 @@ class Cameras:
             self.retained_frames.popleft()
 
     def work(self):
+        self.mark_stage('initialization')
         from astra_on_franka.hardware.cameras import CameraRig,StreamSettings
         from astra_on_franka.perception.cube_tracker import CubeTracker
         import cv2
@@ -84,23 +98,28 @@ class Cameras:
             with CameraRig({k:v['serial'] for k,v in config['cameras'].items()},settings) as rig:
                 index=0
                 while not self.done.is_set():
+                    self.mark_stage('capture_wait')
                     capture=rig.read();frames=capture['cameras']
+                    self.mark_stage('tag_tracking')
                     processing_started=time.monotonic_ns()
                     result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
                     save_started=time.monotonic_ns()
                     saved={};written=[]
                     for name,frame in frames.items():
                         stem=self.run/'frames'/f'{index:06d}_{name}'
+                        self.mark_stage(f'{name}_npz_write')
                         with stem.with_suffix('.npz').open('xb') as f:
                             # Compression delayed publication enough to exhaust the
                             # freshness budget. Preserve all arrays without compression.
                             np.savez(f,**{k:frame[k] for k in ('rgb','depth_raw','depth_aligned')})
                         display=preview if name==cube['camera'] else frame['rgb'][:,:,::-1]
+                        self.mark_stage(f'{name}_jpeg_write')
                         if not cv2.imwrite(str(stem.with_suffix('.jpg')),display): raise RuntimeError('Cannot save camera preview')
                         written.extend((stem.with_suffix('.npz'),stem.with_suffix('.jpg')))
                         saved[name]={k:v for k,v in frame.items() if k not in ('rgb','depth_raw','depth_aligned')}
                         saved[name]['rgbd_file']=str(stem.with_suffix('.npz').relative_to(ROOT))
                         saved[name]['preview_file']=str(stem.with_suffix('.jpg').relative_to(ROOT))
+                    self.mark_stage('publication')
                     published=time.monotonic_ns()
                     oldest=min(f['host_received_monotonic_ns'] for f in frames.values())
                     timing={'sequence':index,'processing_ms':(save_started-processing_started)/1e6,
@@ -110,10 +129,14 @@ class Cameras:
                                  'camera_publication':timing,'retained_camera_frame_sets':5}
                     # Publish complete new files before removing the oldest set.
                     # Old snapshot image paths deliberately expire; re-read latest.
+                    self.mark_stage('retention_cleanup')
                     self.retain_frame_set(written)
                     # Retain timing evidence even if the final status is closed.
+                    self.mark_stage('timing_log_write')
                     with (self.run/'camera_publication.jsonl').open('a',encoding='utf-8') as log:
-                        log.write(json.dumps(timing,allow_nan=False)+'\n')
+                        log.write(json.dumps({**timing,'unix_ns':time.time_ns(),
+                            'stage_ms':dict(self.stage_timings)},allow_nan=False)+'\n')
+                    self.mark_stage('inter_frame_wait')
                     index+=1;self.done.wait(.01)
         except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
         finally:
@@ -129,7 +152,7 @@ class Cameras:
         if now-latest['oldest_receipt_ns']>self.stale_after_s*1e9:
             raise RuntimeError(f'Camera observations stale: ages_ms={ages}; '
                                f'limit_ms={self.stale_after_s*1000}; '
-                               f'publication={latest.get("camera_publication")}')
+                               f'publication={latest.get("camera_publication")}; publisher={self.publisher_diagnostics()}')
         return {**latest,'camera_ages_at_snapshot_ms':ages}
 
     def close(self):
@@ -271,6 +294,11 @@ def main(argv=None):
                 observation_error=f'{type(exc).__name__}: {exc}'
             else:observation_error=None
             observation_log.record(observation_error,observation_stage)
+            if backend:
+                events=backend.gripper.drain_read_events()
+                if events:
+                    with (run/'dynamixel_reads.jsonl').open('a',encoding='utf-8') as log:
+                        for event in events:log.write(json.dumps(event,allow_nan=False)+'\n')
             if observation is not None and observation_error is None:
                 token=filter_.publish(observation)
                 atomic_json(data/'latest.json',{'schema_version':1,'session_id':filter_.session_id,'observation_id':token,
@@ -280,6 +308,8 @@ def main(argv=None):
                     'note':'Agent cannot authorize motion; only operator-controlled service gates permit execution.'})
                 observation_log.published()
             atomic_json(data/'status.json',{'session_id':filter_.session_id,'mode':args.mode,'busy':busy,'fault':fault,
+                'camera_publisher':cameras.publisher_diagnostics() if cameras else None,
+                'dynamixel_read_events_dropped':backend.gripper.read_events_dropped if backend else 0,
                 **observation_log.stats,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})
             if inbox.is_symlink():raise RuntimeError('Symlink inbox refused')
             with inbox.open('rb') as f:raw=f.read(config['max_request_bytes']+1)
@@ -329,6 +359,7 @@ def main(argv=None):
             try:cameras.close()
             except Exception as exc:errors.append(str(exc))
         final_status={'session_id':filter_.session_id,'mode':args.mode,'status':'closed',
+            'camera_publisher':cameras.publisher_diagnostics() if cameras else None,
             'fault':fault,'terminal_error':terminal_error,'cleanup_errors':errors,
             'commands_used':filter_.count,**observation_log.stats,'heartbeat_unix_ns':time.time_ns()}
         atomic_json(data/'status.json',final_status)
