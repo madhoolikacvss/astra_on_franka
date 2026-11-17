@@ -1,8 +1,0 @@
-{
-  "file": "side_view.mp4",
-  "fps": 10.0,
-  "frames": 425,
-  "repeated_frames": 37,
-  "error": null,
-  "source": "Side RGB frames sampled by existing bridge, resampled to 10 fps; not all 30 fps camera frames"
-}

@@ -1,0 +1,166 @@
+{
+  "mode": "live-preview",
+  "session_id": "fb87afd80375462eb582c927578b272a",
+  "bridge_config": {
+    "schema_version": 1,
+    "autonomous_execution_enabled": true,
+    "os_isolation_verified": true,
+    "arm_hardware_test_passed": true,
+    "gripper_hardware_test_passed": true,
+    "request_file": "controller/command.json",
+    "data_directory": "data/agent_bridge",
+    "max_request_bytes": 4096,
+    "observation_ttl_s": 10.0,
+    "minimum_command_interval_s": 1.0,
+    "max_commands_per_session": null,
+    "max_gripper_fraction_step": 0.1,
+    "max_translation_from_session_start_m": null,
+    "max_rotation_from_session_start_deg": null,
+    "max_joint_excursion_from_session_start_rad": null
+  },
+  "workspace": {
+    "schema_version": 1,
+    "status": "approximate_registration_accepted_motion_disabled",
+    "motion_enabled": true,
+    "task": "pick_and_place_cube",
+    "task_object": {
+      "shape": "cube",
+      "side_length_m": 0.06
+    },
+    "goal_check": {
+      "board_center_clearance_m": 0.05,
+      "boundary_basis": "captured_cube_tag_center_placement_region",
+      "note": "Stage 1 checks a point. Cube dimensions are recorded for later volume checks; no extra half-width is subtracted from the captured center limits."
+    },
+    "measurement_frame": {
+      "name": "lab_table",
+      "axes": {
+        "forward": "toward_table",
+        "lateral_positive": "right",
+        "up": "above_tabletop"
+      },
+      "robot_base_transform": null,
+      "tabletop_height_m": 0.0,
+      "base_mounting_surface_height_m": 0.0,
+      "note": "Mounting surface height does not establish the robot API frame origin."
+    },
+    "measurements_m": {
+      "left_edge_from_base_center": 0.44,
+      "right_edge_from_base_center": 0.47,
+      "table_width": 0.91,
+      "table_depth_previously_reported": 0.64,
+      "base_center_behind_near_edge": 0.1,
+      "height_ceiling_above_tabletop": 0.76,
+      "far_boundary_from_base_confirmed": 0.64,
+      "near_edge_to_forward_safety_boundary": 0.54
+    },
+    "proposed_envelopes_m": {
+      "lateral": {
+        "min": -0.44,
+        "max": 0.47
+      },
+      "ceiling_above_tabletop": 0.76,
+      "gripper_forward": {
+        "min": 0.0,
+        "max": 0.64
+      },
+      "arm_links_forward": {
+        "min": -0.15,
+        "max": 0.64
+      },
+      "rear_allowance_interpretation": "150 mm behind base center",
+      "rear_allowance_datum_confirmed": true,
+      "note": "Rear datum confirmed by user; coordinate registration and collision validation remain pending."
+    },
+    "constraints": {
+      "gripper_must_not_go_behind_base": true,
+      "lateral_table_edges_are_obstacle_boundaries": true,
+      "far_edge_is_obstacle_boundary": true,
+      "check_entire_arm_links_and_tool": true,
+      "check_wrist_camera_adapter_and_carried_cube": true,
+      "check_entire_path_not_only_endpoints": true,
+      "rear_mounting_region_geometry": null,
+      "clearance_margin_m": null,
+      "note": "Base is behind the tabletop; a tabletop-only volume cannot contain the whole arm."
+    },
+    "calibration": {
+      "robot_base_T_reference_tag": [
+        [
+          0.04459481148284958,
+          -0.9990051565376478,
+          0.0,
+          0.7273427835007076
+        ],
+        [
+          -0.9990051565376477,
+          -0.0445948114828496,
+          0.0,
+          -0.3849842780640542
+        ],
+        [
+          0.0,
+          0.0,
+          -1.0000000000000009,
+          -5.551115123125783e-17
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "configured_ee_T_grasp_tcp": null,
+      "collision_scene": null,
+      "validated": false
+    },
+    "registration_provenance": {
+      "source_run": "registration_rough_20261116T213828_325186Z_76345fd4",
+      "source_frame": "apriltag_1",
+      "target_frame": "robot_base",
+      "accepted_by_user": true,
+      "quality": "approximate_manual_registration",
+      "rms_fit_residual_mm": 13.295771046942075,
+      "max_fit_residual_mm": 18.927763440054413,
+      "independently_validated": false,
+      "residual_is_error_bound": false,
+      "assumptions": [
+        "Reference Z assigned -0.06 m to every point from approximate user report; not individually recorded.",
+        "Robot-base Z assigned +0.06 m: tag 6 cm above board surface, assuming board surface equals base mounting datum.",
+        "Base origin and axes follow user description; no independent datum verification.",
+        "No independent check points yet. Fit is diagnostic only, not motion calibration."
+      ]
+    }
+  },
+  "gripper_config": {
+    "schema_version": 1,
+    "hardware": "existing_lab_custom_dynamixel_gripper",
+    "source_repositories": [
+      "franka-toy",
+      "gello-local"
+    ],
+    "motion_enabled": true,
+    "device": "/dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_FT8ISG7I-if00-port0",
+    "baud_rate": 4000000,
+    "protocol_version": 2.0,
+    "servo_id": 10,
+    "calibration": {
+      "open_position_raw": 3892,
+      "closed_position_raw": -143,
+      "safe_open_position_raw": 3832,
+      "safe_closed_position_raw": -83,
+      "grasp_current_raw": 45,
+      "maximum_opening_m": 0.119,
+      "closed_fraction_convention": "0=open, 1=closed",
+      "width_conversion": "maximum_opening_m * (1 - closed_fraction)"
+    },
+    "disable_torque_on_shutdown": true,
+    "collision_geometry": null,
+    "configured_ee_T_grasp_tcp": null
+  },
+  "translation_step_m": 0.05,
+  "gripper_transport": {
+    "kind": "spawned_process_rpc",
+    "worker_pid": 269890
+  }
+}

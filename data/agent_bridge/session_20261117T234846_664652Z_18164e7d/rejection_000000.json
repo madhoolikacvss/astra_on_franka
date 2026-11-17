@@ -1,0 +1,14 @@
+{
+  "status": "rejected",
+  "request_id": "approach_cdc14d9f72594dcc9d896704a53e4d32",
+  "reason": "Fresh complete observation unavailable: ValueError: Robot overall read deadline exceeded (100 ms) during validation; sample rejected",
+  "session_id": "7bb7b1a26a05457585fa05eb622b5cad",
+  "rejected_unix_ns": 1794959326979461660,
+  "observation_error": "ValueError: Robot overall read deadline exceeded (100 ms) during validation; sample rejected",
+  "observation_stage": "arm_and_gripper",
+  "last_observation_error": {
+    "message": "ValueError: Robot overall read deadline exceeded (100 ms) during validation; sample rejected",
+    "stage": "arm_and_gripper",
+    "unix_ns": 1794959326977023863
+  }
+}
