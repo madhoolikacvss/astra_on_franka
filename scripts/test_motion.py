@@ -93,7 +93,6 @@ def main(argv=None):
         if args.observations: parser.error('Saved observations cannot authorize motion')
         if workspace.get('motion_enabled') is not True: parser.error('workspace.yaml motion_enabled is false; execution remains locked')
         if not args.confirm_clear_path: parser.error('Execution requires --confirm-clear-path after physical inspection')
-        parser.error('Arm execution blocked: verified FR3 model and joint-trajectory/collision preflight are not implemented; use preview')
         import resource
         if resource.getrlimit(resource.RLIMIT_RTPRIO)[0]<1: parser.error('Realtime priority is unavailable')
     run=create_run(ROOT/'data/motion_tests',prefix='motion_test')

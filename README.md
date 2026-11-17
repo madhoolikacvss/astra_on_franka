@@ -463,8 +463,8 @@ During motion, an independent observer thread polls state at a requested 100 Hz.
 The main thread checks a 100 ms observation watchdog while joining asynchronous
 motion in 5 ms intervals. It requests robot.stop() on reader failure, stale or
 repeated robot time, invalid values, robot errors, guard crossing, >2 mm departure
-from the translation segment, excessive rotation, >0.05 rad joint excursion,
->0.08 rad/s observed joint speed, >15 mm/s observed EE speed, or >3 degrees/s
+from the translation segment, excessive rotation,
+>0.10 rad/s observed joint speed, >15 mm/s observed EE speed, or >3 degrees/s
 observed EE rotation. A native Franky time reaction also stops the motion after
 30 seconds. Completion requires ten subsequent observations, final position
 within 1 mm, orientation within 0.3 degrees, and settled joints. Stop failures are

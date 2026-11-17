@@ -139,9 +139,8 @@ class LiveBackend:
     def perform(self,plan,start,cancel,*,session_start=None,session_joint_limit=None):
         if not self.execute:return {'status':'previewed','plan':plan,'hardware_command_sent':False,
             'joint_trajectory_validated':False,
-            'execution_blocker':'Verified FR3 model and joint-trajectory/collision preflight not implemented'}
+            'safety_scope':'EE/flange point guards and runtime monitoring; no full-body collision planner'}
         if plan['action']=='arm_step':
-            raise RuntimeError('Arm execution blocked: verified FR3 model and joint-trajectory/collision preflight not implemented; no motion submitted')
             set_dynamics(self.robot,self.franky)
             target=np.asarray(plan['target_O_T_EE'])
             motion=self.franky.CartesianMotion(self.franky.Affine(target),self.franky.ReferenceType.Absolute)

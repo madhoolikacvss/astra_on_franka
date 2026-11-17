@@ -67,8 +67,10 @@ Filters enforce session identity, unique request IDs, fresh published observatio
 no command queue, at most one command/s, and 20 accepted commands per session.
 Arm presets are limited to 50 mm or 1 degree and check EE/flange guard boundaries.
 Translation from session start is capped at 50 mm, rotation at 5 degrees and
-observed joint excursion at 0.10 rad. Individual motion supervision retains the
-tighter per-move checks. Gripper target changes are at most 0.10 closed fraction.
+joint excursion is uncapped by default (null). A finite configured session cap
+is monitored throughout motion. The former 0.05 rad per-move cap is removed.
+Measured joint speed is limited to 0.10 rad/s, based on franka-toy; commanded
+joint speed remains capped at 0.02 rad/s. No model-preflight blocker is active. Gripper target changes are at most 0.10 closed fraction.
 
 Malformed JSON, duplicate keys, nonfinite numbers, unknown fields, oversized
 requests, replay and out-of-range targets are rejected, never silently clipped.

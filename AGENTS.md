@@ -1,19 +1,18 @@
 # Hardware motion rules
 
-## Current execution blocker: model-based joint policy pending
+## Current policy: supervised velocity-limited trial
 
-Physical arm execution is blocked in the bridge and standalone motion script.
-Cartesian previews remain available but do NOT validate a joint trajectory.
-Do not follow the live-execution handoff below until this blocker is resolved.
-The supplied repositories lack a verified complete FR3 arm model and collision
-scene. Required next work: validate the model against observed flange poses,
-plan the Cartesian path with continuous joint solutions and absolute joint limits,
-check collision geometry, and supervise measured joints against the planned path.
-No guessed trajectory deviation tolerance or expanded excursion cap is authorized.
-The 0.05 rad per-move cap is retained as a fallback, not claimed to support 50 mm.
-The monitor now checks the 0.10 rad session cap throughout motion as well as at
-command acceptance, and reports the offending joint and signed excursion.
-This is an interim fail-closed implementation, not a completed IK/collision planner.
+The user selected the franka-toy-style velocity policy. The temporary blanket
+model-preflight blocker is removed; the normal operator execution gates remain.
+There is no custom per-move joint-excursion cap. The session excursion cap is
+`null` in config/agent_bridge.yaml (disabled). If an operator configures a finite
+session cap, it is checked before commands and throughout motion.
+Measured joint speed must not exceed 0.10 rad/s, matching franka-toy's default
+velocity setting. Our commanded joint speed remains capped at 0.02 rad/s and
+Cartesian speed at 5 mm/s; acceleration, jerk, pose corridor, freshness, stop,
+50 mm Cartesian session limit, and 30 s timeout remain unchanged.
+This is not the franka-toy controller copied wholesale. No model-based joint
+trajectory or full-body collision check is implemented. Keep operator supervision.
 
 ## Local handoff: supervised 50 mm +X trial
 
@@ -99,8 +98,7 @@ previewing this revised single-command trial. Do not resume the faulted sequence
 7. End the physical trial after the single completed command. Do not send a
    second command, correct residual error, or restart to bypass the 50 mm session
    displacement cap. If any guard rejects or interrupts the move, report the
-   measured partial displacement and stop. The unchanged 0.05 rad per-move joint
-   excursion guard may stop a 50 mm move before it reaches the target.
+   measured partial displacement and stop. Never bypass a failed guard.
 8. Any rejection, failed action, session change, lost observation, unexpected
    movement, or operator stop ends the sequence. No retry, alternate direction,
    automatic recovery, or retreat. If a motion is pending, send the stop request
@@ -113,7 +111,7 @@ previewing this revised single-command trial. Do not resume the faulted sequence
 - Per command: 50 mm translation; current Cartesian speed cap 5 mm/s,
   acceleration 10 mm/s², jerk 50 mm/s³. Do not override dynamics.
 - Session: 50 mm displacement from initial EE position, 5 degrees rotation,
-  0.10 rad joint excursion, 20 accepted commands. This trial permits only one
+  no configured joint excursion cap, 20 accepted commands. This trial permits only one
   translation and no rotations/gripper commands, despite the broader interface.
 - Each move is monitored against fresh arm state and EE/flange point boundaries;
   sensor failures during a command trigger cancellation. Full arm/tool collision

@@ -70,7 +70,8 @@ class CommandFilter:
         pose=np.asarray(arm['O_T_EE']); old=np.asarray(previous['O_T_EE']); initial=np.asarray(self.start['O_T_EE'])
         if np.linalg.norm(pose[:3,3]-old[:3,3])>.001 or angle_between(pose[:3,:3],old[:3,:3])>np.deg2rad(.3):
             raise ValueError('Pose changed since referenced observation')
-        if np.max(np.abs(np.asarray(arm['joint_positions_rad'])-self.start['joint_positions_rad']))>self.config['max_joint_excursion_from_session_start_rad']:
+        joint_cap=self.config['max_joint_excursion_from_session_start_rad']
+        if joint_cap is not None and np.max(np.abs(np.asarray(arm['joint_positions_rad'])-self.start['joint_positions_rad']))>joint_cap:
             raise ValueError('Session joint excursion limit')
         if action=='arm_step':
             if set(args)!={'preset'} or not isinstance(args['preset'],str) or args['preset'] not in PRESETS:

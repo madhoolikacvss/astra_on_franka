@@ -11,6 +11,8 @@ GUARD_M = 0.05
 PERIOD_S = 0.01
 STALE_S = 0.10
 TIMEOUT_S = 30.
+# franka-toy/pi05_franka/controller.py default max_joint_velocity.
+JOINT_SPEED_CEILING_RAD_S = 0.10
 PRESETS = {f'{kind}{axis}{sign}': (kind, i, direction)
            for kind in ('t','r') for i,axis in enumerate('xyz')
            for sign,direction in (('+',1),('-',-1))}
@@ -73,10 +75,14 @@ def validate_sample(sample,start,target,workspace,*,session_start=None,session_j
     if time.monotonic_ns()-sample['host_read_end_monotonic_ns'] > STALE_S*1e9: raise RuntimeError('Stale host observation')
     pose=rigid(sample['O_T_EE']); distances,reasons=pose_guard(pose,sample['F_T_EE'],workspace)
     if not np.allclose(sample['F_T_EE'],start['F_T_EE'],atol=1e-8,rtol=0): reasons.append('Configured tool transform changed')
-    reasons.extend(joint_excursion_reasons(sample,start,.05,'Per-move fallback guard'))
-    if session_start is not None:
+    if session_start is not None and session_joint_limit is not None:
         reasons.extend(joint_excursion_reasons(sample,session_start,session_joint_limit,'Session guard'))
-    if np.max(np.abs(sample['joint_velocities_rad_s']))>.08: reasons.append('Joint velocity exceeded 0.08 rad/s')
+    velocity=np.asarray(sample['joint_velocities_rad_s'],dtype=float)
+    joints=np.asarray(sample['joint_positions_rad'],dtype=float)
+    if velocity.shape!=(7,) or joints.shape!=(7,) or not np.isfinite([velocity,joints]).all():
+        raise RuntimeError('Invalid joint position/velocity observation')
+    if np.max(np.abs(velocity))>JOINT_SPEED_CEILING_RAD_S:
+        reasons.append('Joint velocity exceeded 0.10 rad/s')
     a=np.asarray(start['O_T_EE']); delta=target[:3,3]-a[:3,3]
     fraction=np.clip(np.dot(pose[:3,3]-a[:3,3],delta)/max(np.dot(delta,delta),1e-15),0,1)
     if np.linalg.norm(pose[:3,3]-(a[:3,3]+fraction*delta))>.002: reasons.append('EE left 2 mm translation corridor')
