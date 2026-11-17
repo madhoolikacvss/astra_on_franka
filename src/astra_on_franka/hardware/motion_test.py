@@ -5,7 +5,7 @@ import numpy as np
 
 from astra_on_franka.perception.tool_clearance import rigid
 
-STEP_M = 0.005
+STEP_M = 0.050
 STEP_RAD = np.deg2rad(1.)
 GUARD_M = 0.05
 PERIOD_S = 0.01

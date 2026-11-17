@@ -65,7 +65,7 @@ dynamics, serial registers and paths cannot be overridden by a request.
 Filters enforce session identity, unique request IDs, fresh published observations
 (10 s maximum), no significant pose/gripper change since that snapshot, idle arm,
 no command queue, at most one command/s, and 20 accepted commands per session.
-Arm presets are limited to 5 mm or 1 degree and check EE/flange guard boundaries.
+Arm presets are limited to 50 mm or 1 degree and check EE/flange guard boundaries.
 Translation from session start is capped at 50 mm, rotation at 5 degrees and
 observed joint excursion at 0.10 rad. Individual motion supervision retains the
 tighter per-move checks. Gripper target changes are at most 0.10 closed fraction.
@@ -122,9 +122,12 @@ trusted service identity from the Astra/VS Code execution identity:
    command paths are actually denied; then records os_isolation_verified. This
    repository has NOT installed lab OS permissions or changed account privileges.
 
-Historical recordings and snapshots are preserved. Every distinct inbox content
-is journaled; final command results and session config are saved. Sensor streams
-consume disk space: stop the preview session when testing is finished.
+Camera storage is a rolling buffer of five complete frame sets per session,
+including five JPG previews and five RGB-D NPZs per camera. A sixth set exists
+briefly during publication; older frame paths expire. Re-read latest.json if an
+image disappears before opening it. Existing older sessions are not purged. Every distinct inbox content
+is journaled; final command results and session config are saved. Frame storage is bounded per session; metadata/timing logs still grow.
+Stop the preview session when testing is finished.
 
 ## Local tests
 

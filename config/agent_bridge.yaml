@@ -11,7 +11,7 @@ observation_ttl_s: 10.0
 minimum_command_interval_s: 1.0
 max_commands_per_session: 20
 max_gripper_fraction_step: 0.10
-# Authorized supervised +X trial: up to ten 5 mm steps, 50 mm total.
+# Authorized supervised +X trial: one 50 mm step, 50 mm total.
 max_translation_from_session_start_m: 0.050
 max_rotation_from_session_start_deg: 5.0
 max_joint_excursion_from_session_start_rad: 0.10

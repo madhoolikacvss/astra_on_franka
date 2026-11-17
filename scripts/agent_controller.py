@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Operator-run JSON inbox bridge. Replay and live preview never execute commands."""
 import argparse
+from collections import deque
 import hashlib
 import json
 from pathlib import Path
@@ -29,7 +30,22 @@ class Cameras:
     def __init__(self,run):
         self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
         self.stale_after_s=.5
+        self.retained_frames=deque()
         self.thread=threading.Thread(target=self.work,daemon=True)
+
+    def retain_frame_set(self,paths):
+        """Only prune files created by this publisher in this session's frames dir."""
+        directory=(self.run/'frames').resolve()
+        paths=tuple(Path(path) for path in paths)
+        if any(path.is_symlink() or path.resolve().parent!=directory for path in paths):
+            raise RuntimeError('Frame retention path outside session frames directory')
+        self.retained_frames.append(paths)
+        while len(self.retained_frames)>5:
+            for path in self.retained_frames[0]:
+                if path.is_symlink() or path.resolve().parent!=directory:
+                    raise RuntimeError('Frame retention path changed')
+                path.unlink(missing_ok=True)
+            self.retained_frames.popleft()
 
     def work(self):
         from astra_on_franka.hardware.cameras import CameraRig,StreamSettings
@@ -49,7 +65,7 @@ class Cameras:
                     processing_started=time.monotonic_ns()
                     result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
                     save_started=time.monotonic_ns()
-                    saved={}
+                    saved={};written=[]
                     for name,frame in frames.items():
                         stem=self.run/'frames'/f'{index:06d}_{name}'
                         with stem.with_suffix('.npz').open('xb') as f:
@@ -58,6 +74,7 @@ class Cameras:
                             np.savez(f,**{k:frame[k] for k in ('rgb','depth_raw','depth_aligned')})
                         display=preview if name==cube['camera'] else frame['rgb'][:,:,::-1]
                         if not cv2.imwrite(str(stem.with_suffix('.jpg')),display): raise RuntimeError('Cannot save camera preview')
+                        written.extend((stem.with_suffix('.npz'),stem.with_suffix('.jpg')))
                         saved[name]={k:v for k,v in frame.items() if k not in ('rgb','depth_raw','depth_aligned')}
                         saved[name]['rgbd_file']=str(stem.with_suffix('.npz').relative_to(ROOT))
                         saved[name]['preview_file']=str(stem.with_suffix('.jpg').relative_to(ROOT))
@@ -67,7 +84,10 @@ class Cameras:
                             'save_ms':(published-save_started)/1e6,
                             'oldest_age_at_publication_ms':(published-oldest)/1e6}
                     self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':oldest,
-                                 'camera_publication':timing}
+                                 'camera_publication':timing,'retained_camera_frame_sets':5}
+                    # Publish complete new files before removing the oldest set.
+                    # Old snapshot image paths deliberately expire; re-read latest.
+                    self.retain_frame_set(written)
                     # Retain timing evidence even if the final status is closed.
                     with (self.run/'camera_publication.jsonl').open('a',encoding='utf-8') as log:
                         log.write(json.dumps(timing,allow_nan=False)+'\n')

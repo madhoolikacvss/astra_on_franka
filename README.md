@@ -428,7 +428,7 @@ python scripts/test_motion.py --preset tz+
 python scripts/test_motion.py --preset tz+ --observations data/observations/ARM_RUN/observations.jsonl
 ```
 
-Presets `tx+`, `tx-`, `ty+`, `ty-`, `tz+`, `tz-` translate 5 mm in ROBOT BASE
+Presets `tx+`, `tx-`, `ty+`, `ty-`, `tz+`, `tz-` translate 50 mm in ROBOT BASE
 axes. `rx+`, `rx-`, `ry+`, `ry-`, `rz+`, `rz-` rotate 1 degree about a base-axis
 through the configured EE origin, NOT around the fingertips. One preset only;
 no chained movement or return-to-start is scheduled. Raw measured matrices are

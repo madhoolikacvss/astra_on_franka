@@ -4,7 +4,8 @@
 
 The human has requested a total 50 mm translation in robot-base +X (forward).
 This is an arm-control trial, not a cube-reaching or pick-and-place task.
-Use at most TEN sequential `arm_step` requests with preset `tx+`, each 5 mm.
+Submit exactly ONE `arm_step` request with preset `tx+`, translating 50 mm.
+This replaces the earlier ten-step plan. Do not send ten requests.
 Keep orientation unchanged; do not command the gripper, descend, grasp, return,
 or substitute a different direction. The agent may inspect all three camera
 views to assess the scene. Only the trusted controller sends hardware commands.
@@ -22,9 +23,9 @@ No physical movement has been verified by the saved preview evidence so far.
   contents to `{}`. Use a new service session for the physical trial.
 - First run `python scripts/agent_controller.py --mode live-preview`.
   Ask the agent to submit ONE `tx+` preview and inspect its matching result.
-  A preview does not move the arm or simulate cumulative movement: ten preview
+  A preview does not move the arm or simulate cumulative movement: repeated preview
   requests would repeatedly propose a step from the actual stationary pose.
-- Before live execution, verify a supervised single 5 mm arm hardware test,
+- Before live execution, verify a supervised arm hardware test,
   the gripper hardware test required by the current bridge, and OS isolation.
   Do not mark an unperformed test as passed. The current bridge requires both
   hardware-test gates even when the requested task is arm-only.
@@ -73,17 +74,15 @@ No physical movement has been verified by the saved preview evidence so far.
 6. Wait for `response.json` with the same request AND session IDs. `accepted`
    is pending. In preview, `previewed` ends the single-request preview trial;
    report the proposed target and that no movement occurred. In live execution,
-   only `completed` permits consideration of the next step. Verify a new, idle,
+   only `completed` confirms the command finished successfully. Verify a new, idle,
    valid arm observation and inspect the images after each completed step.
-   Check that measured X increased by approximately 5 mm, with no unexpected
+   Check that measured X increased by approximately 50 mm, with no unexpected
    Y/Z or orientation change; report actual displacement, not just step count.
-7. In live execution repeat only `tx+`, at least 1 second between submissions,
-   stopping after ten completed steps or when the 50 mm target is reached.
-   Never add an eleventh correction. Before submitting, check the proposed next
-   5 mm step against the original endpoint; if it would exceed 50 mm from the
-   initial position, stop short and report the achieved displacement.
-   The controller's independent session limit can also reject the last step due
-   to tracking differences. Do not increase limits or restart to evade that cap.
+7. End the physical trial after the single completed command. Do not send a
+   second command, correct residual error, or restart to bypass the 50 mm session
+   displacement cap. If any guard rejects or interrupts the move, report the
+   measured partial displacement and stop. The unchanged 0.05 rad per-move joint
+   excursion guard may stop a 50 mm move before it reaches the target.
 8. Any rejection, failed action, session change, lost observation, unexpected
    movement, or operator stop ends the sequence. No retry, alternate direction,
    automatic recovery, or retreat. If a motion is pending, send the stop request
@@ -93,11 +92,11 @@ No physical movement has been verified by the saved preview evidence so far.
 
 ### Controller limits and evidence
 
-- Per command: 5 mm translation; current Cartesian speed cap 5 mm/s,
+- Per command: 50 mm translation; current Cartesian speed cap 5 mm/s,
   acceleration 10 mm/s², jerk 50 mm/s³. Do not override dynamics.
 - Session: 50 mm displacement from initial EE position, 5 degrees rotation,
-  0.10 rad joint excursion, 20 accepted commands. This trial permits only ten
-  translations and no rotations/gripper commands, despite the broader interface.
+  0.10 rad joint excursion, 20 accepted commands. This trial permits only one
+  translation and no rotations/gripper commands, despite the broader interface.
 - Each move is monitored against fresh arm state and EE/flange point boundaries;
   sensor failures during a command trigger cancellation. Full arm/tool collision
   geometry is NOT enforced, so operator inspection remains necessary.
@@ -108,6 +107,11 @@ No physical movement has been verified by the saved preview evidence so far.
 - Read `data/agent_bridge/response.json` for command outcomes and the current
   `data/agent_bridge/session_*/` for metadata, inbox history, result files and
   images. Latest persists after shutdown; always pair it with running status.
+- The bridge retains only the latest five complete frame sets per session: five
+  JPGs and five RGB-D NPZs per camera (15 JPGs and 15 NPZs total). Older image
+  paths expire; if a read fails, re-read latest and its current paths. A sixth set
+  exists briefly while it is written. Historical session directories are not
+  automatically deleted.
 - Most recent supplied snapshot showed valid arm/gripper/cameras/cube with
   gripper encoder 3889 (almost fully open). This is historical evidence only.
   A prior fully closed position failed encoder validation; do not recalibrate or
@@ -143,7 +147,7 @@ stop the controller before maintenance. During robot operation:
   {"schema_version":1,"request_id":"unique_id","session_id":"from_latest",
    "observation_id":"from_latest","action":"arm_step",
    "arguments":{"preset":"tz+"}}
-- Allowed arm presets: tx+/tx-/ty+/ty-/tz+/tz- (5 mm in base axes),
+- Allowed arm presets: tx+/tx-/ty+/ty-/tz+/tz- (50 mm in base axes),
   rx+/rx-/ry+/ry-/rz+/rz- (1 degree about base axes through configured EE).
   Do not request free-form coordinates, velocity, force, raw joints, code or paths.
 - Gripper request uses action="gripper_set", arguments={"closed_fraction":0.5}.
