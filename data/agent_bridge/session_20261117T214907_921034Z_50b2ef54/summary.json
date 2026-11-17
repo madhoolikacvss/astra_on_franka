@@ -1,0 +1,44 @@
+{
+  "closed": true,
+  "session_id": "1bd130431ed64c1f95571b496bccb710",
+  "mode": "live-preview",
+  "status": "closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 1652.266662,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.284985,
+      "initialization": 190.227191,
+      "capture_wait": 0.054491,
+      "tag_tracking": 37.179834,
+      "top_down_npz_write": 11.714148,
+      "top_down_jpeg_write": 1.547119,
+      "wrist_npz_write": 16.435178,
+      "wrist_jpeg_write": 3.422683,
+      "side_npz_write": 3.905383,
+      "side_jpeg_write": 7.130522,
+      "publication": 0.025961,
+      "retention_cleanup": 2.946275,
+      "timing_log_write": 0.090312,
+      "inter_frame_wait": 18.437705
+    }
+  },
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [
+    "Gripper IPC fault: [Errno 32] Broken pipe; no retries, worker shutdown requested"
+  ],
+  "commands_used": 0,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: RuntimeError: Dynamixel read register=70 size=1: [TxRxResult] There is no status packet!; elapsed_ms=42.517",
+    "stage": "arm_and_gripper",
+    "unix_ns": 1794954480149232818
+  },
+  "observation_failure_count": 16,
+  "publication_count": 17547,
+  "last_publication_unix_ns": 1794954521433359296,
+  "heartbeat_unix_ns": 1794954523265897093
+}
