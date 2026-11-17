@@ -1,0 +1,20 @@
+{
+  "closed": true,
+  "session_id": "1b4bfe5f22604dc4a5e15b5eb29a3021",
+  "mode": "live-execute",
+  "status": "closed",
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [],
+  "commands_used": 0,
+  "observation_error": "RuntimeError: Camera observations stale: ages_ms={'top_down': 3196.404979, 'wrist': 3183.350147, 'side': 3203.49571}; limit_ms=500.0; publication={'sequence': 1070, 'processing_ms': 19.450101, 'save_ms': 78.165146, 'oldest_age_at_publication_ms': 125.862042}",
+  "last_observation_error": {
+    "message": "RuntimeError: Camera observations stale: ages_ms={'top_down': 3196.404979, 'wrist': 3183.350147, 'side': 3203.49571}; limit_ms=500.0; publication={'sequence': 1070, 'processing_ms': 19.450101, 'save_ms': 78.165146, 'oldest_age_at_publication_ms': 125.862042}",
+    "stage": "cameras",
+    "unix_ns": 1794950279408162119
+  },
+  "observation_failure_count": 33,
+  "publication_count": 687,
+  "last_publication_unix_ns": 1794950276593222376,
+  "heartbeat_unix_ns": 1794950279494991718
+}
