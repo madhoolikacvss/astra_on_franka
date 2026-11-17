@@ -80,8 +80,13 @@ class CommandFilter:
             for fraction in np.linspace(0,1,21):
                 _,reasons=pose_guard(target_pose(pose,args['preset'],fraction),arm['F_T_EE'],self.workspace)
                 if reasons: raise ValueError('; '.join(reasons))
-            if np.linalg.norm(target[:3,3]-initial[:3,3])>self.config['max_translation_from_session_start_m']+1e-9:
-                raise ValueError('Session translation limit')
+            distance=float(np.linalg.norm(target[:3,3]-initial[:3,3]))
+            limit=self.config['max_translation_from_session_start_m']
+            if distance>limit+1e-9:
+                raise ValueError(f'Session translation limit: proposed_distance_m={distance:.9f}, '
+                    f'limit_m={limit:.9f}, excess_m={distance-limit:.9f}; '
+                    f'session_start_xyz_m={initial[:3,3].tolist()}, '
+                    f'current_xyz_m={pose[:3,3].tolist()}, target_xyz_m={target[:3,3].tolist()}')
             if angle_between(initial[:3,:3],target[:3,:3])>np.deg2rad(self.config['max_rotation_from_session_start_deg'])+1e-9:
                 raise ValueError('Session rotation limit')
             plan={'action':action,'preset':args['preset'],'target_O_T_EE':target.tolist()}

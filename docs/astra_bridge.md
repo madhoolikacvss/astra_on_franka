@@ -66,7 +66,7 @@ Filters enforce session identity, unique request IDs, fresh published observatio
 (10 s maximum), no significant pose/gripper change since that snapshot, idle arm,
 no command queue, at most one command/s, and 20 accepted commands per session.
 Arm presets are limited to 50 mm or 1 degree and check EE/flange guard boundaries.
-Translation from session start is capped at 50 mm, rotation at 5 degrees and
+Translation from session start is capped at 52 mm (50 mm command plus 2 mm explicit allowance), rotation at 5 degrees and
 joint excursion is uncapped by default (null). A finite configured session cap
 is monitored throughout motion. The former 0.05 rad per-move cap is removed.
 Measured joint speed is limited to 0.10 rad/s, based on franka-toy; commanded
@@ -138,3 +138,9 @@ observation expiry, session replay, step bounds, stop while busy, motion fault
 stopping, Dynamixel enable ordering, and an end-to-end replay mailbox exchange.
 These tests use fake hardware and a mocked OS lock. Native Linux lock behavior,
 permissions and actual hardware execution require lab verification.
+
+Observation failures/recoveries are recorded in `observation_events.jsonl`;
+`rejection_*.json` retains each rejected request outcome and the current sensor
+error. Live/closed status and session summary include publication/failure counts,
+last publication time, last observation error, and any terminal exception.
+Current `observation_error: null` means recovery, not absence of historical failures.

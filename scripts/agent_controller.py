@@ -26,6 +26,29 @@ def atomic_json(path,value):
     temporary.replace(path)
 
 
+class ObservationLog:
+    def __init__(self,run):
+        self.run=run
+        self.stats={'observation_error':None,'last_observation_error':None,
+                    'observation_failure_count':0,'publication_count':0,
+                    'last_publication_unix_ns':None}
+
+    def record(self,error,stage):
+        now=time.time_ns();previous=self.stats['observation_error']
+        self.stats['observation_error']=error
+        if error is not None:
+            self.stats['observation_failure_count']+=1
+            self.stats['last_observation_error']={'message':error,'stage':stage,'unix_ns':now}
+        if error!=previous:
+            with (self.run/'observation_events.jsonl').open('a',encoding='utf-8') as f:
+                f.write(json.dumps({'unix_ns':now,'event':'failed' if error else 'recovered',
+                    'stage':stage,'error':error,'previous_error':previous},allow_nan=False)+'\n')
+
+    def published(self):
+        self.stats['publication_count']+=1
+        self.stats['last_publication_unix_ns']=time.time_ns()
+
+
 class Cameras:
     def __init__(self,run):
         self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
@@ -209,6 +232,7 @@ def main(argv=None):
     run=create_run(data,prefix='session');filter_=CommandFilter(config,workspace)
     backend=cameras=None;cancel=threading.Event();worker=None;outcome={};busy=False;digest=None;fault=None
     last_request=None;inbox_index=0
+    observation_log=ObservationLog(run);terminal_error=None
     try:
         if args.mode=='replay':
             with args.observations.open() as f:record=json.loads(next(f))
@@ -236,13 +260,17 @@ def main(argv=None):
                 atomic_json(data/'response.json',response)
                 worker=None
             observation=None
+            observation_stage='arm_and_gripper' if backend else 'replay'
             try:
                 observation=backend.observe() if backend else replay
-                if cameras:observation={**observation,**cameras.snapshot()}
+                if cameras:
+                    observation_stage='cameras'
+                    observation={**observation,**cameras.snapshot()}
             except Exception as exc:
                 if busy:cancel.set();fault=str(exc);filter_.fault=fault
-                observation_error=str(exc)
+                observation_error=f'{type(exc).__name__}: {exc}'
             else:observation_error=None
+            observation_log.record(observation_error,observation_stage)
             if observation is not None and observation_error is None:
                 token=filter_.publish(observation)
                 atomic_json(data/'latest.json',{'schema_version':1,'session_id':filter_.session_id,'observation_id':token,
@@ -250,8 +278,9 @@ def main(argv=None):
                     'motion_authorized':False,'observation':observation,
                     'translation_step_m':STEP_M,
                     'note':'Agent cannot authorize motion; only operator-controlled service gates permit execution.'})
+                observation_log.published()
             atomic_json(data/'status.json',{'session_id':filter_.session_id,'mode':args.mode,'busy':busy,'fault':fault,
-                'observation_error':observation_error,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})
+                **observation_log.stats,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})
             if inbox.is_symlink():raise RuntimeError('Symlink inbox refused')
             with inbox.open('rb') as f:raw=f.read(config['max_request_bytes']+1)
             current_digest=hashlib.sha256(raw).digest()
@@ -262,7 +291,8 @@ def main(argv=None):
                 try:
                     request=decode_request(raw,config['max_request_bytes'])
                     if not request:continue
-                    if request.get('action')!='stop' and (observation is None or observation_error):raise ValueError('Fresh complete observation unavailable')
+                    if request.get('action')!='stop' and (observation is None or observation_error):
+                        raise ValueError(f'Fresh complete observation unavailable: {observation_error or "No observation returned"}')
                     plan=filter_.accept(request,observation,busy=busy)
                     if plan['action']=='stop':
                         cancel.set();fault=filter_.fault
@@ -274,10 +304,18 @@ def main(argv=None):
                         atomic_json(data/'response.json',{'request_id':last_request,'status':'accepted','session_id':filter_.session_id,'plan':plan})
                         worker=threading.Thread(target=work,args=(plan,observation),daemon=True);worker.start()
                 except (ValueError,KeyError,TypeError) as exc:
-                    atomic_json(data/'response.json',{'status':'rejected','request_id':request.get('request_id') if isinstance(request,dict) else None,
-                        'reason':str(exc),'session_id':filter_.session_id})
+                    rejection={'status':'rejected','request_id':request.get('request_id') if isinstance(request,dict) else None,
+                        'reason':str(exc),'session_id':filter_.session_id,'rejected_unix_ns':time.time_ns(),
+                        'observation_error':observation_error,
+                        'observation_stage':observation_stage if observation_error else None,
+                        'last_observation_error':observation_log.stats['last_observation_error']}
+                    write_json(run/f'rejection_{inbox_index-1:06d}.json',rejection)
+                    atomic_json(data/'response.json',rejection)
             time.sleep(.1)
     except KeyboardInterrupt:pass
+    except BaseException as exc:
+        terminal_error=f'{type(exc).__name__}: {exc}'
+        raise
     finally:
         cancel.set()
         if worker:worker.join(timeout=35)
@@ -290,8 +328,11 @@ def main(argv=None):
         if cameras:
             try:cameras.close()
             except Exception as exc:errors.append(str(exc))
-        atomic_json(data/'status.json',{'session_id':filter_.session_id,'status':'closed','cleanup_errors':errors,'heartbeat_unix_ns':time.time_ns()})
-        write_json(run/'summary.json',{'closed':True,'cleanup_errors':errors,'commands_used':filter_.count})
+        final_status={'session_id':filter_.session_id,'mode':args.mode,'status':'closed',
+            'fault':fault,'terminal_error':terminal_error,'cleanup_errors':errors,
+            'commands_used':filter_.count,**observation_log.stats,'heartbeat_unix_ns':time.time_ns()}
+        atomic_json(data/'status.json',final_status)
+        write_json(run/'summary.json',{'closed':True,**final_status})
         lock.close()
 
 

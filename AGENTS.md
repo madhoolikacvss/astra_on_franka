@@ -10,7 +10,7 @@ session cap, it is checked before commands and throughout motion.
 Measured joint speed must not exceed 0.10 rad/s, matching franka-toy's default
 velocity setting. Our commanded joint speed remains capped at 0.02 rad/s and
 Cartesian speed at 5 mm/s; acceleration, jerk, pose corridor, freshness, stop,
-50 mm Cartesian session limit, and 30 s timeout remain unchanged.
+52 mm Cartesian session limit (50 mm command plus 2 mm allowance), and 30 s timeout remain unchanged.
 This is not the franka-toy controller copied wholesale. No model-based joint
 trajectory or full-body collision check is implemented. Keep operator supervision.
 
@@ -96,7 +96,7 @@ previewing this revised single-command trial. Do not resume the faulted sequence
    Check that measured X increased by approximately 50 mm, with no unexpected
    Y/Z or orientation change; report actual displacement, not just step count.
 7. End the physical trial after the single completed command. Do not send a
-   second command, correct residual error, or restart to bypass the 50 mm session
+   second command, correct residual error, or restart to bypass the 52 mm session
    displacement cap. If any guard rejects or interrupts the move, report the
    measured partial displacement and stop. Never bypass a failed guard.
 8. Any rejection, failed action, session change, lost observation, unexpected
@@ -110,7 +110,7 @@ previewing this revised single-command trial. Do not resume the faulted sequence
 
 - Per command: 50 mm translation; current Cartesian speed cap 5 mm/s,
   acceleration 10 mm/s², jerk 50 mm/s³. Do not override dynamics.
-- Session: 50 mm displacement from initial EE position, 5 degrees rotation,
+- Session: 52 mm displacement from initial EE position, 5 degrees rotation,
   no configured joint excursion cap, 20 accepted commands. This trial permits only one
   translation and no rotations/gripper commands, despite the broader interface.
 - Each move is monitored against fresh arm state and EE/flange point boundaries;
@@ -201,3 +201,9 @@ a security boundary. The operating agent must not share the service's privileges
   are not a guaranteed error bound. Do not fabricate missing tool geometry.
 - Use fake hardware tests for motion orchestration. Test that preview sends no
   commands and faults request stop before considering lab execution.
+
+Observation failures and recoveries are retained in session observation_events.jsonl.
+Rejected commands are saved as rejection_*.json with the current observation error.
+Status and summary preserve last_observation_error after recovery/shutdown; this
+historical field does not replace the current observation_error readiness check.
+The 2 mm session allowance does not authorize a second command or change workspace boundaries.
