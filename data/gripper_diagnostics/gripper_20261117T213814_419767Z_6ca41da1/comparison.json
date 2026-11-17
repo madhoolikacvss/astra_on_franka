@@ -1,0 +1,73 @@
+{
+  "combined_baseline": {
+    "source": "/home/madhoolika/workspace/astra_on_franka/data/agent_bridge/session_20261117T212400_715744Z_b1342719/dynamixel_reads.jsonl",
+    "read_count": 3624,
+    "registers": {
+      "70": {
+        "read_count": 1808,
+        "failure_count": 2,
+        "failure_rate": 0.0011061946902654867,
+        "elapsed_ms": {
+          "median": 16.093449999999997,
+          "p95": 26.131676499999998,
+          "p99": 30.83154856,
+          "max": 38.923988
+        },
+        "thread_cpu_ms_median": 4.343051
+      },
+      "132": {
+        "read_count": 1816,
+        "failure_count": 8,
+        "failure_rate": 0.004405286343612335,
+        "elapsed_ms": {
+          "median": 10.9848855,
+          "p95": 25.82570025,
+          "p99": 33.482109349999966,
+          "max": 136.177626
+        },
+        "thread_cpu_ms_median": 4.524208
+      }
+    }
+  },
+  "gripper_only": {
+    "source": "/home/madhoolika/workspace/astra_on_franka/data/gripper_diagnostics/gripper_20261117T213814_419767Z_6ca41da1/dynamixel_reads.jsonl",
+    "read_count": 4064,
+    "registers": {
+      "70": {
+        "read_count": 2032,
+        "failure_count": 0,
+        "failure_rate": 0.0,
+        "elapsed_ms": {
+          "median": 15.9846885,
+          "p95": 16.0001777,
+          "p99": 16.01212229,
+          "max": 16.050734
+        },
+        "thread_cpu_ms_median": 15.950101
+      },
+      "132": {
+        "read_count": 2032,
+        "failure_count": 0,
+        "failure_rate": 0.0,
+        "elapsed_ms": {
+          "median": 11.886865499999999,
+          "p95": 11.9812544,
+          "p99": 12.25919789,
+          "max": 12.495132
+        },
+        "thread_cpu_ms_median": 11.8486765
+      }
+    }
+  },
+  "changes": {
+    "70": {
+      "failure_rate_change_percentage_points": -0.11061946902654868,
+      "median_read_ms_change": -0.1087614999999964
+    },
+    "132": {
+      "failure_rate_change_percentage_points": -0.4405286343612335,
+      "median_read_ms_change": 0.9019799999999982
+    }
+  },
+  "interpretation": "Compare similar durations and unchanged wiring/settings. A difference suggests association with workload, not proof of USB contention; repeat to assess variability."
+}

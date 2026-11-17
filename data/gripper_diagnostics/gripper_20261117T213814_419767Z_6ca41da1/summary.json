@@ -1,0 +1,9 @@
+{
+  "attempts": 2032,
+  "successful_observations": 2032,
+  "failed_observations": 0,
+  "elapsed_s": 260.0006524019409,
+  "interrupted": false,
+  "terminal_error": null,
+  "cleanup_error": null
+}

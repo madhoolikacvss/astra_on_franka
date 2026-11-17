@@ -1,0 +1,39 @@
+{
+  "config": {
+    "schema_version": 1,
+    "hardware": "existing_lab_custom_dynamixel_gripper",
+    "source_repositories": [
+      "franka-toy",
+      "gello-local"
+    ],
+    "motion_enabled": true,
+    "device": "/dev/serial/by-id/usb-FTDI_USB__-__Serial_Converter_FT8ISG7I-if00-port0",
+    "baud_rate": 4000000,
+    "protocol_version": 2.0,
+    "servo_id": 10,
+    "calibration": {
+      "open_position_raw": 3892,
+      "closed_position_raw": -143,
+      "safe_open_position_raw": 3832,
+      "safe_closed_position_raw": -83,
+      "grasp_current_raw": 45,
+      "maximum_opening_m": 0.119,
+      "closed_fraction_convention": "0=open, 1=closed",
+      "width_conversion": "maximum_opening_m * (1 - closed_fraction)"
+    },
+    "disable_torque_on_shutdown": true,
+    "collision_geometry": null,
+    "configured_ee_T_grasp_tcp": null
+  },
+  "seconds": 260.0,
+  "gap_after_read_s": 0.1,
+  "python": "3.14.4 | packaged by Anaconda, Inc. | (main, Apr 14 2026, 17:07:44) [GCC 14.3.0]",
+  "platform": "Linux-5.15.96-rt61-x86_64-with-glibc2.31",
+  "dynamixel_sdk_version": "4.0.5",
+  "read_only": true,
+  "registers": [
+    132,
+    70
+  ],
+  "note": "Same sequential reads as bridge. No torque/mode/current/position writes, no hardware reset, no arm/camera connections."
+}
