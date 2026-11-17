@@ -49,6 +49,40 @@ class ObservationLog:
         self.stats['last_publication_unix_ns']=time.time_ns()
 
 
+class ObservationReadiness:
+    """A recent uninterrupted window of usable live observations, not authorization."""
+    def __init__(self):
+        self.since=None;self.last=None;self.count=0
+
+    def update(self,observation,error,*,live,busy,fault):
+        now=time.monotonic();ns=time.monotonic_ns();reason=None
+        if not live:reason='Replay is not live readiness'
+        elif fault:reason='Controller fault'
+        elif busy:reason='Controller busy'
+        elif error or observation is None:reason=error or 'No complete observation'
+        else:
+            arm=observation['arm'];grip=observation.get('gripper')
+            if (not arm.get('valid') or arm.get('has_errors') or
+                arm['robot_mode'].lower().split('.')[-1]!='idle' or
+                not np.isfinite(arm['joint_velocities_rad_s']).all() or
+                np.max(np.abs(arm['joint_velocities_rad_s']))>.005):
+                reason='Arm must be valid, error-free, Idle and stationary'
+            elif not grip or not grip.get('valid'):reason='Invalid gripper observation'
+            elif not 0<=ns-arm['host_read_end_monotonic_ns']<=150_000_000:reason='Arm observation stale'
+            elif not 0<=ns-grip['host_received_monotonic_ns']<=100_000_000:reason='Gripper observation stale'
+            elif not 0<=ns-observation.get('oldest_receipt_ns',0)<=500_000_000:reason='Camera observations stale'
+        if reason:
+            self.since=None;self.count=0;self.last=None
+        else:
+            if self.last is None or now-self.last>.5:self.since=now;self.count=0
+            self.last=now;self.count+=1
+        elapsed=0. if self.since is None else now-self.since
+        stable=reason is None and elapsed>=2. and self.count>=10
+        return {'observations_stable':stable,'ready_for_command':stable,
+                'stable_observations_s':elapsed,'stable_observation_count':self.count,
+                'required_stable_s':2.,'readiness_reason':None if stable else reason or 'Waiting for 2 seconds and 10 healthy observations'}
+
+
 class Cameras:
     def __init__(self,run):
         self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
@@ -255,7 +289,7 @@ def main(argv=None):
     run=create_run(data,prefix='session');filter_=CommandFilter(config,workspace)
     backend=cameras=None;cancel=threading.Event();worker=None;outcome={};busy=False;digest=None;fault=None
     last_request=None;inbox_index=0
-    observation_log=ObservationLog(run);terminal_error=None
+    observation_log=ObservationLog(run);terminal_error=None;readiness=ObservationReadiness()
     try:
         if args.mode=='replay':
             with args.observations.open() as f:record=json.loads(next(f))
@@ -308,7 +342,10 @@ def main(argv=None):
                     'translation_step_m':STEP_M,
                     'note':'Agent cannot authorize motion; only operator-controlled service gates permit execution.'})
                 observation_log.published()
+            readiness_status=readiness.update(observation,observation_error,
+                live=backend is not None,busy=busy,fault=fault)
             atomic_json(data/'status.json',{'session_id':filter_.session_id,'mode':args.mode,'busy':busy,'fault':fault,
+                **readiness_status,
                 'camera_publisher':cameras.publisher_diagnostics() if cameras else None,
                 'dynamixel_read_events_dropped':backend.gripper.read_events_dropped if backend else 0,
                 **observation_log.stats,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})
@@ -324,6 +361,8 @@ def main(argv=None):
                     if not request:continue
                     if request.get('action')!='stop' and (observation is None or observation_error):
                         raise ValueError(f'Fresh complete observation unavailable: {observation_error or "No observation returned"}')
+                    if backend and request.get('action')!='stop' and not readiness_status['ready_for_command']:
+                        raise ValueError(f'Observations not stable: {readiness_status["readiness_reason"]}')
                     plan=filter_.accept(request,observation,busy=busy)
                     if plan['action']=='stop':
                         cancel.set();fault=filter_.fault
@@ -360,6 +399,7 @@ def main(argv=None):
             try:cameras.close()
             except Exception as exc:errors.append(str(exc))
         final_status={'session_id':filter_.session_id,'mode':args.mode,'status':'closed',
+            'observations_stable':False,'ready_for_command':False,'readiness_reason':'Controller closed',
             'camera_publisher':cameras.publisher_diagnostics() if cameras else None,
             'fault':fault,'terminal_error':terminal_error,'cleanup_errors':errors,
             'commands_used':filter_.count,**observation_log.stats,'heartbeat_unix_ns':time.time_ns()}

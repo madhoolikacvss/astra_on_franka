@@ -202,3 +202,16 @@ Stop with Ctrl-C and compare the new session's `dynamixel_reads.jsonl`,
 `observation_events.jsonl`, and camera timing logs with the earlier combined
 baseline. Use the isolated worker in the normal combined bridge; do not run the
 standalone gripper diagnostic alongside it.
+
+The gripper worker ignores terminal SIGINT; the parent handles Ctrl-C, cancels
+active work, and asks the still-running worker to close normally. Broken-pipe
+errors from genuine worker failures remain visible rather than being suppressed.
+
+`status.json` now includes `observations_stable`, `ready_for_command`,
+`stable_observations_s`, `stable_observation_count`, and `readiness_reason`.
+Readiness requires two continuous seconds and at least ten healthy live checks,
+with no observation gap above 500 ms, no fault/busy state, a stationary Idle arm,
+and fresh arm/gripper/camera timestamps. It resets on failures and shutdown.
+Non-stop live requests are rejected until ready. Readiness is a live observation
+condition, not execution authorization, a full-path check, or a guarantee that
+the next read will succeed. Session IDs and heartbeat must still be checked.

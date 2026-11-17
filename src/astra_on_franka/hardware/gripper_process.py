@@ -2,6 +2,7 @@
 from collections import deque
 import multiprocessing as mp
 import os
+import signal
 import threading
 import time
 
@@ -9,6 +10,9 @@ from .managed_gripper import ManagedGripper
 
 
 def gripper_worker(connection,config,execute,factory=ManagedGripper):
+    # Terminal Ctrl+C reaches the process group. Only the parent initiates
+    # cancellation/close; the child must remain alive to disable torque and ack.
+    signal.signal(signal.SIGINT,signal.SIG_IGN)
     gripper=None
     try:
         gripper=factory(config)

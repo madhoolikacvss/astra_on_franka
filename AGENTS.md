@@ -67,6 +67,10 @@ previewing this revised single-command trial. Do not resume the faulted sequence
 2. Read `data/agent_bridge/status.json` and `latest.json`. Require matching
    session IDs, a running service (not `status: closed`), `live: true`, matching
    modes, no fault or observation error, and both snapshots not busy.
+   Require `observations_stable: true` and `ready_for_command: true` in status.
+   These require at least two seconds and ten fresh healthy idle observations;
+   errors, busy state or sampling gaps reset the window. They do not authorize
+   execution or certify collision safety. Closed-session readiness is false.
    Require heartbeat and publication age at most 1 second before each request;
    wait for a fresh snapshot if necessary. Never use a saved closed-session file.
    `motion_authorized: false` in latest is deliberately always false: it means
