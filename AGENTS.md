@@ -48,14 +48,21 @@ of motion. Stop the service with Ctrl-C when finished.
    direction of visible image changes to choose the next robot-base axis step:
    +X forward, +Y left, +Z up. Do not assume camera image axes equal robot axes.
    Use a visible tag position as supporting evidence, not an unquestioned target.
-3. For this approach, select horizontal translations tx+/tx-/ty+/ty- only.
-   Keep the starting height and orientation unchanged, with visible clearance
-   for the whole gripper and camera above the tabletop. Do not descend or touch
-   the board. If the 5 cm gap cannot be reached at this height, pause and report
-   that limitation rather than lowering the arm.
+3. Choose translations in any direction (tx+/tx-/ty+/ty-/tz+/tz-) and rotations
+   about any base axis (rx+/rx-/ry+/ry-/rz+/rz-) as needed to approach the cube.
+   Descent and changes of orientation are authorized; there is no fixed-height
+   or fixed-orientation requirement. Choose the sequence from fresh visual
+   observations without asking permission for each successful next step.
+   Maintain clearance for the whole gripper and wrist camera throughout each
+   translation or rotation, including the volume swept by the fingertips.
+   Never touch the tabletop or cross the configured workspace boundaries.
+   The point guards alone do not establish full-tool clearance; use the fresh
+   views and pause when that clearance cannot be assessed.
    Prefer 10 mm steps, reducing to 5 mm near the estimated 5 cm gap. At most
    50 mm is allowed per command. Stop when roughly 5 cm away; do not chase an
    exact distance or make repeated corrections after reaching that rough gap.
+   Rotations use the existing 1-degree presets, one observed step at a time;
+   omit translation_m for rotation requests. There is no cumulative rotation cap.
    EE pose is not the fingertip pose; custom tool offsets are not fully calibrated.
 4. Submit one request with fresh IDs, for example:
    {"schema_version":1,"request_id":"approach_01_UNIQUE","session_id":"CURRENT",
@@ -75,7 +82,8 @@ of motion. Stop the service with Ctrl-C when finished.
    or the operator stops the task. There is no session-start displacement or
    rotation cap and no 20-command budget. Per-command sizes, speed limits and
    physical workspace guards still apply. Do not change files, limits or restart
-   to bypass a rejection. Keep orientation unchanged for this approach task.
+   to bypass a rejection. Do not stop solely because reaching the objective
+   requires descent or a change of orientation.
 7. Reject/fail/controller fault, stale camera or arm/gripper data, unexpected
    movement, or operator stop ends motion. Do not retry a failed command or
    replan around a guard. Report achieved displacement and remaining uncertainty.
@@ -92,7 +100,7 @@ camera-to-base target is assumed for the wrist or side view.
 `observation.cube` always reports the current detector result.
 `observation.cube_context.last_seen` is historical, with source timestamps and
 age; never treat it as current or assume the cube stayed still after contact.
-A last-seen location may support a short horizontal approach if continuity and
+A last-seen location may support a small approach step if continuity and
 clearance are visible. Do not descend toward an obscured contact region based
 solely on memory. If the cube and relevant path are unclear in every view, wait
 for a clearer view or ask the operator; this is a pause for uncertainty, not a
