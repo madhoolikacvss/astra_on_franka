@@ -28,6 +28,7 @@ def atomic_json(path,value):
 class Cameras:
     def __init__(self,run):
         self.run=run;self.latest=None;self.error=None;self.done=threading.Event()
+        self.stale_after_s=.5
         self.thread=threading.Thread(target=self.work,daemon=True)
 
     def work(self):
@@ -39,24 +40,38 @@ class Cameras:
         rig=None
         try:
             tracker=CubeTracker(cube);settings=StreamSettings(**config['stream'])
+            self.stale_after_s=settings.stale_after_s
             (self.run/'frames').mkdir()
             with CameraRig({k:v['serial'] for k,v in config['cameras'].items()},settings) as rig:
                 index=0
                 while not self.done.is_set():
                     capture=rig.read();frames=capture['cameras']
+                    processing_started=time.monotonic_ns()
                     result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
+                    save_started=time.monotonic_ns()
                     saved={}
                     for name,frame in frames.items():
                         stem=self.run/'frames'/f'{index:06d}_{name}'
                         with stem.with_suffix('.npz').open('xb') as f:
-                            np.savez_compressed(f,**{k:frame[k] for k in ('rgb','depth_raw','depth_aligned')})
+                            # Compression delayed publication enough to exhaust the
+                            # freshness budget. Preserve all arrays without compression.
+                            np.savez(f,**{k:frame[k] for k in ('rgb','depth_raw','depth_aligned')})
                         display=preview if name==cube['camera'] else frame['rgb'][:,:,::-1]
                         if not cv2.imwrite(str(stem.with_suffix('.jpg')),display): raise RuntimeError('Cannot save camera preview')
                         saved[name]={k:v for k,v in frame.items() if k not in ('rgb','depth_raw','depth_aligned')}
                         saved[name]['rgbd_file']=str(stem.with_suffix('.npz').relative_to(ROOT))
                         saved[name]['preview_file']=str(stem.with_suffix('.jpg').relative_to(ROOT))
-                    self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':min(f['host_received_monotonic_ns'] for f in frames.values())}
-                    index+=1;self.done.wait(.1)
+                    published=time.monotonic_ns()
+                    oldest=min(f['host_received_monotonic_ns'] for f in frames.values())
+                    timing={'sequence':index,'processing_ms':(save_started-processing_started)/1e6,
+                            'save_ms':(published-save_started)/1e6,
+                            'oldest_age_at_publication_ms':(published-oldest)/1e6}
+                    self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':oldest,
+                                 'camera_publication':timing}
+                    # Retain timing evidence even if the final status is closed.
+                    with (self.run/'camera_publication.jsonl').open('a',encoding='utf-8') as log:
+                        log.write(json.dumps(timing,allow_nan=False)+'\n')
+                    index+=1;self.done.wait(.01)
         except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
         finally:
             if rig is not None:write_json(self.run/'camera_diagnostics.json',rig.diagnostics())
@@ -64,8 +79,15 @@ class Cameras:
     def snapshot(self):
         if self.error:raise RuntimeError(self.error)
         if self.latest is None:raise RuntimeError('Cameras are warming up')
-        if time.monotonic_ns()-self.latest['oldest_receipt_ns']>500_000_000:raise RuntimeError('Camera observations stale')
-        return self.latest
+        latest=self.latest  # Keep frame metadata and timing from the same publication.
+        now=time.monotonic_ns()
+        ages={name:(now-frame['host_received_monotonic_ns'])/1e6
+              for name,frame in latest['cameras'].items()}
+        if now-latest['oldest_receipt_ns']>self.stale_after_s*1e9:
+            raise RuntimeError(f'Camera observations stale: ages_ms={ages}; '
+                               f'limit_ms={self.stale_after_s*1000}; '
+                               f'publication={latest.get("camera_publication")}')
+        return {**latest,'camera_ages_at_snapshot_ms':ages}
 
     def close(self):
         self.done.set();self.thread.join(timeout=12)
