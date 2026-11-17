@@ -1,0 +1,14 @@
+{
+  "status": "rejected",
+  "request_id": "approach_d56ef327a30b469685f37a5f5c3ac122",
+  "reason": "Fresh complete observation unavailable: RuntimeError: Slow gripper observation including IPC: round_trip_ms=133.320, age_ms=109.544, limit_ms=100",
+  "session_id": "49d1b947f43a4868b35efc08003eb6d4",
+  "rejected_unix_ns": 1794957985052826965,
+  "observation_error": "RuntimeError: Slow gripper observation including IPC: round_trip_ms=133.320, age_ms=109.544, limit_ms=100",
+  "observation_stage": "arm_and_gripper",
+  "last_observation_error": {
+    "message": "RuntimeError: Slow gripper observation including IPC: round_trip_ms=133.320, age_ms=109.544, limit_ms=100",
+    "stage": "arm_and_gripper",
+    "unix_ns": 1794957985050750903
+  }
+}

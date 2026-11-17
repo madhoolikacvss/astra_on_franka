@@ -1,0 +1,39 @@
+{
+  "request_id": "approach_86c7cd55e24a43528be13cf2b11124a6",
+  "session_id": "49d1b947f43a4868b35efc08003eb6d4",
+  "status": "previewed",
+  "plan": {
+    "action": "arm_step",
+    "preset": "ty+",
+    "target_O_T_EE": [
+      [
+        0.9945759254044542,
+        0.02911538880417407,
+        -0.09985500859073405,
+        0.5601243390927093
+      ],
+      [
+        0.027096703490349813,
+        -0.9994012903089904,
+        -0.021513474584128736,
+        -0.17111982922176397
+      ],
+      [
+        -0.10042159760644055,
+        0.01869104233336562,
+        -0.9947693942169021,
+        0.4177728285242874
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "translation_m": 0.01
+  },
+  "hardware_command_sent": false,
+  "joint_trajectory_validated": false,
+  "safety_scope": "EE/flange point guards and runtime monitoring; no full-body collision planner"
+}

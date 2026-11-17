@@ -1,6 +1,6 @@
 {
   "mode": "live-preview",
-  "session_id": "569984fe81484a65a6c8d2b2e43a6a65",
+  "session_id": "49d1b947f43a4868b35efc08003eb6d4",
   "bridge_config": {
     "schema_version": 1,
     "autonomous_execution_enabled": true,
@@ -12,10 +12,10 @@
     "max_request_bytes": 4096,
     "observation_ttl_s": 10.0,
     "minimum_command_interval_s": 1.0,
-    "max_commands_per_session": 20,
+    "max_commands_per_session": null,
     "max_gripper_fraction_step": 0.1,
-    "max_translation_from_session_start_m": 0.052,
-    "max_rotation_from_session_start_deg": 5.0,
+    "max_translation_from_session_start_m": null,
+    "max_rotation_from_session_start_deg": null,
     "max_joint_excursion_from_session_start_rad": null
   },
   "workspace": {
@@ -161,6 +161,6 @@
   "translation_step_m": 0.05,
   "gripper_transport": {
     "kind": "spawned_process_rpc",
-    "worker_pid": 250858
+    "worker_pid": 265647
   }
 }
