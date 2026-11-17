@@ -19,7 +19,10 @@ trajectory or full-body collision check is implemented. Keep operator supervisio
 
 The +X trial completed successfully in session_20261117T223858_047148Z_edaa7388:
 measured displacement was approximately [+50.043, +0.001, +0.035] mm.
-The current task is now to approach the cube using fresh images and observations.
+The current task is to move the gripper toward the cube until the estimated
+gap between the nearest gripper surface and cube surface is roughly 5 cm.
+Use fresh images and observations; a rough visual estimate is sufficient, not
+an exact distance measurement. This target refers to the cube, not the robot base.
 This authorizes bounded arm approach, not contact, closing the gripper, grasping,
 or pick-and-place. The human supervises and starts/stops the service.
 
@@ -45,10 +48,14 @@ of motion. Stop the service with Ctrl-C when finished.
    direction of visible image changes to choose the next robot-base axis step:
    +X forward, +Y left, +Z up. Do not assume camera image axes equal robot axes.
    Use a visible tag position as supporting evidence, not an unquestioned target.
-3. Select one translation preset tx+/tx-/ty+/ty-/tz+/tz-. Prefer 10 mm approach
-   steps, reduce to 5 mm near the cube or under uncertainty. At most 50 mm is
-   allowed per command. Keep orientation unchanged for this first approach.
-   Aim for a visibly clear position above the cube, stopping before contact.
+3. For this approach, select horizontal translations tx+/tx-/ty+/ty- only.
+   Keep the starting height and orientation unchanged, with visible clearance
+   for the whole gripper and camera above the tabletop. Do not descend or touch
+   the board. If the 5 cm gap cannot be reached at this height, pause and report
+   that limitation rather than lowering the arm.
+   Prefer 10 mm steps, reducing to 5 mm near the estimated 5 cm gap. At most
+   50 mm is allowed per command. Stop when roughly 5 cm away; do not chase an
+   exact distance or make repeated corrections after reaching that rough gap.
    EE pose is not the fingertip pose; custom tool offsets are not fully calibrated.
 4. Submit one request with fresh IDs, for example:
    {"schema_version":1,"request_id":"approach_01_UNIQUE","session_id":"CURRENT",
@@ -58,6 +65,12 @@ of motion. Stop the service with Ctrl-C when finished.
 5. Wait for the matching terminal response. After completed, wait for stable
    observations again and inspect all views before deciding another step. In
    preview, report what was proposed; do not assume the pose changed.
+   Consistent qualitative evidence of approaching the cube is sufficient: an
+   individually visible or measurable gap reduction after every 10 mm step is
+   not required. The operator confirmed the previous +Y step moved toward the
+   cube in that setup; use this as supporting evidence, not a universal direction
+   rule. Continue while fresh views support the direction and clear tool path.
+   Pause if evidence contradicts the direction or clearance becomes uncertain.
 6. Continue one observed step at a time until the approach objective is reached
    or the operator stops the task. There is no session-start displacement or
    rotation cap and no 20-command budget. Per-command sizes, speed limits and
@@ -88,7 +101,8 @@ is allowed only when its path is visibly clear and all controller guards pass.
 
 ### Recordings and limits
 
-Each live session saves side_view.mp4 and side_video_frames.jsonl. Video uses
+Each live session saves `data/agent_bridge/session_<timestamp>_<id>/side_view.mp4`
+and `side_video_frames.jsonl` in that same session directory. Video uses
 existing side RGB observations resampled to 10 fps, not every native 30 fps frame.
 Repeated frames and source ages are logged; a frozen video image is not fresh
 sensor evidence. The MP4 is finalized on normal shutdown; use JPGs for live
