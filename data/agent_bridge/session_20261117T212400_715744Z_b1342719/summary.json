@@ -1,0 +1,42 @@
+{
+  "closed": true,
+  "session_id": "cd0345866e4646c1884dec3d4201034c",
+  "mode": "live-preview",
+  "status": "closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 3293.073447,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.177054,
+      "initialization": 209.025214,
+      "capture_wait": 0.029711,
+      "tag_tracking": 33.659805,
+      "top_down_npz_write": 13.7011,
+      "top_down_jpeg_write": 1.544008,
+      "wrist_npz_write": 7.645311,
+      "wrist_jpeg_write": 5.526101,
+      "side_npz_write": 8.543176,
+      "side_jpeg_write": 11.799596,
+      "publication": 0.005571,
+      "retention_cleanup": 2.989114,
+      "timing_log_write": 0.070311,
+      "inter_frame_wait": 11.826217
+    }
+  },
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [],
+  "commands_used": 0,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: Dynamixel read register=132 size=4: [TxRxResult] There is no status packet!; elapsed_ms=37.562",
+    "stage": "arm_and_gripper",
+    "unix_ns": 1794950888579545573
+  },
+  "observation_failure_count": 19,
+  "publication_count": 1801,
+  "last_publication_unix_ns": 1794950893174756859,
+  "heartbeat_unix_ns": 1794950896471204687
+}

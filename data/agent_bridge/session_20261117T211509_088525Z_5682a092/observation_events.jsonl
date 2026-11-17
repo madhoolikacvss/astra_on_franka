@@ -1,7 +1,0 @@
-{"unix_ns": 1794950109326522672, "event": "failed", "stage": "arm_and_gripper", "error": "RuntimeError: Live arm observation stale", "previous_error": null}
-{"unix_ns": 1794950109357782600, "event": "failed", "stage": "cameras", "error": "RuntimeError: Cameras are warming up", "previous_error": "RuntimeError: Live arm observation stale"}
-{"unix_ns": 1794950112327730112, "event": "failed", "stage": "arm_and_gripper", "error": "ValueError: Robot fresh-state deadline exceeded (20 ms); previous_ms=1455874, current_ms=1456133, repeated_reads=0; sample rejected", "previous_error": "RuntimeError: Cameras are warming up"}
-{"unix_ns": 1794950113933540587, "event": "failed", "stage": "cameras", "error": "RuntimeError: Cameras are warming up", "previous_error": "ValueError: Robot fresh-state deadline exceeded (20 ms); previous_ms=1455874, current_ms=1456133, repeated_reads=0; sample rejected"}
-{"unix_ns": 1794950114477566867, "event": "recovered", "stage": "cameras", "error": null, "previous_error": "RuntimeError: Cameras are warming up"}
-{"unix_ns": 1794950146577530384, "event": "failed", "stage": "arm_and_gripper", "error": "RuntimeError: [TxRxResult] There is no status packet!", "previous_error": null}
-{"unix_ns": 1794950146700519089, "event": "recovered", "stage": "cameras", "error": null, "previous_error": "RuntimeError: [TxRxResult] There is no status packet!"}

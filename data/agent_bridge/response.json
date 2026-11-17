@@ -1,14 +1,14 @@
 {
   "status": "rejected",
   "request_id": "xtrial_01_4f37ac015f7a4a31b57383302c8368e2",
-  "reason": "Fresh complete observation unavailable: RuntimeError: Live arm observation stale",
-  "session_id": "1b4bfe5f22604dc4a5e15b5eb29a3021",
-  "rejected_unix_ns": 1794950177942521791,
-  "observation_error": "RuntimeError: Live arm observation stale",
+  "reason": "Fresh complete observation unavailable: RuntimeError: Dynamixel read register=132 size=4: [TxRxResult] There is no status packet!; elapsed_ms=136.157",
+  "session_id": "cd0345866e4646c1884dec3d4201034c",
+  "rejected_unix_ns": 1794950640936335179,
+  "observation_error": "RuntimeError: Dynamixel read register=132 size=4: [TxRxResult] There is no status packet!; elapsed_ms=136.157",
   "observation_stage": "arm_and_gripper",
   "last_observation_error": {
-    "message": "RuntimeError: Live arm observation stale",
+    "message": "RuntimeError: Dynamixel read register=132 size=4: [TxRxResult] There is no status packet!; elapsed_ms=136.157",
     "stage": "arm_and_gripper",
-    "unix_ns": 1794950177941939189
+    "unix_ns": 1794950640933514006
   }
 }
