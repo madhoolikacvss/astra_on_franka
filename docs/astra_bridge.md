@@ -170,3 +170,35 @@ snapshot to obtain an advancing timestamp, and 100 ms total read/validation
 duration (including lock wait). Backwards time is rejected immediately. The
 motion monitor's 100 ms watchdog is unchanged; blocking SDK calls cannot be
 preempted by these Python deadlines.
+
+## Isolated Dynamixel worker
+
+The bridge now spawns a separate process that exclusively opens and owns the
+Dynamixel port. Camera processing and the SDK serial loop no longer share a
+Python interpreter. The parent requests the same sequential register reads at
+the existing bridge cadence; this is not a background cache or a sensor retry.
+Successful observations retain the worker's acquisition timestamps and include
+`worker_pid` and `ipc_round_trip_ms`. Register logs also identify the worker PID;
+session metadata records `gripper_transport`.
+
+The worker rejects motion/enable operations in preview. All live writes still
+use the existing ManagedGripper limits and the bridge's command filters.
+Each RPC has a 250 ms transport deadline (2 s for shutdown); a valid read must
+still complete its full parent round trip within 100 ms. The transport deadline
+does not make older samples valid or extend SDK packet timeouts. IPC timeout or
+disconnect latches a fault, closes the channel and requests worker cleanup; no
+automatic command retry or worker restart occurs. Worker cleanup disables torque
+if that worker enabled it. A hung process or broken hardware connection can
+prevent confirmation of torque disable and is reported as a cleanup error.
+
+To assess isolation, stop the old bridge, copy the updates, reset the inbox to
+`{}` as operator, then record about 260 seconds in live-preview with no commands:
+
+```bash
+python scripts/agent_controller.py --mode live-preview
+```
+
+Stop with Ctrl-C and compare the new session's `dynamixel_reads.jsonl`,
+`observation_events.jsonl`, and camera timing logs with the earlier combined
+baseline. Use the isolated worker in the normal combined bridge; do not run the
+standalone gripper diagnostic alongside it.

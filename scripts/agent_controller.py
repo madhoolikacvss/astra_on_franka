@@ -17,7 +17,7 @@ from test_motion import supervised_move,set_dynamics
 from astra_on_franka.agent_protocol import CommandFilter,decode_request
 from astra_on_franka.hardware.arm_observer import ArmObserver
 from astra_on_franka.hardware.motion_test import TIMEOUT_S,STEP_M,pose_guard
-from astra_on_franka.hardware.managed_gripper import ManagedGripper
+from astra_on_franka.hardware.gripper_process import GripperProcess
 
 
 def atomic_json(path,value):
@@ -168,7 +168,7 @@ class LiveBackend:
         self.robot=franky.Robot('172.16.0.2')
         if self.robot.is_in_control:raise RuntimeError('Robot already controlled')
         self.observer=ArmObserver('172.16.0.2',robot_factory=lambda _:self.robot)
-        try:self.gripper=ManagedGripper(gripper_config)
+        try:self.gripper=GripperProcess(gripper_config,execute=execute)
         except BaseException:self.observer.close();raise
 
     def observe(self):
@@ -262,7 +262,8 @@ def main(argv=None):
             replay=record if 'arm' in record else {'arm':record,'gripper':None}
         else:
             backend=LiveBackend(workspace,grip_config,execute);cameras=Cameras(run);cameras.thread.start()
-        write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config,'translation_step_m':STEP_M})
+        write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config,'translation_step_m':STEP_M,
+            'gripper_transport':{'kind':'spawned_process_rpc','worker_pid':backend.gripper.worker_pid} if backend else None})
         print(f'{args.mode}: session {filter_.session_id}; inbox {inbox}',flush=True)
         def work(plan,current):
             try:outcome['result']=backend.perform(plan,current,cancel,
