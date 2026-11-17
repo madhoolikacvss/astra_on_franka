@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import time
+import threading
 from typing import Any
 
 import numpy as np
 
 ROTATION_ATOL = 1e-4
 BOTTOM_ROW_ATOL = 1e-6
+# Allow brief cached repeats at reader handoff, within the 100 ms motion watchdog.
+NEW_STATE_TIMEOUT_S = 0.020
 # The lab's configured F_T_EE uses rounded 0.7071 coefficients, giving
 # ~1.93e-5 orthogonality/determinant error. Keep originals; do not normalize.
 
@@ -91,13 +94,40 @@ class ArmObserver:
             robot_factory = Robot
         self._robot = robot_factory(host)
         self._previous_robot_ms: int | None = None
+        self._read_lock = threading.Lock()
 
     def read(self) -> dict:
+        start = time.monotonic_ns()
+        if not self._read_lock.acquire(timeout=NEW_STATE_TIMEOUT_S):
+            raise RuntimeError('Arm observation reader busy for 20 ms')
+        try:
+            return self._read_locked(start)
+        finally:
+            self._read_lock.release()
+
+    def _read_locked(self, start: int) -> dict:
         if self._robot is None:
             raise RuntimeError("Observer is closed")
-        start = time.monotonic_ns()
-        state = self._robot.state  # Exactly one robot snapshot per observation.
-        end = time.monotonic_ns()
+        deadline = start + int(NEW_STATE_TIMEOUT_S * 1e9)
+        repeated = 0
+        while True:
+            state = self._robot.state
+            end = time.monotonic_ns()
+            robot_ms = int(state.time.to_msec())
+            previous = self._previous_robot_ms
+            if robot_ms < 0 or (previous is not None and robot_ms < previous):
+                raise ValueError(f'Robot timestamp moved backwards or is negative; '
+                                 f'previous_ms={previous}, current_ms={robot_ms}; sample rejected')
+            if end > deadline:
+                raise ValueError(f'Robot fresh-state deadline exceeded (20 ms); '
+                                 f'previous_ms={previous}, current_ms={robot_ms}, '
+                                 f'repeated_reads={repeated}; sample rejected')
+            if previous is None or robot_ms > previous:
+                break
+            repeated += 1
+            # A duplicate is never published, nor given a new receipt timestamp.
+            # All pose/joint/error fields below come from the one advancing snapshot.
+            time.sleep(.001)
         wall = time.time_ns()
         joints = finite_array(state.q, (7,), "q")
         velocities = finite_array(state.dq, (7,), "dq")
@@ -117,13 +147,8 @@ class ArmObserver:
                 "O_T_EE": transform_diagnostics(state.O_T_EE),
                 "F_T_EE": transform_diagnostics(state.F_T_EE),
             }) from exc
-        robot_ms = int(state.time.to_msec())
-        if robot_ms < 0:
-            raise ValueError("Negative robot timestamp")
-        if self._previous_robot_ms is not None and robot_ms <= self._previous_robot_ms:
-            raise ValueError("Robot timestamp repeated or moved backwards; sample rejected")
-        self._previous_robot_ms = robot_ms
         flags = error_flags(state.current_errors)
+        self._previous_robot_ms = robot_ms
         return {
             "schema_version": 1,
             "valid": True,
@@ -132,6 +157,7 @@ class ArmObserver:
             "host_received_unix_ns": wall,
             "read_duration_ms": (end - start) / 1e6,
             "robot_time_ms": robot_ms,
+            "repeated_state_reads_skipped": repeated,
             "joint_positions_rad": joints.tolist(),
             "joint_velocities_rad_s": velocities.tolist(),
             "O_T_EE": base_ee.tolist(),

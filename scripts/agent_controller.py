@@ -16,7 +16,7 @@ from record_observations import ROOT,create_run,write_json
 from test_motion import supervised_move,set_dynamics
 from astra_on_franka.agent_protocol import CommandFilter,decode_request
 from astra_on_franka.hardware.arm_observer import ArmObserver
-from astra_on_franka.hardware.motion_test import TIMEOUT_S,pose_guard
+from astra_on_franka.hardware.motion_test import TIMEOUT_S,STEP_M,pose_guard
 from astra_on_franka.hardware.managed_gripper import ManagedGripper
 
 
@@ -212,7 +212,7 @@ def main(argv=None):
             replay=record if 'arm' in record else {'arm':record,'gripper':None}
         else:
             backend=LiveBackend(workspace,grip_config,execute);cameras=Cameras(run);cameras.thread.start()
-        write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config})
+        write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config,'translation_step_m':STEP_M})
         print(f'{args.mode}: session {filter_.session_id}; inbox {inbox}',flush=True)
         def work(plan,current):
             try:outcome['result']=backend.perform(plan,current,cancel) if backend else {'status':'previewed','plan':plan,'hardware_command_sent':False}
@@ -244,6 +244,7 @@ def main(argv=None):
                 atomic_json(data/'latest.json',{'schema_version':1,'session_id':filter_.session_id,'observation_id':token,
                     'published_unix_ns':time.time_ns(),'mode':args.mode,'live':args.mode!='replay','busy':busy,'fault':fault,
                     'motion_authorized':False,'observation':observation,
+                    'translation_step_m':STEP_M,
                     'note':'Agent cannot authorize motion; only operator-controlled service gates permit execution.'})
             atomic_json(data/'status.json',{'session_id':filter_.session_id,'mode':args.mode,'busy':busy,'fault':fault,
                 'observation_error':observation_error,'commands_used':filter_.count,'heartbeat_unix_ns':time.time_ns()})

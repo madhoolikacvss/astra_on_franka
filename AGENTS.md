@@ -9,7 +9,10 @@ This replaces the earlier ten-step plan. Do not send ten requests.
 Keep orientation unchanged; do not command the gripper, descend, grasp, return,
 or substitute a different direction. The agent may inspect all three camera
 views to assess the scene. Only the trusted controller sends hardware commands.
-No physical movement has been verified by the saved preview evidence so far.
+The operator reported five completed legacy 5 mm steps (+25.122 mm total X),
+then a timestamp fault on step six. That is not a completed 50 mm trial.
+Require `translation_step_m: 0.05` in the new session's latest snapshot before
+previewing this revised single-command trial. Do not resume the faulted sequence.
 
 ### Operator setup (human/service administrator, not the operating agent)
 
