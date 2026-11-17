@@ -31,8 +31,10 @@ def set_dynamics(robot, franky):
             'relative_factor':factor}
 
 
-def supervised_move(robot,observer,start,target,workspace,motion,*,cancel_event=None,on_observation=None):
-    monitor=Monitor(observer,start,target,workspace,on_observation=on_observation)
+def supervised_move(robot,observer,start,target,workspace,motion,*,cancel_event=None,on_observation=None,
+                    session_start=None,session_joint_limit=None):
+    monitor=Monitor(observer,start,target,workspace,on_observation=on_observation,
+                    session_start=session_start,session_joint_limit=session_joint_limit)
     error=None; stop_error=None; final=None; submitted=False
     monitor.thread.start()
     try:
@@ -91,6 +93,7 @@ def main(argv=None):
         if args.observations: parser.error('Saved observations cannot authorize motion')
         if workspace.get('motion_enabled') is not True: parser.error('workspace.yaml motion_enabled is false; execution remains locked')
         if not args.confirm_clear_path: parser.error('Execution requires --confirm-clear-path after physical inspection')
+        parser.error('Arm execution blocked: verified FR3 model and joint-trajectory/collision preflight are not implemented; use preview')
         import resource
         if resource.getrlimit(resource.RLIMIT_RTPRIO)[0]<1: parser.error('Realtime priority is unavailable')
     run=create_run(ROOT/'data/motion_tests',prefix='motion_test')
@@ -121,7 +124,7 @@ def main(argv=None):
         write_json(run/'preview.json',preview)
         print('Current EE XYZ:',start['ee_position_base_m'])
         print('Proposed EE XYZ:',target[:3,3].tolist())
-        print('Preset:',args.preset,'(t: 5 mm, r: 1 degree, robot-base axes)')
+        print('Preset:',args.preset,'(t: 50 mm, r: 1 degree, robot-base axes)')
         print('Checks:',preview['rejection_reasons'] or 'EE/flange point guards passed')
         if reasons: raise RuntimeError('Preview failed point guards')
         if not args.execute:

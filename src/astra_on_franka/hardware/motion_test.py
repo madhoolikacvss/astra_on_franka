@@ -54,7 +54,18 @@ def pose_guard(pose, flange_ee, workspace):
     return distances,reasons
 
 
-def validate_sample(sample,start,target,workspace):
+def joint_excursion_reasons(sample,reference,limit,label):
+    current=np.asarray(sample['joint_positions_rad'],dtype=float)
+    baseline=np.asarray(reference['joint_positions_rad'],dtype=float)
+    if current.shape!=(7,) or baseline.shape!=(7,) or not np.isfinite([current,baseline]).all():
+        raise ValueError('Invalid joint excursion observations')
+    if not np.isfinite(limit) or limit<=0:raise ValueError('Invalid joint excursion limit')
+    delta=current-baseline
+    return [f'{label}: joint {i+1} excursion {delta[i]:+.6f} rad exceeds {limit:.6f} rad'
+            for i in range(7) if abs(delta[i])>limit]
+
+
+def validate_sample(sample,start,target,workspace,*,session_start=None,session_joint_limit=None):
     if not sample['valid'] or sample['has_errors']: raise RuntimeError('Invalid/error robot state')
     if sample['robot_mode'].lower().split('.')[-1] not in ('idle','move'):
         raise RuntimeError(f"Unexpected robot mode: {sample['robot_mode']}")
@@ -62,7 +73,9 @@ def validate_sample(sample,start,target,workspace):
     if time.monotonic_ns()-sample['host_read_end_monotonic_ns'] > STALE_S*1e9: raise RuntimeError('Stale host observation')
     pose=rigid(sample['O_T_EE']); distances,reasons=pose_guard(pose,sample['F_T_EE'],workspace)
     if not np.allclose(sample['F_T_EE'],start['F_T_EE'],atol=1e-8,rtol=0): reasons.append('Configured tool transform changed')
-    if np.max(np.abs(np.asarray(sample['joint_positions_rad'])-start['joint_positions_rad']))>.05: reasons.append('Joint displacement exceeded 0.05 rad')
+    reasons.extend(joint_excursion_reasons(sample,start,.05,'Per-move fallback guard'))
+    if session_start is not None:
+        reasons.extend(joint_excursion_reasons(sample,session_start,session_joint_limit,'Session guard'))
     if np.max(np.abs(sample['joint_velocities_rad_s']))>.08: reasons.append('Joint velocity exceeded 0.08 rad/s')
     a=np.asarray(start['O_T_EE']); delta=target[:3,3]-a[:3,3]
     fraction=np.clip(np.dot(pose[:3,3]-a[:3,3],delta)/max(np.dot(delta,delta),1e-15),0,1)
@@ -74,18 +87,20 @@ def validate_sample(sample,start,target,workspace):
 
 class Monitor:
     """Poll current state, not delayed callback queues. No disk/camera work here."""
-    def __init__(self,observer,start,target,workspace,on_observation=None):
+    def __init__(self,observer,start,target,workspace,on_observation=None,session_start=None,session_joint_limit=None):
         self.observer,self.start,self.target,self.workspace=observer,start,target,workspace
         self.samples=[]; self.error=None; self.last_ok=time.monotonic(); self.done=threading.Event()
         self.ready=threading.Event(); self.thread=threading.Thread(target=self.run,daemon=True)
         self.on_observation=on_observation
+        self.session_start=session_start;self.session_joint_limit=session_joint_limit
 
     def run(self):
         try:
             while not self.done.is_set():
                 t=time.monotonic(); sample=self.observer.read();self.samples.append(sample)
                 if len(self.samples)>10000: raise RuntimeError('Observation buffer limit')
-                validate_sample(sample,self.start,self.target,self.workspace)
+                validate_sample(sample,self.start,self.target,self.workspace,
+                                session_start=self.session_start,session_joint_limit=self.session_joint_limit)
                 if self.on_observation is not None: self.on_observation(sample)
                 if len(self.samples)>1:
                     previous=self.samples[-2]

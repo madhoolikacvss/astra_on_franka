@@ -1,5 +1,20 @@
 # Hardware motion rules
 
+## Current execution blocker: model-based joint policy pending
+
+Physical arm execution is blocked in the bridge and standalone motion script.
+Cartesian previews remain available but do NOT validate a joint trajectory.
+Do not follow the live-execution handoff below until this blocker is resolved.
+The supplied repositories lack a verified complete FR3 arm model and collision
+scene. Required next work: validate the model against observed flange poses,
+plan the Cartesian path with continuous joint solutions and absolute joint limits,
+check collision geometry, and supervise measured joints against the planned path.
+No guessed trajectory deviation tolerance or expanded excursion cap is authorized.
+The 0.05 rad per-move cap is retained as a fallback, not claimed to support 50 mm.
+The monitor now checks the 0.10 rad session cap throughout motion as well as at
+command acceptance, and reports the offending joint and signed excursion.
+This is an interim fail-closed implementation, not a completed IK/collision planner.
+
 ## Local handoff: supervised 50 mm +X trial
 
 The human has requested a total 50 mm translation in robot-base +X (forward).

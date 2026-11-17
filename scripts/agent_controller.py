@@ -136,15 +136,19 @@ class LiveBackend:
     def arm_update(self,sample):
         self.latest={**self.latest,'arm':sample}
 
-    def perform(self,plan,start,cancel):
-        if not self.execute:return {'status':'previewed','plan':plan,'hardware_command_sent':False}
+    def perform(self,plan,start,cancel,*,session_start=None,session_joint_limit=None):
+        if not self.execute:return {'status':'previewed','plan':plan,'hardware_command_sent':False,
+            'joint_trajectory_validated':False,
+            'execution_blocker':'Verified FR3 model and joint-trajectory/collision preflight not implemented'}
         if plan['action']=='arm_step':
+            raise RuntimeError('Arm execution blocked: verified FR3 model and joint-trajectory/collision preflight not implemented; no motion submitted')
             set_dynamics(self.robot,self.franky)
             target=np.asarray(plan['target_O_T_EE'])
             motion=self.franky.CartesianMotion(self.franky.Affine(target),self.franky.ReferenceType.Absolute)
             motion.add_reaction(self.franky.Reaction(self.franky.Measure.ABS_TIME>TIMEOUT_S,self.franky.CartesianStopMotion()))
             result,samples=supervised_move(self.robot,self.observer,start['arm'],target,self.workspace,motion,
-                cancel_event=cancel,on_observation=self.arm_update)
+                cancel_event=cancel,on_observation=self.arm_update,
+                session_start=session_start,session_joint_limit=session_joint_limit)
             return {**result,'arm_observations':samples}
         target=plan['closed_fraction'];begin=start['gripper']['closed_fraction'];samples=[]
         try:
@@ -215,7 +219,8 @@ def main(argv=None):
         write_json(run/'metadata.json',{'mode':args.mode,'session_id':filter_.session_id,'bridge_config':config,'workspace':workspace,'gripper_config':grip_config,'translation_step_m':STEP_M})
         print(f'{args.mode}: session {filter_.session_id}; inbox {inbox}',flush=True)
         def work(plan,current):
-            try:outcome['result']=backend.perform(plan,current,cancel) if backend else {'status':'previewed','plan':plan,'hardware_command_sent':False}
+            try:outcome['result']=backend.perform(plan,current,cancel,
+                session_start=filter_.start,session_joint_limit=config['max_joint_excursion_from_session_start_rad']) if backend else {'status':'previewed','plan':plan,'hardware_command_sent':False}
             except BaseException as exc:outcome['result']={'status':'failed','error':f'{type(exc).__name__}: {exc}'}
         while True:
             if worker and not worker.is_alive() and busy:
