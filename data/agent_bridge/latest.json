@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "session_id": "a80794217e3941818f45bd3ebbe65a80",
+  "observation_id": "2eebb6680fbb4bfcae465201af23b7cb",
+  "published_unix_ns": 1794874090129183064,
+  "mode": "live-preview",
+  "live": true,
+  "busy": false,
+  "fault": null,
+  "motion_authorized": false,
+  "observation": {
+    "arm": {
+      "schema_version": 1,
+      "valid": true,
+      "host_read_start_monotonic_ns": 448156099676114,
+      "host_read_end_monotonic_ns": 448156100042380,
+      "host_received_unix_ns": 1794874090100235444,
+      "read_duration_ms": 0.366266,
+      "robot_time_ms": 13811444,
+      "joint_positions_rad": [
+        -0.08025904525894363,
+        -0.15758731200419981,
+        -0.2794979254026588,
+        -1.9567319220655113,
+        -0.05226895344181334,
+        1.7838328973307536,
+        0.4284100788644158
+      ],
+      "joint_velocities_rad_s": [
+        -0.0012844820724572915,
+        -0.000403048425622685,
+        0.00034146166820133675,
+        0.0009854205968592772,
+        -0.0005085132343548367,
+        -0.0007569099373365852,
+        -0.0014761978050618057
+      ],
+      "O_T_EE": [
+        [
+          0.9996600672173559,
+          0.012569852510008583,
+          -0.022416632103468864,
+          0.4731646562894719
+        ],
+        [
+          0.012573844166535952,
+          -0.9999113180508237,
+          3.712108624573385e-05,
+          -0.19142071571673797
+        ],
+        [
+          -0.022414177546260846,
+          -0.00031897170637917166,
+          -0.9997487150415161,
+          0.436552279086007
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "F_T_EE": [
+        [
+          0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          -0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.10339999943971634
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "transform_validation": {
+        "rotation_atol": 0.0001,
+        "bottom_row_atol": 1e-06,
+        "matrices_normalized": false,
+        "O_T_EE": {
+          "rotation_determinant": 0.9999807469012083,
+          "rotation_orthogonality_max_abs_error": 1.9253098791804923e-05
+        },
+        "F_T_EE": {
+          "rotation_determinant": 0.9999807469012083,
+          "rotation_orthogonality_max_abs_error": 1.92530987916939e-05
+        }
+      },
+      "ee_position_base_m": [
+        0.4731646562894719,
+        -0.19142071571673797,
+        0.436552279086007
+      ],
+      "ee_rotation_base": [
+        [
+          0.9996600672173559,
+          0.012569852510008583,
+          -0.022416632103468864
+        ],
+        [
+          0.012573844166535952,
+          -0.9999113180508237,
+          3.712108624573385e-05
+        ],
+        [
+          -0.022414177546260846,
+          -0.00031897170637917166,
+          -0.9997487150415161
+        ]
+      ],
+      "has_errors": false,
+      "error_flags": {
+        "base_acceleration_initialization_timeout": false,
+        "base_acceleration_invalid_reading": false,
+        "cartesian_motion_generator_acceleration_discontinuity": false,
+        "cartesian_motion_generator_elbow_limit_violation": false,
+        "cartesian_motion_generator_elbow_sign_inconsistent": false,
+        "cartesian_motion_generator_joint_acceleration_discontinuity": false,
+        "cartesian_motion_generator_joint_position_limits_violation": false,
+        "cartesian_motion_generator_joint_velocity_discontinuity": false,
+        "cartesian_motion_generator_joint_velocity_limits_violation": false,
+        "cartesian_motion_generator_start_elbow_invalid": false,
+        "cartesian_motion_generator_velocity_discontinuity": false,
+        "cartesian_motion_generator_velocity_limits_violation": false,
+        "cartesian_position_limits_violation": false,
+        "cartesian_position_motion_generator_invalid_frame": false,
+        "cartesian_position_motion_generator_start_pose_invalid": false,
+        "cartesian_reflex": false,
+        "cartesian_spline_motion_generator_violation": false,
+        "cartesian_velocity_profile_safety_violation": false,
+        "cartesian_velocity_violation": false,
+        "communication_constraints_violation": false,
+        "controller_torque_discontinuity": false,
+        "force_control_safety_violation": false,
+        "force_controller_desired_force_tolerance_violation": false,
+        "instability_detected": false,
+        "joint_motion_generator_acceleration_discontinuity": false,
+        "joint_motion_generator_position_limits_violation": false,
+        "joint_motion_generator_velocity_discontinuity": false,
+        "joint_motion_generator_velocity_limits_violation": false,
+        "joint_move_in_wrong_direction": false,
+        "joint_p2p_insufficient_torque_for_planning": false,
+        "joint_position_limits_violation": false,
+        "joint_position_motion_generator_start_pose_invalid": false,
+        "joint_reflex": false,
+        "joint_velocity_violation": false,
+        "joint_via_motion_generator_planning_joint_limit_violation": false,
+        "max_goal_pose_deviation_violation": false,
+        "max_path_pose_deviation_violation": false,
+        "power_limit_violation": false,
+        "self_collision_avoidance_violation": false,
+        "start_elbow_sign_inconsistent": false,
+        "tau_j_range_violation": false
+      },
+      "current_errors": "[]",
+      "robot_mode": "RobotMode.Idle"
+    },
+    "gripper": {
+      "valid": true,
+      "raw_position_signed": 3889,
+      "closed_fraction": 0.0007434944237918462,
+      "width_m": 0.11891152416356876,
+      "host_received_monotonic_ns": 448156128922899,
+      "host_received_unix_ns": 1794874090129115703
+    },
+    "cameras": {
+      "top_down": {
+        "host_received_monotonic_ns": 448155724808426,
+        "host_received_unix_ns": 1794874089725001220,
+        "streams": {
+          "color": {
+            "frame_number": 439,
+            "timestamp_ms": 1794874089692.0996,
+            "timestamp_domain": "timestamp_domain.global_time"
+          },
+          "depth": {
+            "frame_number": 437,
+            "timestamp_ms": 1794874089692.0828,
+            "timestamp_domain": "timestamp_domain.global_time"
+          }
+        },
+        "calibration": {
+          "serial_number": "145422070656",
+          "asic_serial_number": "144223023540",
+          "name": "RealSense D435",
+          "firmware_version": "5.17.3.10",
+          "usb_type_descriptor": "3.2",
+          "physical_port": "4-2.4.1-22",
+          "depth_scale_m_per_unit": 0.0010000000474974513,
+          "color_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 606.1214599609375,
+            "fy": 605.1428833007812,
+            "ppx": 318.3548583984375,
+            "ppy": 242.92498779296875,
+            "distortion_model": "distortion.inverse_brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 390.6062316894531,
+            "fy": 390.6062316894531,
+            "ppx": 323.8263244628906,
+            "ppy": 237.31814575195312,
+            "distortion_model": "distortion.brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_to_color_extrinsics": {
+            "rotation_column_major": [
+              0.9999818205833435,
+              0.005399388261139393,
+              -0.002678032498806715,
+              -0.005400543101131916,
+              0.9999853372573853,
+              -0.00042425814899615943,
+              0.0026757025625556707,
+              0.0004387132648844272,
+              0.9999963045120239
+            ],
+            "translation_m": [
+              0.014900271780788898,
+              0.00011492006888147444,
+              0.00026538033853285015
+            ]
+          },
+          "color_format": "format.rgb8",
+          "depth_format": "format.z16",
+          "color_fps": 30,
+          "depth_fps": 30,
+          "image_rotation_applied": false
+        },
+        "aligned_depth_intrinsics": {
+          "width": 640,
+          "height": 480,
+          "fx": 606.1214599609375,
+          "fy": 605.1428833007812,
+          "ppx": 318.3548583984375,
+          "ppy": 242.92498779296875,
+          "distortion_model": "distortion.inverse_brown_conrady",
+          "coeffs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "depth_valid_fraction": 0.8744173177083333,
+        "rgb_depth_timestamp_skew_ms": 0.016845703125,
+        "sequence": 355,
+        "serial": "145422070656",
+        "host_age_ms": 28.524325,
+        "skipped_capture_pairs": 10,
+        "rgbd_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_top_down.npz",
+        "preview_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_top_down.jpg"
+      },
+      "wrist": {
+        "host_received_monotonic_ns": 448155721512484,
+        "host_received_unix_ns": 1794874089721705118,
+        "streams": {
+          "color": {
+            "frame_number": 389,
+            "timestamp_ms": 1794874089688.8594,
+            "timestamp_domain": "timestamp_domain.global_time"
+          },
+          "depth": {
+            "frame_number": 387,
+            "timestamp_ms": 1794874089688.8413,
+            "timestamp_domain": "timestamp_domain.global_time"
+          }
+        },
+        "calibration": {
+          "serial_number": "233622078546",
+          "asic_serial_number": "223423020653",
+          "name": "RealSense D435",
+          "firmware_version": "5.17.3.10",
+          "usb_type_descriptor": "3.2",
+          "physical_port": "4-2.4.4-82",
+          "depth_scale_m_per_unit": 0.0010000000474974513,
+          "color_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 606.0532836914062,
+            "fy": 605.583740234375,
+            "ppx": 315.7156677246094,
+            "ppy": 241.2344207763672,
+            "distortion_model": "distortion.inverse_brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 388.0956726074219,
+            "fy": 388.0956726074219,
+            "ppx": 321.82928466796875,
+            "ppy": 239.18572998046875,
+            "distortion_model": "distortion.brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_to_color_extrinsics": {
+            "rotation_column_major": [
+              0.999977707862854,
+              -0.0009570196270942688,
+              0.006608240306377411,
+              0.00100697111338377,
+              0.9999709129333496,
+              -0.007559788879007101,
+              -0.00660081347450614,
+              0.007566274609416723,
+              0.99994957447052
+            ],
+            "translation_m": [
+              0.01490670908242464,
+              0.0002561969158705324,
+              0.0004133592592552304
+            ]
+          },
+          "color_format": "format.rgb8",
+          "depth_format": "format.z16",
+          "color_fps": 30,
+          "depth_fps": 30,
+          "image_rotation_applied": false
+        },
+        "aligned_depth_intrinsics": {
+          "width": 640,
+          "height": 480,
+          "fx": 606.0532836914062,
+          "fy": 605.583740234375,
+          "ppx": 315.7156677246094,
+          "ppy": 241.2344207763672,
+          "distortion_model": "distortion.inverse_brown_conrady",
+          "coeffs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "depth_valid_fraction": 0.58306640625,
+        "rgb_depth_timestamp_skew_ms": 0.01806640625,
+        "sequence": 353,
+        "serial": "233622078546",
+        "host_age_ms": 31.820267,
+        "skipped_capture_pairs": 10,
+        "rgbd_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_wrist.npz",
+        "preview_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_wrist.jpg"
+      },
+      "side": {
+        "host_received_monotonic_ns": 448155745032818,
+        "host_received_unix_ns": 1794874089745225572,
+        "streams": {
+          "color": {
+            "frame_number": 348,
+            "timestamp_ms": 1794874089712.1482,
+            "timestamp_domain": "timestamp_domain.global_time"
+          },
+          "depth": {
+            "frame_number": 345,
+            "timestamp_ms": 1794874089712.131,
+            "timestamp_domain": "timestamp_domain.global_time"
+          }
+        },
+        "calibration": {
+          "serial_number": "239722073976",
+          "asic_serial_number": "243623021110",
+          "name": "RealSense D435",
+          "firmware_version": "5.17.3.10",
+          "usb_type_descriptor": "3.2",
+          "physical_port": "4-2.4.3-81",
+          "depth_scale_m_per_unit": 0.0010000000474974513,
+          "color_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 607.1196899414062,
+            "fy": 607.349853515625,
+            "ppx": 327.105224609375,
+            "ppy": 242.0038299560547,
+            "distortion_model": "distortion.inverse_brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_intrinsics": {
+            "width": 640,
+            "height": 480,
+            "fx": 384.91107177734375,
+            "fy": 384.91107177734375,
+            "ppx": 322.88446044921875,
+            "ppy": 242.38584899902344,
+            "distortion_model": "distortion.brown_conrady",
+            "coeffs": [
+              0.0,
+              0.0,
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "depth_to_color_extrinsics": {
+            "rotation_column_major": [
+              0.9998613595962524,
+              -0.016243496909737587,
+              -0.0036559617146849632,
+              0.01626746356487274,
+              0.9998457431793213,
+              0.006624243222177029,
+              0.003547796979546547,
+              -0.006682798266410828,
+              0.9999713897705078
+            ],
+            "translation_m": [
+              0.01482868567109108,
+              -0.0004459512419998646,
+              7.487264520023018e-05
+            ]
+          },
+          "color_format": "format.rgb8",
+          "depth_format": "format.z16",
+          "color_fps": 30,
+          "depth_fps": 30,
+          "image_rotation_applied": false
+        },
+        "aligned_depth_intrinsics": {
+          "width": 640,
+          "height": 480,
+          "fx": 607.1196899414062,
+          "fy": 607.349853515625,
+          "ppx": 327.105224609375,
+          "ppy": 242.0038299560547,
+          "distortion_model": "distortion.inverse_brown_conrady",
+          "coeffs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "depth_valid_fraction": 0.8201432291666667,
+        "rgb_depth_timestamp_skew_ms": 0.01708984375,
+        "sequence": 341,
+        "serial": "239722073976",
+        "host_age_ms": 8.299933,
+        "skipped_capture_pairs": 11,
+        "rgbd_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_side.npz",
+        "preview_file": "data/agent_bridge/session_20261117T000752_865151Z_b62bb141/frames/000028_side.jpg"
+      }
+    },
+    "cube": {
+      "schema_version": 1,
+      "detected": true,
+      "reason": null,
+      "reference_frame": "apriltag_1",
+      "tracked_point": "apriltag_0_center",
+      "position_reference_m": [
+        -0.2470800346313121,
+        0.19233046869620185,
+        -0.06746511668056676
+      ],
+      "position_board_normalized": [
+        0.7841145299273372,
+        0.5934233437023964
+      ],
+      "yaw_rad": 1.7198074805789556,
+      "inside_board": true,
+      "T_reference_cube_tag": [
+        [
+          -0.14845208840260796,
+          -0.9885519426155465,
+          -0.026963571720625343,
+          -0.2470800346313121
+        ],
+        [
+          0.9888635535803576,
+          -0.14867877065793011,
+          0.006595116077429297,
+          0.19233046869620185
+        ],
+        [
+          -0.01052852550608735,
+          -0.02568423459392447,
+          0.999614660878877,
+          -0.06746511668056676
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "camera_serial": "145422070656",
+      "source_color": {
+        "frame_number": 439,
+        "timestamp_ms": 1794874089692.0996,
+        "timestamp_domain": "timestamp_domain.global_time"
+      },
+      "source_host_received_monotonic_ns": 448155724808426,
+      "source_host_received_unix_ns": 1794874089725001220,
+      "calibration": {
+        "width": 640,
+        "height": 480,
+        "fx": 606.1214599609375,
+        "fy": 605.1428833007812,
+        "ppx": 318.3548583984375,
+        "ppy": 242.92498779296875,
+        "distortion_model": "distortion.inverse_brown_conrady",
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "tags": [
+        {
+          "id": 0,
+          "accepted": true,
+          "hamming": 0,
+          "decision_margin": 58.302581787109375,
+          "pose_error": 3.8050626257021316e-08
+        },
+        {
+          "id": 1,
+          "accepted": true,
+          "hamming": 0,
+          "decision_margin": 66.96453094482422,
+          "pose_error": 2.1894823758711986e-08
+        }
+      ],
+      "normalization": {
+        "method": "homography_reference_xy",
+        "calibration_id": "board_corners_20261116T205146_051836Z_ee0ab320",
+        "axes": "u left-to-right, v near-to-far; robot-base viewpoint",
+        "center_verified": false
+      },
+      "processing_ms": 30.71579,
+      "source_age_at_result_ms": 59.270475
+    },
+    "oldest_receipt_ns": 448155721512484
+  },
+  "note": "Agent cannot authorize motion; only operator-controlled service gates permit execution."
+}
