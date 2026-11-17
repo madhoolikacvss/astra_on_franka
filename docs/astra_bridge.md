@@ -144,3 +144,29 @@ Observation failures/recoveries are recorded in `observation_events.jsonl`;
 error. Live/closed status and session summary include publication/failure counts,
 last publication time, last observation error, and any terminal exception.
 Current `observation_error: null` means recovery, not absence of historical failures.
+
+## Isolated gripper diagnostic
+
+Operator only: stop the bridge and all camera/robot/gripper recorders first.
+Leave wiring, USB topology, baud rate and existing servo settings unchanged so
+the workload comparison is meaningful. Run from the project root in `reset`:
+
+```bash
+python scripts/diagnose_gripper.py record --seconds 260 --baseline data/agent_bridge/session_20261117T212400_715744Z_b1342719
+```
+
+This opens only the gripper serial port and reads the same position/error
+registers as the bridge. It never writes servo registers, changes torque/mode,
+or connects to the arm/cameras. Each failed observation is recorded, followed
+by the normal 100 ms gap, with no immediate retry. SDK timeouts are unchanged.
+Results are stored in a unique `data/gripper_diagnostics/gripper_*/` directory:
+individual reads, observations, metadata, summary and `comparison.json`.
+The comparison reports per-register failure rates and latency percentiles;
+a difference alone does not prove USB contention. Repeat under comparable
+conditions to assess variability.
+
+Arm timing now has separate budgets: up to 20 ms from the first duplicate
+snapshot to obtain an advancing timestamp, and 100 ms total read/validation
+duration (including lock wait). Backwards time is rejected immediately. The
+motion monitor's 100 ms watchdog is unchanged; blocking SDK calls cannot be
+preempted by these Python deadlines.

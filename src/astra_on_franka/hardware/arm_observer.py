@@ -11,6 +11,7 @@ ROTATION_ATOL = 1e-4
 BOTTOM_ROW_ATOL = 1e-6
 # Allow brief cached repeats at reader handoff, within the 100 ms motion watchdog.
 NEW_STATE_TIMEOUT_S = 0.020
+MAX_READ_DURATION_S = 0.100
 # The lab's configured F_T_EE uses rounded 0.7071 coefficients, giving
 # ~1.93e-5 orthogonality/determinant error. Keep originals; do not normalize.
 
@@ -108,7 +109,8 @@ class ArmObserver:
     def _read_locked(self, start: int) -> dict:
         if self._robot is None:
             raise RuntimeError("Observer is closed")
-        deadline = start + int(NEW_STATE_TIMEOUT_S * 1e9)
+        deadline = start + int(MAX_READ_DURATION_S * 1e9)
+        duplicate_deadline = None
         repeated = 0
         while True:
             state = self._robot.state
@@ -119,12 +121,18 @@ class ArmObserver:
                 raise ValueError(f'Robot timestamp moved backwards or is negative; '
                                  f'previous_ms={previous}, current_ms={robot_ms}; sample rejected')
             if end > deadline:
-                raise ValueError(f'Robot fresh-state deadline exceeded (20 ms); '
+                raise ValueError(f'Robot overall read deadline exceeded (100 ms); '
+                                 f'previous_ms={previous}, current_ms={robot_ms}, '
+                                 f'repeated_reads={repeated}; sample rejected')
+            if duplicate_deadline is not None and end > duplicate_deadline:
+                raise ValueError(f'Robot duplicate-state wait deadline exceeded (20 ms); '
                                  f'previous_ms={previous}, current_ms={robot_ms}, '
                                  f'repeated_reads={repeated}; sample rejected')
             if previous is None or robot_ms > previous:
                 break
             repeated += 1
+            if duplicate_deadline is None:
+                duplicate_deadline=end+int(NEW_STATE_TIMEOUT_S*1e9)
             # A duplicate is never published, nor given a new receipt timestamp.
             # All pose/joint/error fields below come from the one advancing snapshot.
             time.sleep(.001)
@@ -148,6 +156,8 @@ class ArmObserver:
                 "F_T_EE": transform_diagnostics(state.F_T_EE),
             }) from exc
         flags = error_flags(state.current_errors)
+        if time.monotonic_ns()>deadline:
+            raise ValueError('Robot overall read deadline exceeded (100 ms) during validation; sample rejected')
         self._previous_robot_ms = robot_ms
         return {
             "schema_version": 1,
