@@ -57,7 +57,8 @@ class CommandFilter:
             return {'action':'stop'}
         if self.fault: raise ValueError(self.fault)
         if busy: raise ValueError('Controller busy; no command queue')
-        if self.count>=self.config['max_commands_per_session']: raise ValueError('Session command budget exhausted')
+        command_cap=self.config['max_commands_per_session']
+        if command_cap is not None and self.count>=command_cap: raise ValueError('Session command budget exhausted')
         if self.clock()-self.last_command<self.config['minimum_command_interval_s']: raise ValueError('Command rate limit')
         token=request['observation_id']
         if not isinstance(token,str) or token not in self.observations: raise ValueError('Unknown observation_id')
@@ -74,22 +75,27 @@ class CommandFilter:
         if joint_cap is not None and np.max(np.abs(np.asarray(arm['joint_positions_rad'])-self.start['joint_positions_rad']))>joint_cap:
             raise ValueError('Session joint excursion limit')
         if action=='arm_step':
-            if set(args)!={'preset'} or not isinstance(args['preset'],str) or args['preset'] not in PRESETS:
+            if not {'preset'}<=set(args)<={'preset','translation_m'} or not isinstance(args['preset'],str) or args['preset'] not in PRESETS:
                 raise ValueError('Only allowlisted arm presets are accepted')
-            target=target_pose(pose,args['preset'])
+            distance_m=args.get('translation_m',.05)
+            if ('translation_m' in args and args['preset'].startswith('r')) or type(distance_m) not in (int,float) or not math.isfinite(distance_m) or not .005<=distance_m<=.05:
+                raise ValueError('translation_m must be finite, between 0.005 and 0.050, and used only with translation presets')
+            target=target_pose(pose,args['preset'],translation_m=distance_m)
             for fraction in np.linspace(0,1,21):
-                _,reasons=pose_guard(target_pose(pose,args['preset'],fraction),arm['F_T_EE'],self.workspace)
+                _,reasons=pose_guard(target_pose(pose,args['preset'],fraction,translation_m=distance_m),arm['F_T_EE'],self.workspace)
                 if reasons: raise ValueError('; '.join(reasons))
             distance=float(np.linalg.norm(target[:3,3]-initial[:3,3]))
             limit=self.config['max_translation_from_session_start_m']
-            if distance>limit+1e-9:
+            if limit is not None and distance>limit+1e-9:
                 raise ValueError(f'Session translation limit: proposed_distance_m={distance:.9f}, '
                     f'limit_m={limit:.9f}, excess_m={distance-limit:.9f}; '
                     f'session_start_xyz_m={initial[:3,3].tolist()}, '
                     f'current_xyz_m={pose[:3,3].tolist()}, target_xyz_m={target[:3,3].tolist()}')
-            if angle_between(initial[:3,:3],target[:3,:3])>np.deg2rad(self.config['max_rotation_from_session_start_deg'])+1e-9:
+            rotation_cap=self.config['max_rotation_from_session_start_deg']
+            if rotation_cap is not None and angle_between(initial[:3,:3],target[:3,:3])>np.deg2rad(rotation_cap)+1e-9:
                 raise ValueError('Session rotation limit')
-            plan={'action':action,'preset':args['preset'],'target_O_T_EE':target.tolist()}
+            plan={'action':action,'preset':args['preset'],'target_O_T_EE':target.tolist(),
+                  'translation_m':distance_m if args['preset'].startswith('t') else None}
         elif action=='gripper_set':
             if set(args)!={'closed_fraction'} or type(args['closed_fraction']) not in (float,int):
                 raise ValueError('Expected numeric closed_fraction only')

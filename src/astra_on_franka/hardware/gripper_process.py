@@ -93,6 +93,12 @@ class GripperProcess:
                 remaining=max(0,(request['deadline_ns']-time.monotonic_ns())/1e9)
                 if not self._connection.poll(remaining):raise TimeoutError(f'Gripper worker {operation} timeout')
                 response=self._connection.recv()
+                # Ctrl+C may interrupt the parent while an earlier read is pending.
+                # Only shutdown may drain those old replies; never replay a command.
+                while operation=='close' and isinstance(response.get('id'),int) and response['id']<request['id']:
+                    remaining=max(0,(request['deadline_ns']-time.monotonic_ns())/1e9)
+                    if not self._connection.poll(remaining):raise TimeoutError('Gripper close acknowledgement timeout')
+                    response=self._connection.recv()
                 if response.get('id')!=request['id']:raise RuntimeError('Gripper response ID mismatch')
             except (OSError,EOFError,RuntimeError) as exc:
                 self._fault=f'Gripper IPC fault: {exc}; no retries, worker shutdown requested'

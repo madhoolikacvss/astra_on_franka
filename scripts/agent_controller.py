@@ -18,6 +18,7 @@ from astra_on_franka.agent_protocol import CommandFilter,decode_request
 from astra_on_franka.hardware.arm_observer import ArmObserver
 from astra_on_franka.hardware.motion_test import TIMEOUT_S,STEP_M,pose_guard
 from astra_on_franka.hardware.gripper_process import GripperProcess
+from astra_on_franka.hardware.session_video import SessionVideo
 
 
 def atomic_json(path,value):
@@ -124,19 +125,29 @@ class Cameras:
         import cv2
         config=yaml.safe_load((ROOT/'config/cameras.yaml').read_text())
         cube=yaml.safe_load((ROOT/'config/cube.yaml').read_text())
-        rig=None
+        rig=None;video=None;last_seen_cube=None
         try:
             tracker=CubeTracker(cube);settings=StreamSettings(**config['stream'])
             self.stale_after_s=settings.stale_after_s
             (self.run/'frames').mkdir()
+            video=SessionVideo(self.run)
             with CameraRig({k:v['serial'] for k,v in config['cameras'].items()},settings) as rig:
                 index=0
                 while not self.done.is_set():
                     self.mark_stage('capture_wait')
                     capture=rig.read();frames=capture['cameras']
+                    if video.error:raise RuntimeError(video.error)
+                    video.submit(frames['side'])
                     self.mark_stage('tag_tracking')
                     processing_started=time.monotonic_ns()
                     result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
+                    if result.get('detected'):
+                        last_seen_cube={'observation':result,'source_unix_ns':frames[cube['camera']]['host_received_unix_ns'],
+                                        'source_monotonic_ns':frames[cube['camera']]['host_received_monotonic_ns']}
+                    cube_context={'tag_visible':bool(result.get('detected')),
+                        'last_seen':last_seen_cube,
+                        'last_seen_age_s':None if last_seen_cube is None else (time.monotonic_ns()-last_seen_cube['source_monotonic_ns'])/1e9,
+                        'note':'Last-seen pose is historical, not a current measurement. Use fresh camera views for visual inference.'}
                     save_started=time.monotonic_ns()
                     saved={};written=[]
                     for name,frame in frames.items():
@@ -160,6 +171,7 @@ class Cameras:
                             'save_ms':(published-save_started)/1e6,
                             'oldest_age_at_publication_ms':(published-oldest)/1e6}
                     self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':oldest,
+                                 'cube_context':cube_context,'side_video_file':str((self.run/'side_view.mp4').relative_to(ROOT)),
                                  'camera_publication':timing,'retained_camera_frame_sets':5}
                     # Publish complete new files before removing the oldest set.
                     # Old snapshot image paths deliberately expire; re-read latest.
@@ -174,6 +186,9 @@ class Cameras:
                     index+=1;self.done.wait(.01)
         except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
         finally:
+            if video is not None:
+                try:video.close()
+                except Exception as exc:self.error=self.error or str(exc)
             if rig is not None:write_json(self.run/'camera_diagnostics.json',rig.diagnostics())
 
     def snapshot(self):
@@ -192,6 +207,7 @@ class Cameras:
     def close(self):
         self.done.set();self.thread.join(timeout=12)
         if self.thread.is_alive():raise RuntimeError('Camera publisher did not stop')
+        if self.error:raise RuntimeError(self.error)
 
 
 class LiveBackend:

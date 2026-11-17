@@ -64,10 +64,10 @@ dynamics, serial registers and paths cannot be overridden by a request.
 
 Filters enforce session identity, unique request IDs, fresh published observations
 (10 s maximum), no significant pose/gripper change since that snapshot, idle arm,
-no command queue, at most one command/s, and 20 accepted commands per session.
+no command queue and at most one command/s. The accepted-command count is logged
+but has no configured session cap.
 Arm presets are limited to 50 mm or 1 degree and check EE/flange guard boundaries.
-Translation from session start is capped at 52 mm (50 mm command plus 2 mm explicit allowance), rotation at 5 degrees and
-joint excursion is uncapped by default (null). A finite configured session cap
+Session translation, rotation and joint excursion are uncapped by default (null). A finite configured session cap
 is monitored throughout motion. The former 0.05 rad per-move cap is removed.
 Measured joint speed is limited to 0.10 rad/s, based on franka-toy; commanded
 joint speed remains capped at 0.02 rad/s. No model-preflight blocker is active. Gripper target changes are at most 0.10 closed fraction.
@@ -215,3 +215,32 @@ and fresh arm/gripper/camera timestamps. It resets on failures and shutdown.
 Non-stop live requests are rejected until ready. Readiness is a live observation
 condition, not execution authorization, a full-path check, or a guarantee that
 the next read will succeed. Session IDs and heartbeat must still be checked.
+
+## Visual cube approach and side video
+
+Every live session now records `side_view.mp4` (mp4v, nominal 10 fps),
+`side_video_frames.jsonl` (source timestamps, frame ages and repeated-frame flags),
+and `side_video_summary.json`. Encoding runs in its own thread with one latest
+frame reference, using the existing sampled side camera feed rather than opening
+another pipeline. It does not capture every native 30 fps frame. Normal shutdown
+finalizes the MP4. Five JPG/NPZ sets per camera remain retained; the video grows
+with session duration. Encoder errors are reported instead of silently claiming
+a recording exists. No full historical RGB-D archive is added.
+
+Translation requests may specify `arguments.translation_m` from 0.005 to 0.050;
+omitting it retains the 0.050 m default. Rotation presets cannot specify this
+field. Dynamics, per-command step limits and all point guards remain.
+The current task is a supervised approach above the cube, without contact
+or gripper commands. Session length alone no longer limits displacement.
+
+Missing AprilTags alone do not invalidate readiness. `cube` contains the current
+detector result; `cube_context.last_seen` contains explicitly historical tag data,
+its source timestamps, and age at assembly. The agent may use fresh alternate
+views and visual inference during occlusion; it must not misrepresent an inferred
+position as a measured robot-base coordinate or descend into an unseen contact
+region. Stale camera data, faults and rejected motions retain their stop rules.
+See AGENTS.md for the revised approach handoff.
+
+Shutdown can drain an earlier read response left pending by an interrupted parent
+before accepting the close acknowledgement. Other RPCs still require exact IDs;
+this does not retry a command or suppress a failed shutdown.

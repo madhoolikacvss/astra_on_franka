@@ -32,11 +32,11 @@ def angle_between(a,b):
     return float(np.arccos(np.clip((np.trace(orthogonal(a).T@orthogonal(b))-1)/2,-1,1)))
 
 
-def target_pose(start, preset, fraction=1.):
+def target_pose(start, preset, fraction=1., translation_m=STEP_M):
     start=rigid(start); target=start.copy()
     kind,axis,direction=PRESETS[preset]
     target[:3,:3]=orthogonal(start[:3,:3])
-    if kind=='t': target[axis,3]+=direction*STEP_M*fraction
+    if kind=='t': target[axis,3]+=direction*translation_m*fraction
     else: target[:3,:3]=rotation_delta(axis,direction*STEP_RAD*fraction)@target[:3,:3]
     return target
 

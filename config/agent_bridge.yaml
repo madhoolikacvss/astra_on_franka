@@ -9,11 +9,11 @@ data_directory: data/agent_bridge
 max_request_bytes: 4096
 observation_ttl_s: 10.0
 minimum_command_interval_s: 1.0
-max_commands_per_session: 20
+max_commands_per_session: null
 max_gripper_fraction_step: 0.10
-# One 50 mm command, with an explicit 2 mm session allowance for drift.
-max_translation_from_session_start_m: 0.052
-max_rotation_from_session_start_deg: 5.0
+# No cumulative session-motion caps. Per-command and workspace guards remain.
+max_translation_from_session_start_m: null
+max_rotation_from_session_start_deg: null
 # franka-toy-style velocity policy: no custom angular excursion cap.
 # Existing Cartesian bounds and slow commanded dynamics still apply.
 max_joint_excursion_from_session_start_rad: null
