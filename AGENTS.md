@@ -1,5 +1,118 @@
 # Hardware motion rules
 
+## Local handoff: supervised 50 mm +X trial
+
+The human has requested a total 50 mm translation in robot-base +X (forward).
+This is an arm-control trial, not a cube-reaching or pick-and-place task.
+Use at most TEN sequential `arm_step` requests with preset `tx+`, each 5 mm.
+Keep orientation unchanged; do not command the gripper, descend, grasp, return,
+or substitute a different direction. The agent may inspect all three camera
+views to assess the scene. Only the trusted controller sends hardware commands.
+No physical movement has been verified by the saved preview evidence so far.
+
+### Operator setup (human/service administrator, not the operating agent)
+
+- Work directly on the lab Linux filesystem at
+  `/home/madhoolika/workspace/astra_on_franka`; use `conda activate reset`.
+  Do not use a cloud-synchronized copy for live commands or observations.
+- Stop other arm, gripper, and camera owners. Clear the full arm/tool travel
+  region, keep people out of reach, supervise continuously, and have the
+  physical stop accessible. No object should be held during this trial.
+- Before starting the service, reset the existing `controller/command.json`
+  contents to `{}`. Use a new service session for the physical trial.
+- First run `python scripts/agent_controller.py --mode live-preview`.
+  Ask the agent to submit ONE `tx+` preview and inspect its matching result.
+  A preview does not move the arm or simulate cumulative movement: ten preview
+  requests would repeatedly propose a step from the actual stationary pose.
+- Before live execution, verify a supervised single 5 mm arm hardware test,
+  the gripper hardware test required by the current bridge, and OS isolation.
+  Do not mark an unperformed test as passed. The current bridge requires both
+  hardware-test gates even when the requested task is arm-only.
+- Execution gates currently remain false. Only the operator may enable verified
+  gates while the service is stopped: `autonomous_execution_enabled`,
+  `os_isolation_verified`, `arm_hardware_test_passed`, and
+  `gripper_hardware_test_passed` in `config/agent_bridge.yaml`, plus
+  `motion_enabled` in both `config/workspace.yaml` and `config/gripper.yaml`.
+  The operating agent must stop and report a closed gate, not edit it.
+- Once those prerequisites actually hold, the operator starts
+  `python scripts/agent_controller.py --mode live-execute --confirm-clear-path`.
+  This also requires realtime priority. Configuration is loaded at startup.
+  The operator confirms in chat that the physical trial is ready and supervised.
+- At trial end, stop the service from its terminal and restore execution gates
+  to false during maintenance. Do not leave an unattended executable bridge.
+
+### Operating-agent procedure
+
+1. Read this file, then only operational files under `data/`. Write only the
+   contents of the existing `controller/command.json`; no save-by-rename.
+   Do not run hardware scripts or change configurations to prepare the trial.
+2. Read `data/agent_bridge/status.json` and `latest.json`. Require matching
+   session IDs, a running service (not `status: closed`), `live: true`, matching
+   modes, no fault or observation error, and both snapshots not busy.
+   Require heartbeat and publication age at most 1 second before each request;
+   wait for a fresh snapshot if necessary. Never use a saved closed-session file.
+   `motion_authorized: false` in latest is deliberately always false: it means
+   an agent cannot authorize execution. Mode and operator gates determine whether
+   the service executes. Never modify this field or treat preview as execution.
+3. Inspect the three referenced `preview_file` images. Require valid arm and
+   gripper observations, Idle/error-free arm, and available fresh camera frames.
+   Camera `host_age_ms` reflects capture time, not age when the agent reads it;
+   use receipt/publication timestamps to assess freshness. If the view is unclear
+   or the proposed path appears obstructed, stop and report to the operator.
+4. Record the initial `observation.arm.ee_position_base_m` and session ID in
+   chat/memory. The intended endpoint is `[initial_x + 0.050, initial_y, initial_z]`
+   in metres. This is the configured end-effector origin, not fingertip position.
+5. Copy the newest observation/session IDs into the request below. Replace the
+   placeholder request ID with a unique ID for every submission. Send exactly
+   one request, then poll data files; never overwrite a pending request.
+
+   ```json
+   {"schema_version":1,"request_id":"xtrial_01_UNIQUE","session_id":"COPY_CURRENT_SESSION","observation_id":"COPY_FRESH_OBSERVATION","action":"arm_step","arguments":{"preset":"tx+"}}
+   ```
+
+6. Wait for `response.json` with the same request AND session IDs. `accepted`
+   is pending. In preview, `previewed` ends the single-request preview trial;
+   report the proposed target and that no movement occurred. In live execution,
+   only `completed` permits consideration of the next step. Verify a new, idle,
+   valid arm observation and inspect the images after each completed step.
+   Check that measured X increased by approximately 5 mm, with no unexpected
+   Y/Z or orientation change; report actual displacement, not just step count.
+7. In live execution repeat only `tx+`, at least 1 second between submissions,
+   stopping after ten completed steps or when the 50 mm target is reached.
+   Never add an eleventh correction. Before submitting, check the proposed next
+   5 mm step against the original endpoint; if it would exceed 50 mm from the
+   initial position, stop short and report the achieved displacement.
+   The controller's independent session limit can also reject the last step due
+   to tracking differences. Do not increase limits or restart to evade that cap.
+8. Any rejection, failed action, session change, lost observation, unexpected
+   movement, or operator stop ends the sequence. No retry, alternate direction,
+   automatic recovery, or retreat. If a motion is pending, send the stop request
+   described below when possible; for immediate danger use the physical stop.
+   Report initial/final measured XYZ, delta in mm, completed-step count, final
+   response, and any rejection/fault in chat. Do not write a separate report file.
+
+### Controller limits and evidence
+
+- Per command: 5 mm translation; current Cartesian speed cap 5 mm/s,
+  acceleration 10 mm/s², jerk 50 mm/s³. Do not override dynamics.
+- Session: 50 mm displacement from initial EE position, 5 degrees rotation,
+  0.10 rad joint excursion, 20 accepted commands. This trial permits only ten
+  translations and no rotations/gripper commands, despite the broader interface.
+- Each move is monitored against fresh arm state and EE/flange point boundaries;
+  sensor failures during a command trigger cancellation. Full arm/tool collision
+  geometry is NOT enforced, so operator inspection remains necessary.
+- Latest contains arm pose/joints, signed gripper encoder and closed fraction
+  (0=open, 1=closed), all three camera image paths, and cube tag observations.
+  Cube tag is 0, fixed reference tag is 1. Cube visibility is not the objective
+  of this fixed-direction trial; loss of a tag is not permission to reach blindly.
+- Read `data/agent_bridge/response.json` for command outcomes and the current
+  `data/agent_bridge/session_*/` for metadata, inbox history, result files and
+  images. Latest persists after shutdown; always pair it with running status.
+- Most recent supplied snapshot showed valid arm/gripper/cameras/cube with
+  gripper encoder 3889 (almost fully open). This is historical evidence only.
+  A prior fully closed position failed encoder validation; do not recalibrate or
+  close the gripper as part of this arm-only trial.
+
 ## Astra robot-operation role
 
 These restrictions apply when operating the robot through the bridge. They are

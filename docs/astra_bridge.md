@@ -66,7 +66,7 @@ Filters enforce session identity, unique request IDs, fresh published observatio
 (10 s maximum), no significant pose/gripper change since that snapshot, idle arm,
 no command queue, at most one command/s, and 20 accepted commands per session.
 Arm presets are limited to 5 mm or 1 degree and check EE/flange guard boundaries.
-Translation from session start is capped at 30 mm, rotation at 5 degrees and
+Translation from session start is capped at 50 mm, rotation at 5 degrees and
 observed joint excursion at 0.10 rad. Individual motion supervision retains the
 tighter per-move checks. Gripper target changes are at most 0.10 closed fraction.
 
