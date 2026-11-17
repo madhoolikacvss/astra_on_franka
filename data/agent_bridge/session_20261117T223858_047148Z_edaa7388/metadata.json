@@ -1,6 +1,6 @@
 {
-  "mode": "live-preview",
-  "session_id": "cd0345866e4646c1884dec3d4201034c",
+  "mode": "live-execute",
+  "session_id": "33c1843690c0438897718d64c13e0c72",
   "bridge_config": {
     "schema_version": 1,
     "autonomous_execution_enabled": true,
@@ -158,5 +158,9 @@
     "collision_geometry": null,
     "configured_ee_T_grasp_tcp": null
   },
-  "translation_step_m": 0.05
+  "translation_step_m": 0.05,
+  "gripper_transport": {
+    "kind": "spawned_process_rpc",
+    "worker_pid": 252466
+  }
 }

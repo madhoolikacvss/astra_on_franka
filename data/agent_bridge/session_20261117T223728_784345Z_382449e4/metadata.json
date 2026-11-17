@@ -1,6 +1,6 @@
 {
   "mode": "live-preview",
-  "session_id": "1bd130431ed64c1f95571b496bccb710",
+  "session_id": "569984fe81484a65a6c8d2b2e43a6a65",
   "bridge_config": {
     "schema_version": 1,
     "autonomous_execution_enabled": true,
@@ -161,6 +161,6 @@
   "translation_step_m": 0.05,
   "gripper_transport": {
     "kind": "spawned_process_rpc",
-    "worker_pid": 240607
+    "worker_pid": 250858
   }
 }

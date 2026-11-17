@@ -1,0 +1,47 @@
+{
+  "closed": true,
+  "session_id": "33c1843690c0438897718d64c13e0c72",
+  "mode": "live-execute",
+  "status": "closed",
+  "observations_stable": false,
+  "ready_for_command": false,
+  "readiness_reason": "Controller closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 2954.027626,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.33083,
+      "initialization": 206.365781,
+      "capture_wait": 0.037101,
+      "tag_tracking": 40.008849,
+      "top_down_npz_write": 3.952063,
+      "top_down_jpeg_write": 1.435264,
+      "wrist_npz_write": 3.784228,
+      "wrist_jpeg_write": 12.715583,
+      "side_npz_write": 3.657014,
+      "side_jpeg_write": 9.02818,
+      "publication": 0.025551,
+      "retention_cleanup": 2.559048,
+      "timing_log_write": 0.101333,
+      "inter_frame_wait": 14.431227
+    }
+  },
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [
+    "Gripper IPC fault: Gripper response ID mismatch; no retries, worker shutdown requested"
+  ],
+  "commands_used": 1,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: Camera observations stale: ages_ms={'top_down': 596.719515, 'wrist': 591.363416, 'side': 587.247666}; limit_ms=500.0; publication={'sequence': 466, 'processing_ms': 20.63323, 'save_ms': 267.756793, 'oldest_age_at_publication_ms': 316.119077}; publisher={'stage': 'wrist_npz_write', 'stage_age_ms': 1.557559, 'thread_alive': True, 'error': None, 'completed_stage_ms': {'not_started': 0.33083, 'initialization': 206.365781, 'capture_wait': 0.028421, 'tag_tracking': 51.938569, 'top_down_npz_write': 3.781819, 'top_down_jpeg_write': 4.223113, 'wrist_npz_write': 84.675489, 'wrist_jpeg_write': 15.825271, 'side_npz_write': 67.484897, 'side_jpeg_write': 16.285193, 'publication': 0.022891, 'retention_cleanup': 180.998046, 'timing_log_write': 25.664889, 'inter_frame_wait': 12.407901}}",
+    "stage": "cameras",
+    "unix_ns": 1794955193713629827
+  },
+  "observation_failure_count": 8,
+  "publication_count": 607,
+  "last_publication_unix_ns": 1794955223823629720,
+  "heartbeat_unix_ns": 1794955226985495295
+}

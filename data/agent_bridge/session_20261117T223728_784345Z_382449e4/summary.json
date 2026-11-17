@@ -1,0 +1,45 @@
+{
+  "closed": true,
+  "session_id": "569984fe81484a65a6c8d2b2e43a6a65",
+  "mode": "live-preview",
+  "status": "closed",
+  "observations_stable": false,
+  "ready_for_command": false,
+  "readiness_reason": "Controller closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 2249.516516,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.260469,
+      "initialization": 177.210914,
+      "capture_wait": 0.032531,
+      "tag_tracking": 39.991175,
+      "top_down_npz_write": 13.790986,
+      "top_down_jpeg_write": 1.559782,
+      "wrist_npz_write": 3.851187,
+      "wrist_jpeg_write": 7.610082,
+      "side_npz_write": 3.822957,
+      "side_jpeg_write": 3.275828,
+      "publication": 0.023371,
+      "retention_cleanup": 11.307884,
+      "timing_log_write": 0.173666,
+      "inter_frame_wait": 11.728918
+    }
+  },
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [],
+  "commands_used": 1,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: RuntimeError: Dynamixel read register=70 size=1: [TxRxResult] There is no status packet!; elapsed_ms=34.731",
+    "stage": "arm_and_gripper",
+    "unix_ns": 1794955084012579860
+  },
+  "observation_failure_count": 9,
+  "publication_count": 451,
+  "last_publication_unix_ns": 1794955115658197216,
+  "heartbeat_unix_ns": 1794955118064441301
+}
