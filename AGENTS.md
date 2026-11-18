@@ -15,16 +15,19 @@ rotation, joint excursion and command-count caps are disabled (null).
 This is not the franka-toy controller copied wholesale. No model-based joint
 trajectory or full-body collision check is implemented. Keep operator supervision.
 
-## Local handoff: supervised visual cube grasp
+## Local handoff: supervised visual cube pick-up
 
 The +X trial completed successfully in session_20261117T223858_047148Z_edaa7388:
 measured displacement was approximately [+50.043, +0.001, +0.035] mm.
 The user reports the approach succeeded on the lab computer; that latest session
 has not been reviewed in this checkout. The current task is to approach, align
-the two fingers around the 60 mm cube, and close the gripper to grasp it.
+the two fingers around the 60 mm cube, grasp it, and lift it until the cube's
+bottom surface is at least 50 mm above the tabletop. This is cube clearance,
+not EE height or a 50 mm gripper-to-cube gap.
 Rough visual estimates are sufficient; use fresh observations throughout.
 This authorizes opening/closing the gripper and intentional finger contact with
-the cube. Tabletop contact, lifting, transport and placing are not authorized.
+the cube, followed by an observed upward lift. Tool contact with the tabletop,
+lateral transport after grasping, and placing/releasing are not authorized.
 The human supervises and starts/stops the service.
 
 ### Operator setup
@@ -39,7 +42,7 @@ unverified gates true or let the agent edit configurations. Current local defaul
 remain disabled. A preview is a proposed step from the real pose, not simulation
 of motion. Stop the service with Ctrl-C when finished.
 
-### Agent approach and grasp procedure
+### Agent approach, grasp and lift procedure
 
 1. Read this file, then read only data/. Write only controller/command.json.
    Require matching session IDs, a running live service, heartbeat and publication
@@ -81,7 +84,7 @@ of motion. Stop the service with Ctrl-C when finished.
    cube in that setup; use this as supporting evidence, not a universal direction
    rule. Continue while fresh views support the direction and clear tool path.
    Pause if evidence contradicts the direction or clearance becomes uncertain.
-6. Continue one observed step at a time until the grasp objective is reached
+6. Continue one observed step at a time until the grasp-and-lift objective is reached
    or the operator stops the task. There is no session-start displacement or
    rotation cap and no 20-command budget. Per-command sizes, speed limits and
    physical workspace guards still apply. Do not change files, limits or restart
@@ -107,13 +110,38 @@ of motion. Stop the service with Ctrl-C when finished.
   guide, not a verified contact or grasp target.
 - Inspect images and measured opening after each command. Stop closing when
   the cube appears held between the fingers; do not keep squeezing to prove
-  a grasp. No test lift is authorized. Report visual evidence and uncertainty
-  rather than claiming verified holding force or a successful lift.
+  a grasp. After a completed closing command and fresh stable observations,
+  proceed with the observed lift below. Visual contact alone does not prove a
+  secure grasp; do not report success until the cube visibly rises with the tool.
 - The controller checks target opening, not grasp force. Contact can prevent
   reaching a target and cause `Gripper did not reach target; possible contact.
   No retry.` with torque disabled. This remains a failed command: stop and
   report it, never relabel it as success or bypass the timeout. Normal service
   shutdown also disables enabled gripper torque.
+
+### Lift goal and completion
+
+- After grasping, keep the grasp orientation and gripper target unchanged while
+  lifting vertically with tz+ steps. Start with 5 mm to check that the cube rises
+  with the fingers; continue with 5-10 mm steps after fresh observations confirm
+  retention and clearance. Do not lift after a failed gripper command.
+- The goal is at least 50 mm clearance between the cube's bottom and the tabletop.
+  Use the side view, supported by other fresh views and depth where available.
+  The 60 mm cube side is a useful visual scale. Aim slightly above the estimated
+  50 mm threshold rather than claiming exact millimetre accuracy from images.
+  EE displacement alone is insufficient: the cube must actually rise and remain
+  held. Tag loss alone does not stop the task if fresh views show this clearly.
+- Continue checking workspace bounds and clearance for the fingers, camera and
+  carried cube. Current point guards do not check the carried cube's volume.
+  Stop further movement if the cube slips, remains on the board, or its retention
+  or path becomes unclear. Do not automatically squeeze harder or retry a grasp.
+- Once the cube is visibly held at least approximately 50 mm above the tabletop,
+  stop sending movement commands and report the estimated clearance and evidence.
+  If the estimate cannot establish that threshold, report completion as unverified.
+  Do not place or release the cube. The operator must support/secure the cube
+  before stopping the service: shutdown disables gripper torque and can drop it.
+  Do not disable or bypass fault/stop handling to preserve a hold; operator
+  supervision is required throughout the lift.
 
 ### Occlusion is not a sensor fault
 
@@ -147,7 +175,7 @@ compressed session video grows with duration. Historical sessions are retained.
 Commanded Cartesian speed remains 5 mm/s, joint speed 0.02 rad/s, and the measured
 joint ceiling 0.10 rad/s. Workspace point guards, freshness and stop handling
 remain enabled. These are not full-arm/tool-volume collision checks. Gripper
-commands are authorized for the cube grasp described above.
+commands are authorized for the cube grasp and lift described above.
 
 ## Astra robot-operation role
 
@@ -185,7 +213,7 @@ stop the controller before maintenance. During robot operation:
   Do not request free-form coordinates, velocity, force, raw joints, code or paths.
 - Gripper request uses action="gripper_set", arguments={"closed_fraction":0.5}.
   Choose a target in [0,1] within 0.10 of the fresh observed closed_fraction.
-  0=open, 1=closed. The supervised cube grasp above is authorized; other
+  0=open, 1=closed. The supervised cube grasp and lift above are authorized; other
   manipulation needs a separate task instruction.
 - Stop request uses action="stop", arguments={}, observation_id=null, a fresh
   unique request_id and current session_id. It is allowed while busy or stale;
@@ -225,4 +253,4 @@ Rejected commands are saved as rejection_*.json with the current observation err
 Status and summary preserve last_observation_error after recovery/shutdown; this
 historical field does not replace the current observation_error readiness check.
 Removing cumulative session caps does not expand physical workspace boundaries.
-Only the cube-finger contact described in this grasp task is authorized.
+Only the cube-finger contact described in this grasp-and-lift task is authorized.

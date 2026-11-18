@@ -1,11 +1,14 @@
 # astra_on_franka
 
-## Current supervised task: grasp the cube
+## Current supervised task: pick the cube up 5 cm
 
 Follow [AGENTS.md](AGENTS.md) for the operating-agent handoff. Approach and align
 with the 60 mm cube, then open/close the fingers through the bridge to attempt a
-grasp. The former 5 cm stopping gap is an alignment checkpoint. Lifting and
-placing are not part of this task.
+grasp, then lift vertically until the cube bottom is at least 50 mm above the
+tabletop. The former 5 cm approach gap is only an alignment checkpoint. Verify
+that the cube rises with the fingers using fresh views; EE displacement alone
+is not proof. Start the lift with 5 mm, then use observed 5-10 mm upward steps.
+Stop at the goal and report evidence. Placing and releasing are not authorized.
 
 All existing speed, spatial boundaries, freshness, per-command and fault-stop
 constraints remain unchanged. Never touch the tabletop. Gripper targets use
@@ -16,7 +19,8 @@ The agent may only read data and write controller/command.json.
 The controller checks target opening, not holding force. A blocked target may
 time out and disable torque: stop and report it, do not treat it as success or
 retry past the fault. Report visual evidence without claiming verified holding
-force. Shutdown disables enabled torque. Current EE/flange point guards do not
+force. Before shutdown, the operator must support/secure the raised cube:
+shutdown disables enabled torque and can drop it. Current EE/flange point guards do not
 check the full tool volume; visible tabletop clearance and supervision remain
 necessary. See AGENTS.md for the complete procedure.
 
