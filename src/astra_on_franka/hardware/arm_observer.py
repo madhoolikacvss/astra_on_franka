@@ -124,12 +124,15 @@ class ArmObserver:
                 raise ValueError(f'Robot overall read deadline exceeded (100 ms); '
                                  f'previous_ms={previous}, current_ms={robot_ms}, '
                                  f'repeated_reads={repeated}; sample rejected')
+            # A delayed poll can return a genuinely new snapshot. Its overall
+            # read/validation deadline still applies; the shorter duplicate
+            # budget only rejects a timestamp that remains unchanged.
+            if previous is None or robot_ms > previous:
+                break
             if duplicate_deadline is not None and end > duplicate_deadline:
                 raise ValueError(f'Robot duplicate-state wait deadline exceeded (20 ms); '
                                  f'previous_ms={previous}, current_ms={robot_ms}, '
                                  f'repeated_reads={repeated}; sample rejected')
-            if previous is None or robot_ms > previous:
-                break
             repeated += 1
             if duplicate_deadline is None:
                 duplicate_deadline=end+int(NEW_STATE_TIMEOUT_S*1e9)
