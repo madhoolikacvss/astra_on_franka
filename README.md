@@ -1,5 +1,26 @@
 # astra_on_franka
 
+## Current supervised task: grasp the cube
+
+Follow [AGENTS.md](AGENTS.md) for the operating-agent handoff. Approach and align
+with the 60 mm cube, then open/close the fingers through the bridge to attempt a
+grasp. The former 5 cm stopping gap is an alignment checkpoint. Lifting and
+placing are not part of this task.
+
+All existing speed, spatial boundaries, freshness, per-command and fault-stop
+constraints remain unchanged. Never touch the tabletop. Gripper targets use
+closed_fraction (0=open, 1=closed), with at most 0.10 change from the current
+observation per command. Close in small observed increments with the arm still.
+The agent may only read data and write controller/command.json.
+
+The controller checks target opening, not holding force. A blocked target may
+time out and disable torque: stop and report it, do not treat it as success or
+retry past the fault. Report visual evidence without claiming verified holding
+force. Shutdown disables enabled torque. Current EE/flange point guards do not
+check the full tool volume; visible tabletop clearance and supervision remain
+necessary. See AGENTS.md for the complete procedure.
+
+
 Hardware integration project for the lab Franka Panda and custom Dynamixel gripper.
 
 See [existing setup and data conventions](docs/existing_setup.md) for findings
