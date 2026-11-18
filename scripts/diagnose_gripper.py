@@ -24,6 +24,43 @@ class ReadOnlyGripper(ManagedGripper):
         self.port.closePort()
 
 
+def inspect_transport(config, sys_root=Path('/sys')):
+    """Read OS metadata only: never open the serial port or change settings."""
+    device=Path(config['device'])
+    report={'configured_device':str(device),'baud_rate':config['baud_rate'],
+            'device_exists':device.exists(),'platform':platform.platform(),
+            'latency_timer_ms':None,'latency_timer_path':None,'usb_devices':[],
+            'errors':[]}
+    if not device.exists():
+        report['errors'].append('Configured serial device does not exist on this host')
+        return report
+    resolved=device.resolve()
+    report['resolved_device']=str(resolved)
+    tty=sys_root/'class/tty'/resolved.name/'device'
+    latency=sys_root/'bus/usb-serial/devices'/resolved.name/'latency_timer'
+    if latency.exists():
+        report['latency_timer_path']=str(latency)
+        try:report['latency_timer_ms']=int(latency.read_text().strip())
+        except (OSError,ValueError) as exc:report['errors'].append(str(exc))
+    else:
+        report['errors'].append('USB serial latency_timer not available')
+    if tty.exists():
+        node=tty.resolve()
+        report['sysfs_device']=str(node)
+        for ancestor in (node,*node.parents):
+            if not (ancestor/'idVendor').exists():continue
+            usb={'path':str(ancestor)}
+            for name in ('idVendor','idProduct','manufacturer','product','serial','speed',
+                         'power/control','power/autosuspend_delay_ms'):
+                path=ancestor/name
+                if path.exists():
+                    try:usb[name]=path.read_text().strip()
+                    except OSError as exc:report['errors'].append(str(exc))
+            report['usb_devices'].append(usb)
+    report['note']='Read-only OS inspection. USB latency is distinct from SDK packet timeout and the 100 ms observation deadline.'
+    return report
+
+
 def summarize(path):
     path=Path(path)
     if path.is_dir():path=path/'dynamixel_reads.jsonl'
@@ -59,7 +96,7 @@ def record(args):
     write_json(run/'metadata.json',{'config':config,'seconds':args.seconds,'gap_after_read_s':args.interval,
         'python':sys.version,'platform':platform.platform(),
         'dynamixel_sdk_version':importlib.metadata.version('dynamixel-sdk'),
-        'read_only':True,'registers':[132,70],
+        'read_only':True,'registers':[132,70],'transport':inspect_transport(config),
         'note':'Same sequential reads as bridge. No torque/mode/current/position writes, no hardware reset, no arm/camera connections.'})
     print(f'Recording to {run}',flush=True)
     gripper=None;attempts=successes=0;interrupted=False;terminal_error=None
@@ -101,6 +138,7 @@ def record(args):
 def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__)
     commands=parser.add_subparsers(dest='action',required=True)
+    commands.add_parser('inspect',help='Read USB latency/topology from OS; no serial connection or setting changes')
     capture=commands.add_parser('record',help='Operator only: stop bridge and all gripper owners first')
     capture.add_argument('--seconds',type=float,default=260)
     capture.add_argument('--interval',type=float,default=.1,help='Gap after each read, matching bridge sleep')
@@ -108,6 +146,9 @@ def main(argv=None):
     comparison=commands.add_parser('compare',help='Offline; does not import SDK or open devices')
     comparison.add_argument('baseline',type=Path);comparison.add_argument('standalone',type=Path)
     args=parser.parse_args(argv)
+    if args.action=='inspect':
+        config=yaml.safe_load((ROOT/'config/gripper.yaml').read_text())
+        print(json.dumps(inspect_transport(config),indent=2));return 0
     if args.action=='compare':
         print(json.dumps(compare(args.baseline,args.standalone),indent=2));return 0
     return record(args)
