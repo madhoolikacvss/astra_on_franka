@@ -1,0 +1,45 @@
+{
+  "closed": true,
+  "session_id": "bedc6662e5244e1e93f339be0d148abe",
+  "mode": "live-execute",
+  "status": "closed",
+  "observations_stable": false,
+  "ready_for_command": false,
+  "readiness_reason": "Controller closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 1676.525238,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.272236,
+      "initialization": 173.978301,
+      "capture_wait": 0.029181,
+      "tag_tracking": 32.316312,
+      "top_down_npz_write": 4.103491,
+      "top_down_jpeg_write": 1.50101,
+      "wrist_npz_write": 18.861419,
+      "wrist_jpeg_write": 3.240564,
+      "side_npz_write": 3.951388,
+      "side_jpeg_write": 3.165952,
+      "publication": 0.053521,
+      "retention_cleanup": 2.802385,
+      "timing_log_write": 0.085671,
+      "inter_frame_wait": 10.071758
+    }
+  },
+  "fault": "RuntimeError: ValueError: Robot duplicate-state wait deadline exceeded (20 ms); previous_ms=14202129, current_ms=14202163, repeated_reads=1; sample rejected",
+  "terminal_error": null,
+  "cleanup_errors": [],
+  "commands_used": 35,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: Cameras are warming up",
+    "stage": "cameras",
+    "unix_ns": 1794962166391894450
+  },
+  "observation_failure_count": 8,
+  "publication_count": 6434,
+  "last_publication_unix_ns": 1794962915730590677,
+  "heartbeat_unix_ns": 1794962917551008065
+}

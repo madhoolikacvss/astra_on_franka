@@ -1,0 +1,333 @@
+{
+  "request_id": "grasp_approach_dba4913b442d4d6ba537ab0a317cb4f0",
+  "session_id": "bedc6662e5244e1e93f339be0d148abe",
+  "status": "failed",
+  "error": "RuntimeError: ValueError: Robot duplicate-state wait deadline exceeded (20 ms); previous_ms=14202129, current_ms=14202163, repeated_reads=1; sample rejected",
+  "stop_error": null,
+  "command_submitted": true,
+  "final": null,
+  "arm_observations": [
+    {
+      "schema_version": 1,
+      "valid": true,
+      "host_read_start_monotonic_ns": 536921521399361,
+      "host_read_end_monotonic_ns": 536921521990033,
+      "host_received_unix_ns": 1794962855522189667,
+      "read_duration_ms": 0.590672,
+      "robot_time_ms": 14202089,
+      "repeated_state_reads_skipped": 0,
+      "joint_positions_rad": [
+        0.06322082723385275,
+        0.018894070094709794,
+        -4.1285179116482566e-05,
+        -1.7185856269877222,
+        0.0006278885416287542,
+        1.7270483812148951,
+        0.8462242584448517
+      ],
+      "joint_velocities_rad_s": [
+        -4.0581292814351525e-05,
+        0.0007573944836173827,
+        -0.00031436395742492836,
+        0.00030578112601851396,
+        0.0002824407207531729,
+        0.0015130057836634785,
+        0.0009526830428629753
+      ],
+      "O_T_EE": [
+        [
+          0.9999332403236512,
+          0.0022525695333210916,
+          -0.010449393752365421,
+          0.5656840820567692
+        ],
+        [
+          0.002252270658963329,
+          -0.9999878362002059,
+          -4.03701444518928e-05,
+          0.03590953296777379
+        ],
+        [
+          -0.010449357584589253,
+          1.6832586401704583e-05,
+          -0.9999454027798018,
+          0.45389140539173445
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "F_T_EE": [
+        [
+          0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          -0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.10339999943971634
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "transform_validation": {
+        "rotation_atol": 0.0001,
+        "bottom_row_atol": 1e-06,
+        "matrices_normalized": false,
+        "O_T_EE": {
+          "rotation_determinant": 0.9999807469012088,
+          "rotation_orthogonality_max_abs_error": 1.9253098791804923e-05
+        },
+        "F_T_EE": {
+          "rotation_determinant": 0.9999807469012083,
+          "rotation_orthogonality_max_abs_error": 1.92530987916939e-05
+        }
+      },
+      "ee_position_base_m": [
+        0.5656840820567692,
+        0.03590953296777379,
+        0.45389140539173445
+      ],
+      "ee_rotation_base": [
+        [
+          0.9999332403236512,
+          0.0022525695333210916,
+          -0.010449393752365421
+        ],
+        [
+          0.002252270658963329,
+          -0.9999878362002059,
+          -4.03701444518928e-05
+        ],
+        [
+          -0.010449357584589253,
+          1.6832586401704583e-05,
+          -0.9999454027798018
+        ]
+      ],
+      "has_errors": false,
+      "error_flags": {
+        "base_acceleration_initialization_timeout": false,
+        "base_acceleration_invalid_reading": false,
+        "cartesian_motion_generator_acceleration_discontinuity": false,
+        "cartesian_motion_generator_elbow_limit_violation": false,
+        "cartesian_motion_generator_elbow_sign_inconsistent": false,
+        "cartesian_motion_generator_joint_acceleration_discontinuity": false,
+        "cartesian_motion_generator_joint_position_limits_violation": false,
+        "cartesian_motion_generator_joint_velocity_discontinuity": false,
+        "cartesian_motion_generator_joint_velocity_limits_violation": false,
+        "cartesian_motion_generator_start_elbow_invalid": false,
+        "cartesian_motion_generator_velocity_discontinuity": false,
+        "cartesian_motion_generator_velocity_limits_violation": false,
+        "cartesian_position_limits_violation": false,
+        "cartesian_position_motion_generator_invalid_frame": false,
+        "cartesian_position_motion_generator_start_pose_invalid": false,
+        "cartesian_reflex": false,
+        "cartesian_spline_motion_generator_violation": false,
+        "cartesian_velocity_profile_safety_violation": false,
+        "cartesian_velocity_violation": false,
+        "communication_constraints_violation": false,
+        "controller_torque_discontinuity": false,
+        "force_control_safety_violation": false,
+        "force_controller_desired_force_tolerance_violation": false,
+        "instability_detected": false,
+        "joint_motion_generator_acceleration_discontinuity": false,
+        "joint_motion_generator_position_limits_violation": false,
+        "joint_motion_generator_velocity_discontinuity": false,
+        "joint_motion_generator_velocity_limits_violation": false,
+        "joint_move_in_wrong_direction": false,
+        "joint_p2p_insufficient_torque_for_planning": false,
+        "joint_position_limits_violation": false,
+        "joint_position_motion_generator_start_pose_invalid": false,
+        "joint_reflex": false,
+        "joint_velocity_violation": false,
+        "joint_via_motion_generator_planning_joint_limit_violation": false,
+        "max_goal_pose_deviation_violation": false,
+        "max_path_pose_deviation_violation": false,
+        "power_limit_violation": false,
+        "self_collision_avoidance_violation": false,
+        "start_elbow_sign_inconsistent": false,
+        "tau_j_range_violation": false
+      },
+      "current_errors": "[]",
+      "robot_mode": "RobotMode.Idle"
+    },
+    {
+      "schema_version": 1,
+      "valid": true,
+      "host_read_start_monotonic_ns": 536921561571180,
+      "host_read_end_monotonic_ns": 536921572085166,
+      "host_received_unix_ns": 1794962855572292971,
+      "read_duration_ms": 10.513986,
+      "robot_time_ms": 14202129,
+      "repeated_state_reads_skipped": 0,
+      "joint_positions_rad": [
+        0.06322231228679784,
+        0.01889246874552086,
+        -4.1212982039872874e-05,
+        -1.7185836541428239,
+        0.0006289421155750635,
+        1.7270425191050671,
+        0.8462253612559112
+      ],
+      "joint_velocities_rad_s": [
+        -0.0004377656204990629,
+        0.00027027051312878683,
+        -0.00013066541724576677,
+        0.000895941941593217,
+        0.0013447629450015312,
+        -0.0014197743688125432,
+        0.0014531703109293512
+      ],
+      "O_T_EE": [
+        [
+          0.9999332151368572,
+          0.0022528528850853102,
+          -0.010451742646187479,
+          0.5656829651545979
+        ],
+        [
+          0.002252563184121259,
+          -0.9999878355764453,
+          -3.949019717778071e-05,
+          0.03591055197023073
+        ],
+        [
+          -0.01045170447236769,
+          1.5944349135655657e-05,
+          -0.9999453782663243,
+          0.4538927539646471
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "F_T_EE": [
+        [
+          0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          -0.707099974155426,
+          0.707099974155426,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.10339999943971634
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "transform_validation": {
+        "rotation_atol": 0.0001,
+        "bottom_row_atol": 1e-06,
+        "matrices_normalized": false,
+        "O_T_EE": {
+          "rotation_determinant": 0.9999807469012084,
+          "rotation_orthogonality_max_abs_error": 1.9253098792026968e-05
+        },
+        "F_T_EE": {
+          "rotation_determinant": 0.9999807469012083,
+          "rotation_orthogonality_max_abs_error": 1.92530987916939e-05
+        }
+      },
+      "ee_position_base_m": [
+        0.5656829651545979,
+        0.03591055197023073,
+        0.4538927539646471
+      ],
+      "ee_rotation_base": [
+        [
+          0.9999332151368572,
+          0.0022528528850853102,
+          -0.010451742646187479
+        ],
+        [
+          0.002252563184121259,
+          -0.9999878355764453,
+          -3.949019717778071e-05
+        ],
+        [
+          -0.01045170447236769,
+          1.5944349135655657e-05,
+          -0.9999453782663243
+        ]
+      ],
+      "has_errors": false,
+      "error_flags": {
+        "base_acceleration_initialization_timeout": false,
+        "base_acceleration_invalid_reading": false,
+        "cartesian_motion_generator_acceleration_discontinuity": false,
+        "cartesian_motion_generator_elbow_limit_violation": false,
+        "cartesian_motion_generator_elbow_sign_inconsistent": false,
+        "cartesian_motion_generator_joint_acceleration_discontinuity": false,
+        "cartesian_motion_generator_joint_position_limits_violation": false,
+        "cartesian_motion_generator_joint_velocity_discontinuity": false,
+        "cartesian_motion_generator_joint_velocity_limits_violation": false,
+        "cartesian_motion_generator_start_elbow_invalid": false,
+        "cartesian_motion_generator_velocity_discontinuity": false,
+        "cartesian_motion_generator_velocity_limits_violation": false,
+        "cartesian_position_limits_violation": false,
+        "cartesian_position_motion_generator_invalid_frame": false,
+        "cartesian_position_motion_generator_start_pose_invalid": false,
+        "cartesian_reflex": false,
+        "cartesian_spline_motion_generator_violation": false,
+        "cartesian_velocity_profile_safety_violation": false,
+        "cartesian_velocity_violation": false,
+        "communication_constraints_violation": false,
+        "controller_torque_discontinuity": false,
+        "force_control_safety_violation": false,
+        "force_controller_desired_force_tolerance_violation": false,
+        "instability_detected": false,
+        "joint_motion_generator_acceleration_discontinuity": false,
+        "joint_motion_generator_position_limits_violation": false,
+        "joint_motion_generator_velocity_discontinuity": false,
+        "joint_motion_generator_velocity_limits_violation": false,
+        "joint_move_in_wrong_direction": false,
+        "joint_p2p_insufficient_torque_for_planning": false,
+        "joint_position_limits_violation": false,
+        "joint_position_motion_generator_start_pose_invalid": false,
+        "joint_reflex": false,
+        "joint_velocity_violation": false,
+        "joint_via_motion_generator_planning_joint_limit_violation": false,
+        "max_goal_pose_deviation_violation": false,
+        "max_path_pose_deviation_violation": false,
+        "power_limit_violation": false,
+        "self_collision_avoidance_violation": false,
+        "start_elbow_sign_inconsistent": false,
+        "tau_j_range_violation": false
+      },
+      "current_errors": "[]",
+      "robot_mode": "RobotMode.Idle"
+    }
+  ]
+}

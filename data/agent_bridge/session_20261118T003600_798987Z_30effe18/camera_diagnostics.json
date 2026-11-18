@@ -1,0 +1,1489 @@
+{
+  "phase": "streaming",
+  "stale_after_s": 0.5,
+  "errors": {},
+  "cameras": {
+    "top_down": {
+      "phase": "closed",
+      "accepted_pairs": 22484,
+      "repeated_pairs": 0,
+      "zero_counter_pairs": 0,
+      "startup_resets": 0,
+      "startup_streak": 5,
+      "skew_rejected_pairs": 0,
+      "read_started_monotonic_ns": 536981852832733,
+      "last_read_duration_ms": 36.604537,
+      "last_returned_streams": {
+        "color": {
+          "frame_number": 22571,
+          "timestamp_ms": 1794962915844.8638,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "depth": {
+          "frame_number": 22568,
+          "timestamp_ms": 1794962915844.8467,
+          "timestamp_domain": "timestamp_domain.global_time"
+        }
+      },
+      "stop_started_monotonic_ns": 536981889490421,
+      "stop_duration_ms": 686.155958,
+      "serial": "145422070656",
+      "recent_transitions": [
+        {
+          "host_monotonic_ns": 536981392788087,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22555,
+              "timestamp_ms": 1794962915311.1316,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22552,
+              "timestamp_ms": 1794962915311.1145,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22556,
+              "timestamp_ms": 1794962915344.49,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22553,
+              "timestamp_ms": 1794962915344.473,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981418744725,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22556,
+              "timestamp_ms": 1794962915344.49,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22553,
+              "timestamp_ms": 1794962915344.473,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22557,
+              "timestamp_ms": 1794962915377.8484,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22554,
+              "timestamp_ms": 1794962915377.8313,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981458643598,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22557,
+              "timestamp_ms": 1794962915377.8484,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22554,
+              "timestamp_ms": 1794962915377.8313,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22558,
+              "timestamp_ms": 1794962915411.2068,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22555,
+              "timestamp_ms": 1794962915411.1897,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981485358531,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22558,
+              "timestamp_ms": 1794962915411.2068,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22555,
+              "timestamp_ms": 1794962915411.1897,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22559,
+              "timestamp_ms": 1794962915444.5652,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22556,
+              "timestamp_ms": 1794962915444.5483,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981518733905,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22559,
+              "timestamp_ms": 1794962915444.5652,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22556,
+              "timestamp_ms": 1794962915444.5483,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22560,
+              "timestamp_ms": 1794962915477.9238,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22557,
+              "timestamp_ms": 1794962915477.9067,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981559056585,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22560,
+              "timestamp_ms": 1794962915477.9238,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22557,
+              "timestamp_ms": 1794962915477.9067,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22561,
+              "timestamp_ms": 1794962915511.2822,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22558,
+              "timestamp_ms": 1794962915511.2654,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981585404762,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22561,
+              "timestamp_ms": 1794962915511.2822,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22558,
+              "timestamp_ms": 1794962915511.2654,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22562,
+              "timestamp_ms": 1794962915544.6409,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22559,
+              "timestamp_ms": 1794962915544.6238,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981625880315,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22562,
+              "timestamp_ms": 1794962915544.6409,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22559,
+              "timestamp_ms": 1794962915544.6238,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22563,
+              "timestamp_ms": 1794962915577.9988,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22560,
+              "timestamp_ms": 1794962915577.982,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981652696751,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22563,
+              "timestamp_ms": 1794962915577.9988,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22560,
+              "timestamp_ms": 1794962915577.982,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22564,
+              "timestamp_ms": 1794962915611.357,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22561,
+              "timestamp_ms": 1794962915611.3398,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981691753637,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22564,
+              "timestamp_ms": 1794962915611.357,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22561,
+              "timestamp_ms": 1794962915611.3398,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22565,
+              "timestamp_ms": 1794962915644.7148,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22562,
+              "timestamp_ms": 1794962915644.698,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981719388577,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22565,
+              "timestamp_ms": 1794962915644.7148,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22562,
+              "timestamp_ms": 1794962915644.698,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22566,
+              "timestamp_ms": 1794962915678.073,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22563,
+              "timestamp_ms": 1794962915678.0562,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981753371844,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22566,
+              "timestamp_ms": 1794962915678.073,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22563,
+              "timestamp_ms": 1794962915678.0562,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22567,
+              "timestamp_ms": 1794962915711.4312,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22564,
+              "timestamp_ms": 1794962915711.414,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981786313429,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22567,
+              "timestamp_ms": 1794962915711.4312,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22564,
+              "timestamp_ms": 1794962915711.414,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22568,
+              "timestamp_ms": 1794962915744.7893,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22565,
+              "timestamp_ms": 1794962915744.7722,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981820223235,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22568,
+              "timestamp_ms": 1794962915744.7893,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22565,
+              "timestamp_ms": 1794962915744.7722,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22569,
+              "timestamp_ms": 1794962915778.1475,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22566,
+              "timestamp_ms": 1794962915778.1304,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981852775102,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22569,
+              "timestamp_ms": 1794962915778.1475,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22566,
+              "timestamp_ms": 1794962915778.1304,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22570,
+              "timestamp_ms": 1794962915811.5056,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22567,
+              "timestamp_ms": 1794962915811.4885,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981889441490,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22570,
+              "timestamp_ms": 1794962915811.5056,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22567,
+              "timestamp_ms": 1794962915811.4885,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22571,
+              "timestamp_ms": 1794962915844.8638,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22568,
+              "timestamp_ms": 1794962915844.8467,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        }
+      ],
+      "host_age_ms": 1651.397156,
+      "last_delivered_sequence": 22481
+    },
+    "wrist": {
+      "phase": "closed",
+      "accepted_pairs": 22484,
+      "repeated_pairs": 0,
+      "zero_counter_pairs": 0,
+      "startup_resets": 0,
+      "startup_streak": 5,
+      "skew_rejected_pairs": 0,
+      "read_started_monotonic_ns": 536981853132679,
+      "last_read_duration_ms": 27.339276,
+      "last_returned_streams": {
+        "color": {
+          "frame_number": 22519,
+          "timestamp_ms": 1794962915843.384,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "depth": {
+          "frame_number": 22516,
+          "timestamp_ms": 1794962915843.366,
+          "timestamp_domain": "timestamp_domain.global_time"
+        }
+      },
+      "stop_started_monotonic_ns": 536981880522376,
+      "stop_duration_ms": 489.115756,
+      "serial": "233622078546",
+      "recent_transitions": [
+        {
+          "host_monotonic_ns": 536981392356528,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22503,
+              "timestamp_ms": 1794962915309.6626,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22500,
+              "timestamp_ms": 1794962915309.6448,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22504,
+              "timestamp_ms": 1794962915343.0203,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22501,
+              "timestamp_ms": 1794962915343.0022,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981417987940,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22504,
+              "timestamp_ms": 1794962915343.0203,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22501,
+              "timestamp_ms": 1794962915343.0022,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22505,
+              "timestamp_ms": 1794962915376.3777,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22502,
+              "timestamp_ms": 1794962915376.3599,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.017822265625
+        },
+        {
+          "host_monotonic_ns": 536981451765982,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22505,
+              "timestamp_ms": 1794962915376.3777,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22502,
+              "timestamp_ms": 1794962915376.3599,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22506,
+              "timestamp_ms": 1794962915409.7354,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22503,
+              "timestamp_ms": 1794962915409.7173,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981484678578,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22506,
+              "timestamp_ms": 1794962915409.7354,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22503,
+              "timestamp_ms": 1794962915409.7173,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22507,
+              "timestamp_ms": 1794962915443.093,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22504,
+              "timestamp_ms": 1794962915443.075,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981518352127,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22507,
+              "timestamp_ms": 1794962915443.093,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22504,
+              "timestamp_ms": 1794962915443.075,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22508,
+              "timestamp_ms": 1794962915476.4504,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22505,
+              "timestamp_ms": 1794962915476.4326,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.017822265625
+        },
+        {
+          "host_monotonic_ns": 536981553516837,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22508,
+              "timestamp_ms": 1794962915476.4504,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22505,
+              "timestamp_ms": 1794962915476.4326,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22509,
+              "timestamp_ms": 1794962915509.808,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22506,
+              "timestamp_ms": 1794962915509.79,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981585018094,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22509,
+              "timestamp_ms": 1794962915509.808,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22506,
+              "timestamp_ms": 1794962915509.79,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22510,
+              "timestamp_ms": 1794962915543.1658,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22507,
+              "timestamp_ms": 1794962915543.1477,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981626110460,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22510,
+              "timestamp_ms": 1794962915543.1658,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22507,
+              "timestamp_ms": 1794962915543.1477,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22511,
+              "timestamp_ms": 1794962915576.5232,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22508,
+              "timestamp_ms": 1794962915576.5054,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.017822265625
+        },
+        {
+          "host_monotonic_ns": 536981647499329,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22511,
+              "timestamp_ms": 1794962915576.5232,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22508,
+              "timestamp_ms": 1794962915576.5054,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22512,
+              "timestamp_ms": 1794962915609.8809,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22509,
+              "timestamp_ms": 1794962915609.8628,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981680619018,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22512,
+              "timestamp_ms": 1794962915609.8809,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22509,
+              "timestamp_ms": 1794962915609.8628,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22513,
+              "timestamp_ms": 1794962915643.2385,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22510,
+              "timestamp_ms": 1794962915643.2205,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981714035713,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22513,
+              "timestamp_ms": 1794962915643.2385,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22510,
+              "timestamp_ms": 1794962915643.2205,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22514,
+              "timestamp_ms": 1794962915676.596,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22511,
+              "timestamp_ms": 1794962915676.5781,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.017822265625
+        },
+        {
+          "host_monotonic_ns": 536981748423206,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22514,
+              "timestamp_ms": 1794962915676.596,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22511,
+              "timestamp_ms": 1794962915676.5781,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22515,
+              "timestamp_ms": 1794962915709.9536,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22512,
+              "timestamp_ms": 1794962915709.9355,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981781527786,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22515,
+              "timestamp_ms": 1794962915709.9536,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22512,
+              "timestamp_ms": 1794962915709.9355,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22516,
+              "timestamp_ms": 1794962915743.3113,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22513,
+              "timestamp_ms": 1794962915743.2932,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981814891689,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22516,
+              "timestamp_ms": 1794962915743.3113,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22513,
+              "timestamp_ms": 1794962915743.2932,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22517,
+              "timestamp_ms": 1794962915776.6687,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22514,
+              "timestamp_ms": 1794962915776.651,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.017822265625
+        },
+        {
+          "host_monotonic_ns": 536981853100698,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22517,
+              "timestamp_ms": 1794962915776.6687,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22514,
+              "timestamp_ms": 1794962915776.651,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22518,
+              "timestamp_ms": 1794962915810.0264,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22515,
+              "timestamp_ms": 1794962915810.0083,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        },
+        {
+          "host_monotonic_ns": 536981880475305,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22518,
+              "timestamp_ms": 1794962915810.0264,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22515,
+              "timestamp_ms": 1794962915810.0083,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22519,
+              "timestamp_ms": 1794962915843.384,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22516,
+              "timestamp_ms": 1794962915843.366,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01806640625
+        }
+      ],
+      "host_age_ms": 1656.103459,
+      "last_delivered_sequence": 22481
+    },
+    "side": {
+      "phase": "closed",
+      "accepted_pairs": 22469,
+      "repeated_pairs": 0,
+      "zero_counter_pairs": 2,
+      "startup_resets": 0,
+      "startup_streak": 5,
+      "skew_rejected_pairs": 0,
+      "read_started_monotonic_ns": 536981859606785,
+      "last_read_duration_ms": 39.021305,
+      "last_returned_streams": {
+        "color": {
+          "frame_number": 22479,
+          "timestamp_ms": 1794962915853.9778,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "depth": {
+          "frame_number": 22477,
+          "timestamp_ms": 1794962915853.9607,
+          "timestamp_domain": "timestamp_domain.global_time"
+        }
+      },
+      "stop_started_monotonic_ns": 536981898678901,
+      "stop_duration_ms": 1629.860314,
+      "serial": "239722073976",
+      "recent_transitions": [
+        {
+          "host_monotonic_ns": 536981393115263,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22463,
+              "timestamp_ms": 1794962915320.25,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22461,
+              "timestamp_ms": 1794962915320.233,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22464,
+              "timestamp_ms": 1794962915353.608,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22462,
+              "timestamp_ms": 1794962915353.5908,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981425455227,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22464,
+              "timestamp_ms": 1794962915353.608,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22462,
+              "timestamp_ms": 1794962915353.5908,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22465,
+              "timestamp_ms": 1794962915386.9656,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22463,
+              "timestamp_ms": 1794962915386.9487,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981459842911,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22465,
+              "timestamp_ms": 1794962915386.9656,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22463,
+              "timestamp_ms": 1794962915386.9487,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22466,
+              "timestamp_ms": 1794962915420.3235,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22464,
+              "timestamp_ms": 1794962915420.3066,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981492220835,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22466,
+              "timestamp_ms": 1794962915420.3235,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22464,
+              "timestamp_ms": 1794962915420.3066,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22467,
+              "timestamp_ms": 1794962915453.6814,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22465,
+              "timestamp_ms": 1794962915453.6643,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981525548979,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22467,
+              "timestamp_ms": 1794962915453.6814,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22465,
+              "timestamp_ms": 1794962915453.6643,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22468,
+              "timestamp_ms": 1794962915487.0393,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22466,
+              "timestamp_ms": 1794962915487.0222,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981560200898,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22468,
+              "timestamp_ms": 1794962915487.0393,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22466,
+              "timestamp_ms": 1794962915487.0222,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22469,
+              "timestamp_ms": 1794962915520.3972,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22467,
+              "timestamp_ms": 1794962915520.3801,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981592445409,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22469,
+              "timestamp_ms": 1794962915520.3972,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22467,
+              "timestamp_ms": 1794962915520.3801,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22470,
+              "timestamp_ms": 1794962915553.755,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22468,
+              "timestamp_ms": 1794962915553.738,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981625708982,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22470,
+              "timestamp_ms": 1794962915553.755,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22468,
+              "timestamp_ms": 1794962915553.738,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22471,
+              "timestamp_ms": 1794962915587.113,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22469,
+              "timestamp_ms": 1794962915587.096,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981659129076,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22471,
+              "timestamp_ms": 1794962915587.113,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22469,
+              "timestamp_ms": 1794962915587.096,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22472,
+              "timestamp_ms": 1794962915620.4712,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22470,
+              "timestamp_ms": 1794962915620.454,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981696536219,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22472,
+              "timestamp_ms": 1794962915620.4712,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22470,
+              "timestamp_ms": 1794962915620.454,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22473,
+              "timestamp_ms": 1794962915653.829,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22471,
+              "timestamp_ms": 1794962915653.8123,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981730289921,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22473,
+              "timestamp_ms": 1794962915653.829,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22471,
+              "timestamp_ms": 1794962915653.8123,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22474,
+              "timestamp_ms": 1794962915687.1873,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22472,
+              "timestamp_ms": 1794962915687.1702,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981760150926,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22474,
+              "timestamp_ms": 1794962915687.1873,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22472,
+              "timestamp_ms": 1794962915687.1702,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22475,
+              "timestamp_ms": 1794962915720.5454,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22473,
+              "timestamp_ms": 1794962915720.5283,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981792943799,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22475,
+              "timestamp_ms": 1794962915720.5454,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22473,
+              "timestamp_ms": 1794962915720.5283,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22476,
+              "timestamp_ms": 1794962915753.9036,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22474,
+              "timestamp_ms": 1794962915753.8865,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981825794943,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22476,
+              "timestamp_ms": 1794962915753.9036,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22474,
+              "timestamp_ms": 1794962915753.8865,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22477,
+              "timestamp_ms": 1794962915787.2615,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22475,
+              "timestamp_ms": 1794962915787.2446,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.016845703125
+        },
+        {
+          "host_monotonic_ns": 536981859561854,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22477,
+              "timestamp_ms": 1794962915787.2615,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22475,
+              "timestamp_ms": 1794962915787.2446,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22478,
+              "timestamp_ms": 1794962915820.6196,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22476,
+              "timestamp_ms": 1794962915820.6025,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        },
+        {
+          "host_monotonic_ns": 536981898631610,
+          "previous_accepted_streams": {
+            "color": {
+              "frame_number": 22478,
+              "timestamp_ms": 1794962915820.6196,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22476,
+              "timestamp_ms": 1794962915820.6025,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "current_streams": {
+            "color": {
+              "frame_number": 22479,
+              "timestamp_ms": 1794962915853.9778,
+              "timestamp_domain": "timestamp_domain.global_time"
+            },
+            "depth": {
+              "frame_number": 22477,
+              "timestamp_ms": 1794962915853.9607,
+              "timestamp_domain": "timestamp_domain.global_time"
+            }
+          },
+          "decision": "accept",
+          "rgb_depth_timestamp_skew_ms": 0.01708984375
+        }
+      ],
+      "host_age_ms": 1642.740307,
+      "last_delivered_sequence": 22466
+    }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "closed": true,
+  "session_id": "1a36521926a247be8e027746929af959",
+  "mode": "live-preview",
+  "status": "closed",
+  "observations_stable": false,
+  "ready_for_command": false,
+  "readiness_reason": "Controller closed",
+  "camera_publisher": {
+    "stage": "inter_frame_wait",
+    "stage_age_ms": 3153.820828,
+    "thread_alive": false,
+    "error": null,
+    "completed_stage_ms": {
+      "not_started": 0.282076,
+      "initialization": 186.180063,
+      "capture_wait": 0.071952,
+      "tag_tracking": 21.783942,
+      "top_down_npz_write": 12.959597,
+      "top_down_jpeg_write": 1.472999,
+      "wrist_npz_write": 12.812315,
+      "wrist_jpeg_write": 3.296155,
+      "side_npz_write": 17.043418,
+      "side_jpeg_write": 3.068281,
+      "publication": 0.059711,
+      "retention_cleanup": 9.325176,
+      "timing_log_write": 0.137373,
+      "inter_frame_wait": 13.19101
+    }
+  },
+  "fault": null,
+  "terminal_error": null,
+  "cleanup_errors": [],
+  "commands_used": 1,
+  "observation_error": null,
+  "last_observation_error": {
+    "message": "RuntimeError: Cameras are warming up",
+    "stage": "cameras",
+    "unix_ns": 1794962071970769939
+  },
+  "observation_failure_count": 8,
+  "publication_count": 671,
+  "last_publication_unix_ns": 1794962149595219113,
+  "heartbeat_unix_ns": 1794962152847103026
+}

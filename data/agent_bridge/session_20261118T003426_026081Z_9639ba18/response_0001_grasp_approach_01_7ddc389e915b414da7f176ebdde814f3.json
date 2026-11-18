@@ -1,0 +1,39 @@
+{
+  "request_id": "grasp_approach_01_7ddc389e915b414da7f176ebdde814f3",
+  "session_id": "1a36521926a247be8e027746929af959",
+  "status": "previewed",
+  "plan": {
+    "action": "arm_step",
+    "preset": "tx+",
+    "target_O_T_EE": [
+      [
+        0.9999998433191124,
+        0.0005333368896820815,
+        0.0001700397419252256,
+        0.3171179401872171
+      ],
+      [
+        0.0005332613079898178,
+        -0.9999997591459266,
+        0.00044423019525652546,
+        0.0002001649932726195
+      ],
+      [
+        0.00017027662532110213,
+        -0.0004441394500389685,
+        -0.9999998868730039,
+        0.4870622917655311
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "translation_m": 0.01
+  },
+  "hardware_command_sent": false,
+  "joint_trajectory_validated": false,
+  "safety_scope": "EE/flange point guards and runtime monitoring; no full-body collision planner"
+}

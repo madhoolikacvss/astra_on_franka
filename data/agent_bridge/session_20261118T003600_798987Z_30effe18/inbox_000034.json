@@ -1,0 +1,4 @@
+{
+  "received_unix_ns": 1794962838420042795,
+  "bytes_utf8": "{\"schema_version\": 1, \"request_id\": \"grasp_approach_9eb41de564654574bddce508084f3f4a\", \"session_id\": \"bedc6662e5244e1e93f339be0d148abe\", \"observation_id\": \"a5b818feef914e73857ef933053e38a1\", \"action\": \"arm_step\", \"arguments\": {\"preset\": \"tz-\", \"translation_m\": 0.01}}"
+}
