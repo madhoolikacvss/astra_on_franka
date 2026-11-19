@@ -8,7 +8,12 @@ grasp, then lift vertically until the cube bottom is at least 50 mm above the
 tabletop. The former 5 cm approach gap is only an alignment checkpoint. Verify
 that the cube rises with the fingers using fresh views; EE displacement alone
 is not proof. Start the lift with 5 mm, then use observed 5-10 mm upward steps.
-Stop at the goal and report evidence. Placing and releasing are not authorized.
+Stop at the goal and report evidence. Keep trying after task-level misses
+(completed commands but no successful grasp/lift): use fresh views, reopen only
+when the cube is supported on the board, adjust alignment and try again. No
+fixed attempt count applies. Failed/rejected commands, controller faults and
+stale observations still stop motion; never bypass them. Placing and releasing
+a suspended cube are not authorized.
 
 All existing speed, spatial boundaries, freshness, per-command and fault-stop
 constraints remain unchanged. Never touch the tabletop. Gripper targets use

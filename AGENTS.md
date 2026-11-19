@@ -30,6 +30,13 @@ the cube, followed by an observed upward lift. Tool contact with the tabletop,
 lateral transport after grasping, and placing/releasing are not authorized.
 The human supervises and starts/stops the service.
 
+Persistence is part of the task: keep making observed attempts until the cube
+is held at least 50 mm above the tabletop, the operator stops, or a controller/
+observation safety condition requires stopping. A missed grasp or empty lift
+after successfully completed commands is not a reason to end the task. No
+fixed attempt count applies. Distinguish a task-level miss from a command whose
+response is failed/rejected or a latched controller fault; those still stop motion.
+
 ### Operator setup
 
 `latest.json.motion_authorized` is informational and is ALWAYS false in the
@@ -103,9 +110,30 @@ of motion. Stop the service with Ctrl-C when finished.
    physical workspace guards still apply. Do not change files, limits or restart
    to bypass a rejection. Do not stop solely because reaching the objective
    requires descent or a change of orientation.
-7. Reject/fail/controller fault, stale camera or arm/gripper data, unexpected
+7. A rejected/failed command or controller fault, stale camera or arm/gripper data, unexpected
    movement, or operator stop ends motion. Do not retry a failed command or
    replan around a guard. Report achieved displacement and remaining uncertainty.
+
+### Reattempts after a missed grasp
+
+- If commands completed but the cube remains on the board, inspect all fresh
+  views and determine its current position. Do not reuse the pre-contact tag
+  position as if it were current; an attempt can shift the cube.
+- With the bridge ready and error-free and the cube visibly supported on the
+  board, open the fingers incrementally, withdraw along a visibly clear path
+  if needed, adjust alignment/orientation, then approach and grasp again.
+  Keep all existing step, speed, workspace, tabletop-clearance and current limits.
+- Use evidence from the miss to change the next attempt. Do not repeat an
+  identical unsuccessful sequence blindly or increase force to overcome a miss.
+  No additional operator permission is needed for an ordinary task-level retry.
+- If a slip occurs, stop the current lift and reassess. Retry only once fresh
+  views establish that the cube is resting on the board and the path is clear.
+  Do not open over an unsupported cube or chase a falling object. If the cube's
+  support, location or clearance is unclear, pause for observation/operator help.
+- Continue the attempt/observe/adjust loop while those conditions hold. A
+  missing tag alone does not end the loop. A failed/rejected command, latched
+  fault or invalid/stale observation still does; do not restart the service,
+  clear faults, reuse request IDs or bypass safeguards to continue.
 
 ### Grasping the cube
 
@@ -146,8 +174,10 @@ of motion. Stop the service with Ctrl-C when finished.
   held. Tag loss alone does not stop the task if fresh views show this clearly.
 - Continue checking workspace bounds and clearance for the fingers, camera and
   carried cube. Current point guards do not check the carried cube's volume.
-  Stop further movement if the cube slips, remains on the board, or its retention
-  or path becomes unclear. Do not automatically squeeze harder or retry a grasp.
+  If the cube remains on the board after a completed lift command, follow the
+  reattempt procedure rather than ending the task. If it slips or retention/path
+  becomes unclear, stop the lift and reassess as above. Do not squeeze harder
+  automatically or bypass a fault to retry.
 - Once the cube is visibly held at least approximately 50 mm above the tabletop,
   stop sending movement commands and report the estimated clearance and evidence.
   If the estimate cannot establish that threshold, report completion as unverified.
