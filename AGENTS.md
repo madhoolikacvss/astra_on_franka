@@ -32,6 +32,19 @@ The human supervises and starts/stops the service.
 
 ### Operator setup
 
+`latest.json.motion_authorized` is informational and is ALWAYS false in the
+current bridge, including successful live-execute sessions. It means that an
+observation cannot itself grant motion permission. It is NOT an execution gate
+or readiness flag. Do not wait for it to become true, ask the operator to change
+it, or refuse a command solely because it is false.
+
+For this authorized task, require mode=live-execute, matching current session IDs,
+fresh observations/heartbeat, busy=false, fault=null, observation_error=null,
+observations_stable=true and ready_for_command=true. Then submit one permitted
+command through the bridge; its operator gates and command filter remain the
+authority on execution. Read response.json for the actual outcome. Never edit
+the observation file or bypass a rejection. A live-preview session cannot move.
+
 Use the Linux workspace `/home/madhoolika/workspace/astra_on_franka` and conda
 `reset`. Stop competing hardware owners and reset controller/command.json to
 `{}` before starting a new service. Preview with:
