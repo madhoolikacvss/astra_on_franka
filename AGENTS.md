@@ -188,6 +188,23 @@ of motion. Stop the service with Ctrl-C when finished.
 
 ### Occlusion is not a sensor fault
 
+The top-down camera covers the full board, but the arm can obscure the cube.
+The side and wrist cameras cover only portions of the board; a full-board view
+in all three cameras is neither expected nor required. The operator confirms
+the cube is visible in the side view at the initial, undisturbed state. Inspect
+that view to establish visual context; this does not guarantee later visibility.
+
+When the top-down view is blocked, combine whichever fresh views show the cube
+or relevant landmarks with the last observed cube position and known arm motion.
+Use that estimate to choose small bounded approach or viewpoint-adjustment
+steps, observe their effect, and revise the estimate. Different directions and
+rotations may be tried when their swept tool path is visibly clear. Do not end
+the attempt merely because a camera sees only part of the board or the cube is
+absent from one view. Estimates are not verified current tag measurements.
+If all views leave the cube/contact region uncertain, use only a clearly safe
+viewpoint adjustment or pause for a clearer view; do not descend blindly into
+contact. Existing bounds, speed limits and fault/freshness stops still apply.
+
 A missing AprilTag detection alone does not make observations invalid and does
 not end the task. Inspect the other fresh views; the cube may still be visible.
 Use its visible appearance and the last known location to infer a next small
@@ -207,9 +224,11 @@ is allowed only when its path is visibly clear and all controller guards pass.
 
 ### Recordings and limits
 
-Each live session saves `data/agent_bridge/session_<timestamp>_<id>/side_view.mp4`
-and `side_video_frames.jsonl` in that same session directory. Video uses
-existing side RGB observations resampled to 10 fps, not every native 30 fps frame.
+Each live session saves `top_down_view.mp4`, `wrist_view.mp4`, and `side_view.mp4`
+under `data/agent_bridge/session_<timestamp>_<id>/`. Each has a corresponding
+`<view>_video_frames.jsonl` and `<view>_video_summary.json`. Observation metadata
+contains `video_files` for all three views; `side_video_file` remains compatible.
+Video uses existing RGB observations resampled to 10 fps, not every native 30 fps frame.
 Repeated frames and source ages are logged; a frozen video image is not fresh
 sensor evidence. The MP4 is finalized on normal shutdown; use JPGs for live
 agent perception. The five-frame-set JPG/NPZ buffer remains bounded, while the

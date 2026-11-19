@@ -1,11 +1,14 @@
-"""Bounded-memory side-view video recorder using the existing camera feed."""
+"""Bounded-memory per-camera video recorder using the existing camera feed."""
 import json
 import threading
 import time
 
 
 class SessionVideo:
-    def __init__(self,run,fps=10.):
+    def __init__(self,run,fps=10.,*,view="side"):
+        if view not in ("side", "top_down", "wrist"):
+            raise ValueError("Unknown video camera view")
+        self.view=view;self.video_file=f"{view}_view.mp4"
         self.run=run;self.fps=fps;self.latest=None;self.error=None;self.frames=0
         self.done=threading.Event();self.thread=threading.Thread(target=self.work,daemon=True)
         self.thread.start()
@@ -19,15 +22,15 @@ class SessionVideo:
         try:
             import cv2
             import numpy as np
-            with (self.run/'side_video_frames.jsonl').open('x') as log:
+            with (self.run/f'{self.view}_video_frames.jsonl').open('x') as log:
                 while not self.done.is_set():
                     frame=self.latest
                     if frame is None:self.done.wait(.01);continue
                     now=time.monotonic()
                     if start is None:
                         start=now;h,w=frame[0].shape[:2]
-                        writer=cv2.VideoWriter(str(self.run/'side_view.mp4'),cv2.VideoWriter_fourcc(*'mp4v'),self.fps,(w,h))
-                        if not writer.isOpened():raise RuntimeError('Cannot open side_view.mp4 encoder (mp4v)')
+                        writer=cv2.VideoWriter(str(self.run/self.video_file),cv2.VideoWriter_fourcc(*'mp4v'),self.fps,(w,h))
+                        if not writer.isOpened():raise RuntimeError(f'Cannot open {self.video_file} encoder (mp4v)')
                     delay=start+self.frames/self.fps-now
                     if delay>0:self.done.wait(min(delay,.1));continue
                     repeated=frame[2]==last_source;repeats+=int(repeated)
@@ -39,12 +42,12 @@ class SessionVideo:
         except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
         finally:
             if writer is not None:writer.release()
-            with (self.run/'side_video_summary.json').open('w') as f:
-                json.dump({'file':'side_view.mp4','fps':self.fps,'frames':self.frames,
+            with (self.run/f'{self.view}_video_summary.json').open('w') as f:
+                json.dump({'view':self.view,'file':self.video_file,'fps':self.fps,'frames':self.frames,
                     'repeated_frames':repeats,'error':self.error,
-                    'source':'Side RGB frames sampled by existing bridge, resampled to 10 fps; not all 30 fps camera frames'},f,indent=2)
+                    'source':f'{self.view} RGB frames sampled by existing bridge, resampled to {self.fps:g} fps; not all native camera frames'},f,indent=2)
 
     def close(self):
         self.done.set();self.thread.join(10)
-        if self.thread.is_alive():raise RuntimeError('Side video writer did not stop')
+        if self.thread.is_alive():raise RuntimeError(f'{self.view} video writer did not stop')
         if self.error:raise RuntimeError(self.error)

@@ -1,5 +1,22 @@
 # astra_on_franka
 
+## Camera coverage and session video
+
+Top-down covers the board but may be blocked by the arm. Side and wrist views
+cover only part of the board. The side view initially shows the cube according
+to the operator; use fresh partial views, landmarks and observed arm motion to
+estimate the next small step when a tag/view is occluded. Full visibility in all
+views is not required. Follow AGENTS.md for clearance and uncertainty handling.
+
+Each new live session records top_down_view.mp4, wrist_view.mp4 and side_view.mp4
+in data/agent_bridge/session_<timestamp>_<id>/. Each view has its own
+<view>_video_frames.jsonl timing log and <view>_video_summary.json. Video samples
+the existing RGB feed at 10 fps, with repeated-source frames explicitly logged;
+it is not full-rate native camera capture. Use the live JPG observations for
+control. Normal shutdown finalizes all videos. The five-image-set buffer stays
+bounded; videos grow with session duration and three feeds use more disk/CPU.
+Support any held cube before shutdown, since gripper torque is disabled.
+
 ## Current supervised task: pick the cube up 5 cm
 
 Follow [AGENTS.md](AGENTS.md) for the operating-agent handoff. Approach and align

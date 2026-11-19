@@ -125,19 +125,21 @@ class Cameras:
         import cv2
         config=yaml.safe_load((ROOT/'config/cameras.yaml').read_text())
         cube=yaml.safe_load((ROOT/'config/cube.yaml').read_text())
-        rig=None;video=None;last_seen_cube=None
+        rig=None;videos={};last_seen_cube=None
         try:
             tracker=CubeTracker(cube);settings=StreamSettings(**config['stream'])
             self.stale_after_s=settings.stale_after_s
             (self.run/'frames').mkdir()
-            video=SessionVideo(self.run)
+            for name in ("top_down", "wrist", "side"):
+                videos[name]=SessionVideo(self.run,view=name)
             with CameraRig({k:v['serial'] for k,v in config['cameras'].items()},settings) as rig:
                 index=0
                 while not self.done.is_set():
                     self.mark_stage('capture_wait')
                     capture=rig.read();frames=capture['cameras']
-                    if video.error:raise RuntimeError(video.error)
-                    video.submit(frames['side'])
+                    for name,video in videos.items():
+                        if video.error:raise RuntimeError(f'{name} video: {video.error}')
+                        video.submit(frames[name])
                     self.mark_stage('tag_tracking')
                     processing_started=time.monotonic_ns()
                     result,preview=tracker.process(frames[cube['camera']],max_age_s=settings.stale_after_s)
@@ -171,6 +173,7 @@ class Cameras:
                             'save_ms':(published-save_started)/1e6,
                             'oldest_age_at_publication_ms':(published-oldest)/1e6}
                     self.latest={'cameras':saved,'cube':result,'oldest_receipt_ns':oldest,
+                                 'video_files':{name:str((self.run/video.video_file).relative_to(ROOT)) for name,video in videos.items()},
                                  'cube_context':cube_context,'side_video_file':str((self.run/'side_view.mp4').relative_to(ROOT)),
                                  'camera_publication':timing,'retained_camera_frame_sets':5}
                     # Publish complete new files before removing the oldest set.
@@ -186,9 +189,10 @@ class Cameras:
                     index+=1;self.done.wait(.01)
         except Exception as exc:self.error=f'{type(exc).__name__}: {exc}'
         finally:
-            if video is not None:
+            for video in videos.values():video.done.set()
+            for name,video in videos.items():
                 try:video.close()
-                except Exception as exc:self.error=self.error or str(exc)
+                except Exception as exc:self.error=self.error or f"{name} video: {exc}"
             if rig is not None:write_json(self.run/'camera_diagnostics.json',rig.diagnostics())
 
     def snapshot(self):
